@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
+import Menu from "./components/Menu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,20 +17,18 @@ export const metadata: Metadata = {
   title: "Reflow Profile System",
 };
 
-export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <header>
-        <Header />
-      </header>
+      <head>
 
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <Menu />
+        <main>{children}</main>
+        <footer className="fixed">Footer content</footer>
       </body>
-
-      <footer className="fixed">
-        
-      </footer>
-    </html >
+    </html>
   );
 }
+
