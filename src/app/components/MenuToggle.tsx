@@ -49,32 +49,38 @@ const MenuToggle = () => {
         <>
             {/* Button */}
             {!isMenuOpen && (
-                    <motion.div
-                        className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3"
-                        whileTap={{ scale: 0.9 }}
-                        drag
-                        dragConstraints={dragBounds}
-                        dragElastic={0.2}
-                        style={{ x: position.x, y: position.y }}
-                        onDragEnd={(e, info) => {
-                            setPosition({ x: info.point.x, y: info.point.y });
-                        }}
-                    >
-                        <div className="flex flex-col size-[62px] justify-start items-start z-10 animate-bounce">
-                            <div className="fixed flex flex-col size-[62px] bg-black/70 blur-[4] rounded-2xl justify-center items-center mr-[3px] mt-[2px] ml-[2px] cursor-pointer z-10 drop-shadow-2xl "></div>
-                            <div
-                                className="fixed flex flex-col size-15 bg-white blur-[4] rounded-2xl justify-center items-center mr-[2px] cursor-pointer z-20"
-                                onClick={() => setIsMenuOpen(true)}
-                            >
-                                <Image
-                                    src="/images/LOGO3.png"
-                                    alt="Menu Image"
-                                    width={50}
-                                    height={50}
-                                />
-                            </div>
+                <motion.div
+                    className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3"
+                    whileTap={{ scale: 0.9 }}
+                    drag
+                    dragConstraints={dragBounds}
+                    dragElastic={0.2}
+                    style={{ x: position.x, y: position.y }}
+                    onDragEnd={(e, info) => {
+                        setPosition({ x: info.point.x, y: info.point.y });
+                    }}
+                >
+                    <div className="flex flex-col size-[62px] justify-start items-start z-10 animate-bounce ">
+                        <div className="fixed flex flex-col size-[62px] bg-black/70 blur-[4] rounded-2xl justify-center items-center mr-[3px] mt-[2px] ml-[2px] cursor-pointer z-10 drop-shadow-2xl "></div>
+                        <div
+                            className="fixed flex flex-col size-15 bg-white blur-[4] rounded-2xl justify-center items-center mr-[2px] cursor-pointer z-20 "
+                            onClick={() => setIsMenuOpen(true)}
+                        >
+                            <Image
+                                src="/images/LOGO3.png"
+                                alt="Menu Image"
+                                width={50}
+                                height={50}
+                            />
                         </div>
-                    </motion.div>
+                        <span className="relative inline-flex size-3 rounded-full bg-blue-800 z-40">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-700 opacity-75 z-50">
+                            </span>
+                        </span>
+
+
+                    </div>
+                </motion.div>
             )}
 
             {/* MENU */}
