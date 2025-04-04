@@ -73,8 +73,8 @@ const MenuToggle = () => {
                                 height={50}
                             />
                         </div>
-                        <span className="relative inline-flex size-3 rounded-full bg-blue-800 z-40">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-700 opacity-75 z-50">
+                        <span className="relative top-0 left-12 inline-flex size-3 rounded-full bg-blue-800 z-40">
+                            <span className="absolute inline-flex size-3 h-full w-full animate-ping rounded-full bg-sky-700 opacity-75 z-50">
                             </span>
                         </span>
 
