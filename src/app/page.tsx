@@ -21,7 +21,7 @@ const Home = () => {
           <input type="text" className="col-span-1 px-2 py-1 border rounded" placeholder="Enter Model" />
 
         </div>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col w-full justify-center items-center">
           <button type="button" className="bg-indigo-500 ..." disabled>
             <svg className="mr-3 size-5 animate-spin ..." viewBox="0 0 24 24">
               !-- ... --
