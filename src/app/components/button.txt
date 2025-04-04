@@ -1,2 +1,18 @@
-https://blog.payrollschedule.net/
-https://th.pngtree.com/freepng/scan-icon-png-download_5458368.html
+ปุ่ม canpro
+import { GoAlertFill } from "react-icons/go"; 
+<GoAlertFill />
+
+import { GoSkipFill } from "react-icons/go";
+<GoSkipFill />
+
+dashboard
+import { BsClipboard2DataFill } from "react-icons/bs";
+<BsClipboard2DataFill />
+
+
+scan
+import { BsUpcScan } from "react-icons/bs";
+<BsUpcScan />
+
+import { GoCheckCircle } from "react-icons/go";
+<GoCheckCircle />
