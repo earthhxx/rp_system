@@ -49,9 +49,8 @@ const MenuToggle = () => {
         <>
             {/* Button */}
             {!isMenuOpen && (
-                <div className="fixed flex flex-col w-full justify-center items-center bg-amber-300">
                     <motion.div
-                        className="fixed h-fit w-fit justify-center items-center pb-8 pt-5"
+                        className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3"
                         whileTap={{ scale: 0.9 }}
                         drag
                         dragConstraints={dragBounds}
@@ -76,7 +75,6 @@ const MenuToggle = () => {
                             </div>
                         </div>
                     </motion.div>
-                </div>
             )}
 
             {/* MENU */}
