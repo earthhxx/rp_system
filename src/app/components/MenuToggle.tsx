@@ -50,7 +50,7 @@ const MenuToggle = () => {
             {/* Button */}
             {!isMenuOpen && (
                 <motion.div
-                    className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3"
+                    className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3 z-90"
                     whileTap={{ scale: 0.9 }}
                     drag
                     dragConstraints={dragBounds}
@@ -86,10 +86,7 @@ const MenuToggle = () => {
             {/* MENU */}
             {isMenuOpen && (
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-10 bg-black/20 backdrop-blur-sm">
-                    <div
-                        ref={menuRef}
-                        className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
-                    >
+                    <div ref={menuRef} className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
                         <div className="flex w-full h-full"></div>
                         <div className="flex flex-col justify-center items-center w-full h-full">
                             <GoCheckCircle className="size-30" />
