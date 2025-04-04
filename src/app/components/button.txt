@@ -1,4 +1,4 @@
-ปุ่ม canpro
+ปุ่ม cancel
 import { GoAlertFill } from "react-icons/go"; 
 <GoAlertFill />
 
