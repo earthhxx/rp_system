@@ -12,11 +12,13 @@ const Home = () => {
   const [submitStage, setSubmitStage] = useState<SubmitStage>("idle");
 
   let buttonClass = "";
+  let buttonClassL = "";
   let buttonContent = null;
 
   switch (submitStage) {
     case "idle":
       buttonClass = "bg-blue-50 text-blue-800";
+      buttonClassL = "bg-sky-100"
       buttonContent = (
         <>
           <div className="flex w-full h-full justify-center items-center">
@@ -28,7 +30,8 @@ const Home = () => {
       );
       break;
     case "waiting":
-      buttonClass = "bg-red-500 text-black";
+      buttonClass = "bg-yellow-500 text-black";
+      buttonClassL = "bg-yellow-100/50"
       buttonContent = (
         <>
           <svg
@@ -57,6 +60,7 @@ const Home = () => {
       break;
     case "CHECKED":
       buttonClass = "flex w-full h-full bg-blue-800 text-white";
+      buttonClassL = "bg-blue-700/40"
       buttonContent = (
         <>
           <span className="relative" >
@@ -97,7 +101,7 @@ const Home = () => {
         {/* Header */}
         <div className="fixed top-100 flex h-100 w-full bg-blue-800/40 backdrop-blur-sm drop-shadow-2xl items-center justify-center">
           {/* box1 */}
-          <div className="flex flex-col max-h-full w-2/4 justify-center items-center">
+          <div className={`flex flex-col max-h-full w-2/4 justify-center items-center${buttonClassL}`}>
             {/* row1 */}
             <div className="flex w-full justify-center items-center">
               <div className="flex text-xl justify-center items-center">
