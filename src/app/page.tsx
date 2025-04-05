@@ -93,11 +93,11 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {/* Header */}
-      <div className="flex h-20 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center px-8">
+      <div className="flex h-20 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center ps-8">
         {/* box1 */}
         <div className="flex flex-col h-32 w-2/4 justify-center items-center">
           <div className="flex w-full">
-            <div className="flex items-center space-x-4 w-3/5">
+            <div className="flex items-center w-3/5">
               <label className="text-white w-24">MODEL :</label>
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
@@ -105,11 +105,11 @@ const Home = () => {
             </div>
           </div>
           <div className="flex w-full">
-            <div className="flex items-center space-x-4 w-3/5">
+            <div className="flex items-center w-3/5">
               <label className="text-white w-24">LINE :</label>
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
-            <div className="flex items-center space-x-4 w-3/5">
+            <div className="flex items-center w-3/5">
               <label className="text-white w-24">PRODUCT :</label>
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
@@ -120,7 +120,7 @@ const Home = () => {
           <button
             onClick={() => setIsCardOpen(true)}
             type="button"
-            className={`flex items-center px-4 py-2 rounded-md shadow transition-all duration-300 ${buttonClass}`}
+            className={`flex w-full h-full items-center px-4 py-2 rounded-md shadow transition-all duration-300 ${buttonClass}`}
           >
             {buttonContent}
           </button>
@@ -182,7 +182,7 @@ const Home = () => {
           alt="Menu Image"
           width={819}
           height={1093}
-          className="object-contain w-full h-full"
+          className="w-full h-full"
         />
       </div>
     </div>
