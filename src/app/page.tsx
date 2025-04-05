@@ -16,11 +16,13 @@ const Home = () => {
 
   switch (submitStage) {
     case "idle":
-      buttonClass = "bg-indigo-500 text-white";
+      buttonClass = "bg-blue-50 text-blue-800";
       buttonContent = (
         <>
+        <div className="flex justify-center">
           <div className="w-full h-full animate-pulse">
             NONE
+          </div>
           </div>
         </>
       );
@@ -54,12 +56,12 @@ const Home = () => {
       );
       break;
     case "CHECKED":
-      buttonClass = "flex size-36 mr-2 w-5 h-5 bg-green-600 text-white";
+      buttonClass = "flex w-full h-full bg-blue-800 text-white";
       buttonContent = (
         <>
-          <span className="relative size-15" >
-            <span className="absolute inline-flex animate-ping rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+          <span className="relative" >
+            <span className="absolute inline-flex animate-ping rounded-full bg-blue-800 opacity-75"></span>
+            <span className="relative inline-flex size-3 rounded-full bg-blue-800"></span>
           </span>
         </>
       );
@@ -93,13 +95,13 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {/* Header */}
-      <div className="flex h-22 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center ps-8">
+      <div className="flex h-22 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
         {/* box1 */}
         <div className="flex flex-col max-h-full w-2/4 justify-center items-center">
           {/* row1 */}
           <div className="flex w-full justify-center items-center">
             <div className="flex text-xl justify-center items-center">
-              <div className="text-white font-bold">01239129380</div>
+              <div className="text-white font-bold">2312313131231231231123123</div>
             </div>
 
 
@@ -111,11 +113,11 @@ const Home = () => {
           </div>
         </div>
         {/* box2 */}
-        <div className="flex h-20 w-2/4 items-center justify-center">
+        <div className="flex h-full w-2/4 items-center justify-center">
           <button
             onClick={() => setIsCardOpen(true)}
             type="button"
-            className={`flex w-full h-full items-center px-4 py-2 rounded-md shadow transition-all duration-300 ${buttonClass}`}
+            className={`flex w-full h-full items-center px-4 py-2 shadow transition-all duration-300 ${buttonClass}`}
           >
             {buttonContent}
           </button>
