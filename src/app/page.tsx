@@ -35,7 +35,7 @@ const Home = () => {
       buttonContent = (
         <>
           <svg
-            className="size-30 mr-2 animate-spin text-white"
+            className="size-24 animate-spin text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -54,7 +54,7 @@ const Home = () => {
               d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
             />
           </svg>
-          <div className=" w-70 text-center font-bold">Waiting for check... </div>
+          <div className=" w-62 text-center font-bold">Waiting for check... </div>
         </>
       );
       break;
@@ -99,9 +99,9 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
         {/* Header */}
-        <div className={`fixed top-100 flex h-100 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+        <div className={`fixed top-120 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
           {/* box1 */}
-          <div className="flex flex-col max-h-full w-2/4 justify-center items-center">
+          <div className="flex flex-col max-h-full w-full justify-center items-center">
             {/* row1 */}
             <div className="flex w-full justify-center items-center">
               <div className="flex text-xl justify-center items-center">
@@ -111,15 +111,15 @@ const Home = () => {
             {/* row2 */}
             <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
               <div className="text-white w-40 font-bold">SMT-1</div>
-              <div className="text-white w-60 font-bold">CYN-1231213123-DAS-DK</div>
+              <div className="text-white w-80 font-bold">CYN-1231213123-DAS-DK</div>
             </div>
           </div>
           {/* box2 */}
-          <div className="flex h-full w-2/4 items-center justify-center">
+          <div className="flex h-full w-120 items-center justify-center">
             <button
               onClick={() => setIsCardOpen(true)}
               type="button"
-              className={`flex w-full h-full justify-center items-center px-4 py-2 shadow transition-all duration-300 ${buttonClass}`}
+              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
             >
               {buttonContent}
             </button>
