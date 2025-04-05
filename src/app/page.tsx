@@ -4,11 +4,71 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
 import { GoCheckCircle, GoSkipFill } from "react-icons/go";
 
+
 const Home = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   type SubmitStage = "idle" | "waiting" | "CHECKED";
   const [submitStage, setSubmitStage] = useState<SubmitStage>("idle");
+
+  let buttonClass = "";
+  let buttonContent = null;
+
+  switch (submitStage) {
+    case "idle":
+      buttonClass = "bg-indigo-500 text-white";
+      buttonContent = (
+        <>
+          <svg className="animate-pulse">
+            NONE
+          </svg>
+        </>
+      );
+      break;
+    case "waiting":
+      buttonClass = "bg-red-500 text-black";
+      buttonContent = (
+        <>
+          <svg
+            className="mr-2 w-5 h-5 animate-spin text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+            />
+          </svg>
+          Waiting for CHECK...
+        </>
+      );
+      break;
+    case "CHECKED":
+      buttonClass = "bg-green-600 text-white";
+      buttonContent = (
+        <>
+        <svg className="animate-bounce">
+          <circle className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75">
+          </circle>
+          <circle className="relative inline-flex size-3 rounded-full bg-green-500">
+          </circle>
+        CHECKED
+        </svg>
+        </>
+      );
+      break;
+  }
+
 
 
   useEffect(() => {
@@ -61,43 +121,11 @@ const Home = () => {
           <button
             onClick={() => setIsCardOpen(true)}
             type="button"
-            className={`flex items-center px-4 py-2 rounded-md shadow transition-all duration-300 ${submitStage === "idle"
-                ? "bg-indigo-500 text-white"
-                : submitStage === "waiting"
-                  ? "bg-yellow-500 text-black"
-                  : "bg-green-600 text-white"
-              }`}
+            className={`flex items-center px-4 py-2 rounded-md shadow transition-all duration-300 ${buttonClass}`}
           >
-            {submitStage === "idle" && (
-              <>
-                <svg
-                  className="mr-2 w-5 h-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-                  />
-                </svg>
-                Processing…
-              </>
-            )}
-
-            {submitStage === "waiting" && "Waiting for Confirm..."}
-
-            {submitStage === "CHECKED" && "Submitted ✔"}
+            {buttonContent}
           </button>
+
         </div>
 
       </div>
@@ -119,9 +147,9 @@ const Home = () => {
                   console.log("Submit2");
                 }
                 else {
-                  Home(refresh)
+                  window.location.reload();
                 }
-                
+
               }}
               className="flex flex-col justify-center items-center w-full h-full">
 
