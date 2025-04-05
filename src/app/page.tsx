@@ -19,7 +19,7 @@ const Home = () => {
       buttonClass = "bg-indigo-500 text-white";
       buttonContent = (
         <>
-          <div className="flex mr-2 size-36 animate-pulse">
+          <div className="w-full h-full animate-pulse">
             NONE
           </div>
         </>
@@ -107,7 +107,7 @@ const Home = () => {
           {/* row2 */}
           <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
             <div className="text-white w-40 mr-4 font-bold">SMT-1</div>
-            <div className="text-white w-full font-bold">CYN-1231213123-DASDK</div>
+            <div className="text-white w-full font-bold">CYN-1231213123-DAS-DK</div>
           </div>
         </div>
         {/* box2 */}
