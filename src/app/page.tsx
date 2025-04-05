@@ -99,9 +99,9 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
         {/* Header */}
-        <div className="fixed top-100 flex h-100 w-full bg-blue-800/40 backdrop-blur-sm drop-shadow-2xl items-center justify-center">
+        <div className={`fixed top-100 flex h-100 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
           {/* box1 */}
-          <div className={`flex flex-col max-h-full w-2/4 justify-center items-center${buttonClassL}`}>
+          <div className="flex flex-col max-h-full w-2/4 justify-center items-center">
             {/* row1 */}
             <div className="flex w-full justify-center items-center">
               <div className="flex text-xl justify-center items-center">
