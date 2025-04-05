@@ -19,9 +19,9 @@ const Home = () => {
       buttonClass = "bg-indigo-500 text-white";
       buttonContent = (
         <>
-          <svg className="animate-pulse">
+          <div className="flex mr-2 size-36 animate-pulse">
             NONE
-          </svg>
+          </div>
         </>
       );
       break;
@@ -54,16 +54,13 @@ const Home = () => {
       );
       break;
     case "CHECKED":
-      buttonClass = "bg-green-600 text-white";
+      buttonClass = "flex size-36 mr-2 w-5 h-5 bg-green-600 text-white";
       buttonContent = (
         <>
-        <svg className="animate-bounce">
-          <circle className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75">
-          </circle>
-          <circle className="relative inline-flex size-3 rounded-full bg-green-500">
-          </circle>
-        CHECKED
-        </svg>
+          <span className="relative size-15" >
+            <span className="absolute inline-flex animate-ping rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+          </span>
         </>
       );
       break;
@@ -96,11 +93,12 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {/* Header */}
-      <div className="flex h-32 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center px-8">
-        <div className="flex flex-col h-32 w-full justify-center items-center">
+      <div className="flex h-20 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center px-8">
+        {/* box1 */}
+        <div className="flex flex-col h-32 w-2/4 justify-center items-center">
           <div className="flex w-full">
             <div className="flex items-center space-x-4 w-3/5">
-              <label className="text-white w-24">PRODUCT :</label>
+              <label className="text-white w-24">MODEL :</label>
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
             <div className="w-2/5 flex justify-end">
@@ -112,12 +110,13 @@ const Home = () => {
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
             <div className="flex items-center space-x-4 w-3/5">
-              <label className="text-white w-24">MODEL :</label>
+              <label className="text-white w-24">PRODUCT :</label>
               <input type="text" className="flex-grow p-2 rounded-md" />
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center">
+        {/* box2 */}
+        <div className="flex h-20 w-2/4 items-center justify-center">
           <button
             onClick={() => setIsCardOpen(true)}
             type="button"
