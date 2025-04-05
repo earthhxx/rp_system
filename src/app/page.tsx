@@ -93,26 +93,21 @@ const Home = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {/* Header */}
-      <div className="flex h-20 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center ps-8">
+      <div className="flex h-22 w-full bg-blue-800/60 backdrop-blur-lg drop-shadow-2xl items-center justify-center ps-8">
         {/* box1 */}
-        <div className="flex flex-col h-32 w-2/4 justify-center items-center">
-          <div className="flex w-full">
-            <div className="flex items-center w-3/5">
-              <label className="text-white w-24">MODEL :</label>
-              <input type="text" className="flex-grow p-2 rounded-md" />
+        <div className="flex flex-col max-h-full w-2/4 justify-center items-center">
+          {/* row1 */}
+          <div className="flex w-full justify-center items-center">
+            <div className="flex text-xl justify-center items-center">
+              <div className="text-white font-bold">01239129380</div>
             </div>
-            <div className="w-2/5 flex justify-end">
-            </div>
+
+
           </div>
-          <div className="flex w-full">
-            <div className="flex items-center w-3/5">
-              <label className="text-white w-24">LINE :</label>
-              <input type="text" className="flex-grow p-2 rounded-md" />
-            </div>
-            <div className="flex items-center w-3/5">
-              <label className="text-white w-24">PRODUCT :</label>
-              <input type="text" className="flex-grow p-2 rounded-md" />
-            </div>
+          {/* row2 */}
+          <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
+            <div className="text-white w-40 mr-4 font-bold">SMT-1</div>
+            <div className="text-white w-full font-bold">CYN-1231213123-DASDK</div>
           </div>
         </div>
         {/* box2 */}
