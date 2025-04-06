@@ -55,7 +55,7 @@ const Home = () => {
           <div className="flex justify-center items-center w-86 ps-4 pe-4">
             <svg
               className="w-24 h-24 m-2"
-              viewBox="0 0 52 52"
+              viewBox="0 0 56 56"
             >
               {/* วงกลม */}
               <circle
@@ -64,7 +64,7 @@ const Home = () => {
                 cy="26"
                 r="23"
                 fill="none"
-                stroke="#4CAF50"
+                stroke="#4ade80"
                 strokeWidth="4"
               />
 
@@ -72,15 +72,15 @@ const Home = () => {
               <path
                 className="check-mark"
                 fill="none"
-                stroke="#7ac142"
+                stroke="#4ade80"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M14 27 L22 35 L38 19"
               />
             </svg>
-            <div className="flex h-20 w-2"></div>
-            <p className="text-3xl font-bold text-green-600 backdrop-blur-md bg-white/30 px-4 py-2 rounded-xl shadow-xl">
+            <div className="flex h-10"></div>
+            <p className="text-5xl font-bold text-white backdrop-blur-md py-2 rounded-xl">
               Check
             </p>
           </div>
