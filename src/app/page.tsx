@@ -54,15 +54,15 @@ const Home = () => {
         <>
           <div className="flex justify-center items-center w-86 ps-4 pe-4">
             <svg
-              className="w-40 h-40"
+              className="w-24 h-24 m-2"
               viewBox="0 0 52 52"
             >
               {/* วงกลม */}
               <circle
-                className="check-circle"
+                className="check-circle "
                 cx="26"
                 cy="26"
-                r="25"
+                r="23"
                 fill="none"
                 stroke="#4CAF50"
                 strokeWidth="4"
@@ -80,7 +80,9 @@ const Home = () => {
               />
             </svg>
             <div className="flex h-20 w-2"></div>
-            <div className="ps-4 pe-4 font-bold text-green-500 text-[25px] stroke-black stroke-4 drop-shadow-2xl">CHECKED </div>
+            <p className="text-3xl font-bold text-green-600 backdrop-blur-md bg-white/30 px-4 py-2 rounded-xl shadow-xl">
+              Check
+            </p>
           </div>
         </>
       );
