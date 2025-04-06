@@ -5,12 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -23,4 +17,37 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.check-circle {
+  stroke-dasharray: 157;
+  stroke-dashoffset: 157;
+  animation: drawCircle 1s ease-out forwards;
+}
+
+.check-mark {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: drawCheck 0.5s ease-out forwards;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes drawCircle {
+  from {
+    stroke-dashoffset: 157;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawCheck {
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }

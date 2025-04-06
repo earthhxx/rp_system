@@ -8,65 +8,80 @@ import { GoCheckCircle, GoSkipFill } from "react-icons/go";
 const Home = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  type SubmitStage = "idle" | "waiting" | "CHECKED";
-  const [submitStage, setSubmitStage] = useState<SubmitStage>("idle");
+  type SubmitStage = "waiting" | "CHECKED";
+  const [submitStage, setSubmitStage] = useState<SubmitStage>("waiting");
 
   let buttonClass = "";
   let buttonClassL = "";
   let buttonContent = null;
 
   switch (submitStage) {
-    case "idle":
-      buttonClass = "bg-blue-50 text-blue-800";
-      buttonClassL = "bg-sky-100"
-      buttonContent = (
-        <>
-          <div className="flex w-full h-full justify-center items-center">
-            <div className="w-full h-full animate-pulse">
-              NONE
-            </div>
-          </div>
-        </>
-      );
-      break;
     case "waiting":
       buttonClass = "bg-yellow-500 text-black";
       buttonClassL = "bg-yellow-100/50"
       buttonContent = (
         <>
-          <svg
-            className="size-24 animate-spin text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-            />
-          </svg>
-          <div className=" w-62 text-center font-bold">Waiting for check... </div>
+          <div className="flex justify-center items-center w-86 ps-4 pe-4">
+            <svg
+              className="size-24 animate-spin text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+              />
+            </svg>
+            <div className="ps-4 pe-4 w-62 font-bold text-[25px]">Waiting for check... </div>
+          </div>
         </>
       );
       break;
     case "CHECKED":
-      buttonClass = "flex w-full h-full bg-blue-800 text-white";
-      buttonClassL = "bg-blue-700/40"
+      buttonClass = "bg-blue-800 text-black";
+      buttonClassL = "bg-blue-50/10"
       buttonContent = (
         <>
-          <span className="relative" >
-            <span className="absolute inline-flex animate-ping rounded-full bg-blue-800 opacity-75"></span>
-            <span className="relative inline-flex size-3 rounded-full bg-blue-800"></span>
-          </span>
+          <div className="flex justify-center items-center w-86 ps-4 pe-4">
+            <svg
+              className="w-40 h-40"
+              viewBox="0 0 52 52"
+            >
+              {/* วงกลม */}
+              <circle
+                className="check-circle"
+                cx="26"
+                cy="26"
+                r="25"
+                fill="none"
+                stroke="#4CAF50"
+                strokeWidth="4"
+              />
+
+              {/* เครื่องหมายถูก */}
+              <path
+                className="check-mark"
+                fill="none"
+                stroke="#7ac142"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14 27 L22 35 L38 19"
+              />
+            </svg>
+            <div className="flex h-20 w-2"></div>
+            <div className="ps-4 pe-4 font-bold text-green-500 text-[25px] stroke-black stroke-4 drop-shadow-2xl">CHECKED </div>
+          </div>
         </>
       );
       break;
@@ -98,50 +113,46 @@ const Home = () => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
-        {/* Header */}
-        <div className={`fixed top-120 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
-          {/* box1 */}
-          <div className="flex flex-col max-h-full w-full justify-center items-center">
-            {/* row1 */}
-            <div className="flex w-full justify-center items-center">
-              <div className="flex text-xl justify-center items-center">
-                <div className="text-white font-bold">2312313131231231231123123</div>
-              </div>
-            </div>
-            {/* row2 */}
-            <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
-              <div className="text-white w-40 font-bold">SMT-1</div>
-              <div className="text-white w-80 font-bold">CYN-1231213123-DAS-DK</div>
+      {/* Header */}
+      <div className={`fixed top-120 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+        {/* box1 */}
+        <div className="flex flex-col max-h-full w-full justify-center items-center">
+          {/* row1 */}
+          <div className="flex w-full justify-center items-center">
+            <div className="flex text-xl justify-center items-center">
+              <div className="text-white font-bold">2312313131231231231123123</div>
             </div>
           </div>
-          {/* box2 */}
-          <div className="flex h-full w-120 items-center justify-center">
-            <button
-              onClick={() => setIsCardOpen(true)}
-              type="button"
-              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
-            >
-              {buttonContent}
-            </button>
+          {/* row2 */}
+          <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
+            <div className="text-white w-40 font-bold">SMT-1</div>
+            <div className="text-white w-80 font-bold">CYN-1231213123-DAS-DK</div>
           </div>
         </div>
+        {/* box2 */}
+        <div className="flex h-full w-120 items-center justify-center">
+          <button
+            onClick={() => setIsCardOpen(true)}
+            type="button"
+            className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
+          >
+            {buttonContent}
+          </button>
+        </div>
+      </div>
 
 
       {/* CARD */}
       {isCardOpen && (
         <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
-          <div ref={cardRef} className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+          <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
             <div className="flex w-full h-full"></div>
             <div
               onClick={() => {
-                if (submitStage === "idle") {
-                  setSubmitStage("waiting");
-                  setIsCardOpen(false);
-                  console.log("Submit1");
-                } else if (submitStage === "waiting") {
+                if (submitStage === "waiting") {
                   setSubmitStage("CHECKED");
                   setIsCardOpen(false);
-                  console.log("Submit2");
+                  console.log("CHECKED");
                 }
                 else {
                   window.location.reload();
