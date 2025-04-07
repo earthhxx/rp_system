@@ -21,7 +21,8 @@ const checkreflowpage = () => {
       buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center">
-            <div className="flex justify-center items-center">
+            <div className="flex flex-col justify-center items-center">
+            <div className="ps-4 pe-4 font-bold text-[25px]">Measurement Profile</div>
               <svg
                 className="size-24 animate-spin text-white"
                 xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +43,9 @@ const checkreflowpage = () => {
                   d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
                 />
               </svg>
-              <div className="ps-4 pe-4 font-bold text-[25px]">Waiting for check... </div>
+              <div className="ps-4 pe-4 font-bold text-[25px]">..Please Waiting.. </div>
+              <div className="ps-4 pe-4 font-bold text-[25px]">..โปรดรอสักครู่.. </div>
+              <div className="ps-4 pe-4 font-bold text-[25px]">กระบวนการวัดโปรไฟล์ </div>
             </div>
             <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl">
 
@@ -127,20 +130,21 @@ const checkreflowpage = () => {
       {/* Header */}
       <div className={`fixed top-120 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
         {/* box1 */}
-        <div className="flex flex-col max-h-full w-full justify-center items-center">
+        <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
           {/* row1 */}
-          <div className="flex w-full justify-center items-center">
-            <div className="flex text-xl justify-center items-center">
-              <div className="flex text-white font-bold text-[40px]">SMT-13</div>
+          <div className="flex w-full justify-start items-center">
+            <div className="flex text-xl justify-start items-center">
+              <div className="flex text-white font-bold text-[25px]">SMT-13</div>
             </div>
           </div>
           {/* row2 */}
-          <div className="flex w-full mt-8 text-xl text-center justify-center items-center">
+          <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
             <div className="text-white font-bold text-[40px]">NPVV051DX1BM8BO</div>
           </div>
           {/* row3 */}
-          <div className="flex w-full mt-8 text-xl text-center justify-center items-center">
-            <div className="text-white font-bold text-[40px]">Pro No: 202504030036</div>
+          <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
+            <div className="font-roboto text-white font-bold text-[25px]">Production No:</div>
+            <div className="text-white font-roboto font-bold text-[25px]">202504030036</div>
           </div>
         </div>
         {/* box2 */}
