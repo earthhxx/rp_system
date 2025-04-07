@@ -16,8 +16,8 @@ const checkreflowpage = () => {
 
   switch (submitStage) {
     case "waiting":
-      buttonClass = "bg-yellow-500 text-black";
-      buttonClassL = "bg-yellow-100/50"
+      buttonClass = "bg-yellow-400 text-black";
+      buttonClassL = "bg-yellow-400/30"
       buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center w-86">
@@ -126,7 +126,7 @@ const checkreflowpage = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {/* Header */}
-      <div className={`fixed top-120 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+      <div className={`fixed top-100 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
         {/* box1 */}
         <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
           {/* row1 */}
