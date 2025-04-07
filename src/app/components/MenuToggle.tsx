@@ -4,8 +4,11 @@ import Image from "next/image";
 import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
+import { useRouter } from 'next/navigation';
 
 const MenuToggle = () => {
+    const router = useRouter();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
@@ -71,6 +74,7 @@ const MenuToggle = () => {
                                 alt="Menu Image"
                                 width={50}
                                 height={50}
+                                draggable={false}
                             />
                         </div>
                         <span className="relative top-0 left-12 inline-flex size-3 rounded-full bg-blue-800 z-40">
@@ -98,7 +102,7 @@ const MenuToggle = () => {
                             DASHBOARD
                         </div>
                         <div className="flex w-full h-full"></div>
-                        <div className="flex flex-col justify-center items-center w-full h-full">
+                        <div onClick={() => router.push('/Pages')} className="flex flex-col justify-center items-center w-full h-full">
                             <BsUpcScan className="size-30" />
                             SCAN PRODUCT
                         </div>

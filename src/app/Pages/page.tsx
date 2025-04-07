@@ -21,7 +21,8 @@ const checkreflowpage = () => {
       buttonClassL = "bg-yellow-100/50"
       buttonContent = (
         <>
-          <div className="flex justify-center items-center w-86 ps-4 pe-4">
+        <div className="flex flex-col justify-center items-center">
+        <div className="flex justify-center items-center">
             <svg
               className="size-24 animate-spin text-white"
               xmlns="http://www.w3.org/2000/svg"
@@ -42,8 +43,13 @@ const checkreflowpage = () => {
                 d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
               />
             </svg>
-            <div className="ps-4 pe-4 w-62 font-bold text-[25px]">Waiting for check... </div>
+            <div className="ps-4 pe-4 font-bold text-[25px]">Waiting for check... </div>
           </div>
+          <div className="w-full text-[25px] text-black backdrop-blur-md rounded-xl">
+              รอวัด Profile
+            </div>
+        </div>
+          
         </>
       );
       break;
@@ -52,37 +58,41 @@ const checkreflowpage = () => {
       buttonClassL = "bg-blue-50/10"
       buttonContent = (
         <>
-          <div className="flex justify-center items-center w-86 ps-4 pe-4">
-            <svg
-              className="w-24 h-24 m-2"
-              viewBox="0 0 56 56"
-            >
-              {/* วงกลม */}
-              <circle
-                className="check-circle "
-                cx="26"
-                cy="26"
-                r="23"
-                fill="none"
-                stroke="#4ade80"
-                strokeWidth="4"
-              />
+          <div className="flex flex-col justify-center items-center w-86 ps-4 pe-4">
+            <div className="flex items-center">
+              <svg
+                className="w-28 h-28"
+                viewBox="0 0 56 56"
+              >
+                {/* วงกลม */}
+                <circle
+                  className="check-circle "
+                  cx="26"
+                  cy="26"
+                  r="23"
+                  fill="none"
+                  stroke="#4ade80"
+                  strokeWidth="4"
+                />
 
-              {/* เครื่องหมายถูก */}
-              <path
-                className="check-mark"
-                fill="none"
-                stroke="#4ade80"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14 27 L22 35 L38 19"
-              />
-            </svg>
-            <div className="flex h-10"></div>
-            <p className="text-5xl font-bold text-white backdrop-blur-md py-2 rounded-xl">
-              Check
-            </p>
+                {/* เครื่องหมายถูก */}
+                <path
+                  className="check-mark"
+                  fill="none"
+                  stroke="#4ade80"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14 27 L22 35 L38 19"
+                />
+              </svg>
+              <p className="text-[25px] font-bold text-white backdrop-blur-md rounded-xl">
+                Already Checked
+              </p>
+            </div>
+            <div className="w-full text-[25px] text-white backdrop-blur-md rounded-xl">
+              วัดเสร็จเรียบร้อย
+            </div>
           </div>
         </>
       );
@@ -126,13 +136,13 @@ const checkreflowpage = () => {
             </div>
           </div>
           {/* row2 */}
-          <div className="flex w-full mt-2 text-xl text-center justify-center items-center pe-4 ps-4">
-            <div className="text-white w-40 font-bold">SMT-1</div>
-            <div className="text-white w-80 font-bold">CYN-1231213123-DAS-DK</div>
+          <div className="flex w-full mt-2 text-xl text-center justify-center items-center">
+            <div className="text-white font-bold">SMT-1</div>
+            <div className="flex text-white font-bold">CY841/CY822/CY840/CY824/CB</div>
           </div>
         </div>
         {/* box2 */}
-        <div className="flex h-full w-120 items-center justify-center">
+        <div className="flex h-full w-80 items-center justify-center">
           <button
             onClick={() => setIsCardOpen(true)}
             type="button"
