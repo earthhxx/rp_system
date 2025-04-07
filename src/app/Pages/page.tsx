@@ -20,9 +20,9 @@ const checkreflowpage = () => {
       buttonClassL = "bg-yellow-100/50"
       buttonContent = (
         <>
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col justify-center items-center w-86">
             <div className="flex flex-col justify-center items-center">
-            <div className="ps-4 pe-4 font-bold text-[25px]">Measurement Profile</div>
+            <div className="font-roboto font-bold text-[25px] mb-6">Measurement Profile</div>
               <svg
                 className="size-24 animate-spin text-white"
                 xmlns="http://www.w3.org/2000/svg"
@@ -43,9 +43,7 @@ const checkreflowpage = () => {
                   d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
                 />
               </svg>
-              <div className="ps-4 pe-4 font-bold text-[25px]">..Please Waiting.. </div>
-              <div className="ps-4 pe-4 font-bold text-[25px]">..โปรดรอสักครู่.. </div>
-              <div className="ps-4 pe-4 font-bold text-[25px]">กระบวนการวัดโปรไฟล์ </div>
+              <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..กำลังวัดโปรไฟล์..</div>
             </div>
             <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl">
 
@@ -88,11 +86,11 @@ const checkreflowpage = () => {
                   d="M14 27 L22 35 L38 19"
                 />
               </svg>
-              <p className="text-[20px] font-bold text-white backdrop-blur-md rounded-xl">
+              <p className="font-roboto text-[20px] font-bold text-white backdrop-blur-md rounded-xl">
                 Already Checked
               </p>
             </div>
-            <div className="w-full text-[20px] text-white backdrop-blur-md rounded-xl">
+            <div className="font-kanit w-full text-[20px] text-white backdrop-blur-md rounded-xl">
               วัดเสร็จเรียบร้อย
             </div>
           </div>
@@ -139,7 +137,7 @@ const checkreflowpage = () => {
           </div>
           {/* row2 */}
           <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-            <div className="text-white font-bold text-[40px]">NPVV051DX1BM8BO</div>
+            <div className="font-roboto text-white font-bold text-[40px]">NPVV051DX1BM8BO</div>
           </div>
           {/* row3 */}
           <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
