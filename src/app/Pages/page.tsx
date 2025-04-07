@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
 import { GoCheckCircle, GoSkipFill } from "react-icons/go";
 
-
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -21,35 +20,35 @@ const checkreflowpage = () => {
       buttonClassL = "bg-yellow-100/50"
       buttonContent = (
         <>
-        <div className="flex flex-col justify-center items-center">
-        <div className="flex justify-center items-center">
-            <svg
-              className="size-24 animate-spin text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-              />
-            </svg>
-            <div className="ps-4 pe-4 font-bold text-[25px]">Waiting for check... </div>
-          </div>
-          <div className="w-full text-[25px] text-black backdrop-blur-md rounded-xl">
-              รอวัด Profile
+          <div className="flex flex-col justify-center items-center">
+            <div className="flex justify-center items-center">
+              <svg
+                className="size-24 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+                />
+              </svg>
+              <div className="ps-4 pe-4 font-bold text-[25px]">Waiting for check... </div>
             </div>
-        </div>
-          
+            <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl">
+
+            </div>
+          </div>
+
         </>
       );
       break;
@@ -86,11 +85,11 @@ const checkreflowpage = () => {
                   d="M14 27 L22 35 L38 19"
                 />
               </svg>
-              <p className="text-[25px] font-bold text-white backdrop-blur-md rounded-xl">
+              <p className="text-[20px] font-bold text-white backdrop-blur-md rounded-xl">
                 Already Checked
               </p>
             </div>
-            <div className="w-full text-[25px] text-white backdrop-blur-md rounded-xl">
+            <div className="w-full text-[20px] text-white backdrop-blur-md rounded-xl">
               วัดเสร็จเรียบร้อย
             </div>
           </div>
@@ -132,13 +131,16 @@ const checkreflowpage = () => {
           {/* row1 */}
           <div className="flex w-full justify-center items-center">
             <div className="flex text-xl justify-center items-center">
-              <div className="text-white font-bold">2312313131231231231123123</div>
+              <div className="flex text-white font-bold text-[40px]">SMT-13</div>
             </div>
           </div>
           {/* row2 */}
-          <div className="flex w-full mt-2 text-xl text-center justify-center items-center">
-            <div className="text-white font-bold">SMT-1</div>
-            <div className="flex text-white font-bold">CY841/CY822/CY840/CY824/CB</div>
+          <div className="flex w-full mt-8 text-xl text-center justify-center items-center">
+            <div className="text-white font-bold text-[40px]">NPVV051DX1BM8BO</div>
+          </div>
+          {/* row3 */}
+          <div className="flex w-full mt-8 text-xl text-center justify-center items-center">
+            <div className="text-white font-bold text-[40px]">Pro No: 202504030036</div>
           </div>
         </div>
         {/* box2 */}
