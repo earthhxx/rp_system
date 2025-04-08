@@ -3,6 +3,8 @@ import Image from "next/image";
 import React, { useState, useRef, useEffect } from "react";
 import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
 import { GoCheckCircle, GoSkipFill } from "react-icons/go";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import { count } from "console";
 
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
@@ -13,22 +15,52 @@ const checkreflowpage = () => {
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [employeeId, setEmployeeId] = useState("");
+  const scannerRef = useRef<any>(null);
+  const [SetTopper, setTopper] = useState(false);
 
   useEffect(() => {
-    const handleScan = (e: KeyboardEvent) => {
-      if (!isCardOpen) return;
+    if (isCardOpen && !scannerRef.current) {
+      scannerRef.current = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 10, qrbox: 250 },
+        false
+      );
 
-      if (inputRef.current) {
-        inputRef.current.focus(); // ให้ input โฟกัสไว้เสมอ
-      }
-    };
+      scannerRef.current.render(
+        (decodedText: string) => {
+          // เมื่อสแกนเจอ
+          if (inputRef.current) {
+            inputRef.current.value = decodedText;
+          }
+          setEmployeeId(decodedText);
 
-    window.addEventListener("keydown", handleScan);
+          // เคลียร์ scanner และปิดกล้อง
+          scannerRef.current.clear().then(() => {
+            scannerRef.current = null;
+          }).catch((error: any) => {
+            console.error("Failed to clear scanner: ", error);
+          });
+
+          // ทำสิ่งอื่น เช่น submit อัตโนมัติ:
+          setSubmitStage("CHECKED");
+          setShowBar(false);
+          setIsCardOpen(false);
+        },
+        (errorMessage: string) => {
+          console.warn("Scan error:", errorMessage);
+        }
+      );
+    }
 
     return () => {
-      window.removeEventListener("keydown", handleScan);
+      // Cleanup ตอน unmount หรือปิด card
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch((e: any) => console.error(e));
+        scannerRef.current = null;
+      }
     };
   }, [isCardOpen]);
+
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -36,10 +68,21 @@ const checkreflowpage = () => {
 
   useEffect(() => {
     if (submitStage === "CHECKED") {
+      setTopper(false); // ซ่อน topper เมื่อ submitStage เป็น CHECKED
+      const timer = setTimeout(() => {
+        setTopper(true); // แสดง topper หลังจาก 3 วินาที
+      }, 2000);
+
+      return () => clearTimeout(timer); // ทำการล้าง timer เมื่อ component ถูก unmount หรือ submitStage เปลี่ยน
+    }
+  }, [submitStage]);
+
+  useEffect(() => {
+    if (submitStage === "CHECKED") {
       setShowChecked(true); // reset visibility
       const timer = setTimeout(() => {
         setShowChecked(false); // hide after 3 seconds
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer); // cleanup on unmount or status change
     }
   }, [submitStage]);
@@ -48,7 +91,7 @@ const checkreflowpage = () => {
     case "waiting":
 
       buttonClass = "bg-yellow-400 text-black";
-      buttonClassL = "bg-yellow-400/30"
+      buttonClassL = "bg-yellow-400/50"
       buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center w-86">
@@ -85,7 +128,7 @@ const checkreflowpage = () => {
       break;
     case "CHECKED":
       buttonClass = "";
-      buttonClassL = "bg-green-400/10"
+      buttonClassL = "bg-green-300/10"
       buttonContent =
         <>
           <div className="flex flex-col justify-center items-center w-86 ps-4 pe-4">
@@ -148,45 +191,98 @@ const checkreflowpage = () => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
-      {showChecked && (
-        <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
-          {showBar && (
 
-            < div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
-              {/* row1 */}
-              <div className="flex w-full justify-start items-center">
-                <div className="flex text-xl justify-start items-center">
-                  <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">SMT-13</div>
-                </div>
-              </div>
-              {/* row2 */}
-              <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">NPVV051DX1BM8BO</div>
-              </div>
-              {/* row3 */}
-              <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
-                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
-                <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">202504030036</div>
+      {SetTopper && (
+        <div className="flex flex-col justify-center items-center relative">
+          {/* Header Box */}
+          <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+            {/* Box1 */}
+            <div className="flex flex-col max-h-full justify-center items-center">
+              {/* Row2 */}
+              <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
+                <div className="font-roboto text-4xl text-white w-full font-bold">CYN-1231213123-DAS-DK</div>
               </div>
             </div>
-
-
-
-          )}
-
-          {/* box2 */}
-
-          <div className="flex h-full w-80 items-center justify-center">
-            <button
-              onClick={() => setIsCardOpen(true)}
-              type="button"
-              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
-            >
-              {buttonContent}
-            </button>
+            {/* Box2 */}
+            <div className="flex h-full items-center justify-center">
+              <button
+                onClick={() => setIsCardOpen(true)}
+                type="button"
+                className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
+              >
+                <svg
+                  className="w-20 h-20"
+                  viewBox="0 0 56 56"
+                >
+                  {/* วงกลม */}
+                  <circle
+                    className="check-circle "
+                    cx="26"
+                    cy="26"
+                    r="23"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="4"
+                  />
+                  {/* เครื่องหมายถูก */}
+                  <path
+                    className="check-mark"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M14 27 L22 35 L38 19"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* Success Message */}
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
+            <div className="flex justify-center items-center "> ! SUCCESS !</div>
           </div>
         </div>
       )}
+
+      {
+        showChecked && (
+          <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+            {showBar && (
+
+              < div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
+                {/* row1 */}
+                <div className="flex w-full justify-start items-center">
+                  <div className="flex text-xl justify-start items-center">
+                    <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">SMT-13</div>
+                  </div>
+                </div>
+                {/* row2 */}
+                <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
+                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">NPVV051DX1BM8BO</div>
+                </div>
+                {/* row3 */}
+                <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
+                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
+                  <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">202504030036</div>
+                </div>
+              </div>
+            )}
+
+            {/* box2 */}
+            <div className="flex h-full w-80 items-center justify-center">
+              <button
+                onClick={() => setIsCardOpen(true)}
+                type="button"
+                className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
+              >
+                {buttonContent}
+              </button>
+            </div>
+          </div>
+        )
+      }
 
 
       {/* CARD */}
@@ -194,8 +290,9 @@ const checkreflowpage = () => {
         isCardOpen && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-              <div className="flex justify-center items-center w-full m-4">Please enter your Employee ID :</div>
-              <div className="flex justify-center items-center w-full m-4">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
               <input
                 ref={inputRef}
                 type="text"
@@ -207,8 +304,8 @@ const checkreflowpage = () => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span className="flex w-1/2 h-20">
-                  <BsUpcScan className="size-20"></BsUpcScan>
+                <span className="flex w-1/2 h-32 justify-center">
+                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
                 <div
                   onClick={() => {
@@ -223,7 +320,7 @@ const checkreflowpage = () => {
                       window.location.reload();
                     }
                   }}
-                  className="flex flex-col justify-center items-center w-1/2 h-40 bg-green-600">
+                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
                 </div>
               </div>

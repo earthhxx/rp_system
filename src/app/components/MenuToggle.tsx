@@ -92,23 +92,23 @@ const MenuToggle = () => {
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-10 bg-black/20 backdrop-blur-sm">
                     <div ref={menuRef} className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
                         <div className="flex w-full h-full"></div>
-                        <div className="flex flex-col justify-center items-center w-full h-full">
-                            <GoCheckCircle className="size-30" />
+                        <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                            <GoCheckCircle className="size-30 text-white " />
                             SUBMIT PRODUCT
                         </div>
                         <div className="flex w-full h-full"></div>
-                        <div className="flex flex-col justify-center items-center w-full h-full">
-                            <BsClipboard2DataFill className="size-30" />
+                        <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                            <BsClipboard2DataFill className="size-30 text-white" />
                             DASHBOARD
                         </div>
                         <div className="flex w-full h-full"></div>
-                        <div onClick={() => router.push('/Pages')} className="flex flex-col justify-center items-center w-full h-full">
-                            <BsUpcScan className="size-30" />
+                        <div onClick={() => router.push('/Pages')} className="flex flex-col justify-center items-center w-full h-full text-white">
+                            <BsUpcScan className="size-30 text-white" />
                             SCAN PRODUCT
                         </div>
                         <div className="flex w-full h-full"></div>
-                        <div className="flex flex-col justify-center items-center w-full h-full">
-                            <GoSkipFill className="size-30" />
+                        <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                            <GoSkipFill className="size-30 text-white" />
                             CANCEL PRODUCT
                         </div>
                         <div className="flex w-full h-full"></div>
