@@ -68,7 +68,7 @@ const checkreflowpage = () => {
     case "CHECKED":
       buttonClass = "";
       buttonClassL = "bg-green-400/10"
-      buttonContent = 
+      buttonContent =
         <>
           <div className="flex flex-col justify-center items-center w-86 ps-4 pe-4">
             <div className="flex items-center">
@@ -131,43 +131,43 @@ const checkreflowpage = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {showChecked && (
-      <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
-        {showBar && (
+        <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+          {showBar && (
 
-          < div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
-            {/* row1 */}
-            <div className="flex w-full justify-start items-center">
-              <div className="flex text-xl justify-start items-center">
-                <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">SMT-13</div>
+            < div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
+              {/* row1 */}
+              <div className="flex w-full justify-start items-center">
+                <div className="flex text-xl justify-start items-center">
+                  <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">SMT-13</div>
+                </div>
+              </div>
+              {/* row2 */}
+              <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">NPVV051DX1BM8BO</div>
+              </div>
+              {/* row3 */}
+              <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
+                <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">202504030036</div>
               </div>
             </div>
-            {/* row2 */}
-            <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-              <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">NPVV051DX1BM8BO</div>
-            </div>
-            {/* row3 */}
-            <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
-              <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
-              <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">202504030036</div>
-            </div>
+
+
+
+          )}
+
+          {/* box2 */}
+
+          <div className="flex h-full w-80 items-center justify-center">
+            <button
+              onClick={() => setIsCardOpen(true)}
+              type="button"
+              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
+            >
+              {buttonContent}
+            </button>
           </div>
-
-
-
-        )}
-
-        {/* box2 */}
-        
-        <div className="flex h-full w-80 items-center justify-center">
-          <button
-            onClick={() => setIsCardOpen(true)}
-            type="button"
-            className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
-          >
-            {buttonContent}
-          </button>
         </div>
-      </div>
       )}
 
 
@@ -175,42 +175,31 @@ const checkreflowpage = () => {
       {
         isCardOpen && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
-            <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-              <div className="flex w-full h-full"></div>
-              <div
-                onClick={() => {
-                  if (submitStage === "waiting") {
-                    setSubmitStage("CHECKED");
-                    setShowBar(false);
-                    setIsCardOpen(false);
-                    console.log("CHECKED");
-                  }
-                  else {
-                    window.location.reload();
-                  }
+            <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+              <div className="flex w-full h-full">Please enter your Employee ID :</div>
+              <div className="flex w-full h-full">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <input className="flex w-full h-full"></input>
+              <div className="flex w-full h-full items-center">
 
-                }}
-                className="flex flex-col justify-center items-center w-full h-full">
-
-                <GoCheckCircle className="size-30" />
-                SUBMIT PRODUCT
+                <span className="flex w-1/2 h-full">
+                <BsUpcScan className="size-20"></BsUpcScan>
+                </span>
+                <div
+                  onClick={() => {
+                    if (submitStage === "waiting") {
+                      setSubmitStage("CHECKED");
+                      setShowBar(false);
+                      setIsCardOpen(false);
+                      console.log("CHECKED");
+                    }
+                    else {
+                      window.location.reload();
+                    }
+                  }}
+                  className="flex flex-col justify-center items-center w-1/2 h-full bg-green-600">
+                  SUBMIT
+                </div>
               </div>
-              <div className="flex w-full h-full"></div>
-              <div className="flex flex-col justify-center items-center w-full h-full">
-                <BsClipboard2DataFill className="size-30" />
-                DASHBOARD
-              </div>
-              <div className="flex w-full h-full"></div>
-              <div className="flex flex-col justify-center items-center w-full h-full">
-                <BsUpcScan className="size-30" />
-                SCAN PRODUCT
-              </div>
-              <div className="flex w-full h-full"></div>
-              <div className="flex flex-col justify-center items-center w-full h-full">
-                <GoSkipFill className="size-30" />
-                CANCEL PRODUCT
-              </div>
-              <div className="flex w-full h-full"></div>
             </div>
           </div>
         )
