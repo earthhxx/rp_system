@@ -11,6 +11,24 @@ const checkreflowpage = () => {
   type SubmitStage = "waiting" | "CHECKED";
   const [submitStage, setSubmitStage] = useState<SubmitStage>("waiting");
   const [showChecked, setShowChecked] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [employeeId, setEmployeeId] = useState("");
+
+  useEffect(() => {
+    const handleScan = (e: KeyboardEvent) => {
+      if (!isCardOpen) return;
+
+      if (inputRef.current) {
+        inputRef.current.focus(); // ให้ input โฟกัสไว้เสมอ
+      }
+    };
+
+    window.addEventListener("keydown", handleScan);
+
+    return () => {
+      window.removeEventListener("keydown", handleScan);
+    };
+  }, [isCardOpen]);
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -178,7 +196,15 @@ const checkreflowpage = () => {
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full m-4">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full m-4">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <input type="text" id="first_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={employeeId}
+                id="employee_id"
+                onChange={(e) => setEmployeeId(e.target.value)}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="รหัสพนักงาน"
+              />
               <div className="flex w-full h-full items-center">
 
                 <span className="flex w-1/2 h-20">
@@ -191,6 +217,7 @@ const checkreflowpage = () => {
                       setShowBar(false);
                       setIsCardOpen(false);
                       console.log("CHECKED");
+                      console.log("Scanned ID:", employeeId);
                     }
                     else {
                       window.location.reload();
