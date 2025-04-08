@@ -176,13 +176,13 @@ const checkreflowpage = () => {
         isCardOpen && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-              <div className="flex w-full h-full">Please enter your Employee ID :</div>
-              <div className="flex w-full h-full">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <input className="flex w-full h-full"></input>
+              <div className="flex justify-center items-center w-full m-4">Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full m-4">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <input type="text" id="first_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" />
               <div className="flex w-full h-full items-center">
 
-                <span className="flex w-1/2 h-full">
-                <BsUpcScan className="size-20"></BsUpcScan>
+                <span className="flex w-1/2 h-20">
+                  <BsUpcScan className="size-20"></BsUpcScan>
                 </span>
                 <div
                   onClick={() => {
@@ -196,7 +196,7 @@ const checkreflowpage = () => {
                       window.location.reload();
                     }
                   }}
-                  className="flex flex-col justify-center items-center w-1/2 h-full bg-green-600">
+                  className="flex flex-col justify-center items-center w-1/2 h-40 bg-green-600">
                   SUBMIT
                 </div>
               </div>
