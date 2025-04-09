@@ -241,7 +241,7 @@ const checkreflowpage = () => {
           
           {/* Success Message */}
           <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-            <div className="flex justify-center items-center "> ! SUCCESS !</div>
+            <div className="flex justify-center items-center "> ! SUCCESS ! ${employeeId} </div>
           </div>
         </div>
       )}
