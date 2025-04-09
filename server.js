@@ -19,3 +19,4 @@ app.prepare().then(() => {
     console.log('✅ Server ready at https://localhost:3000');
   });
 });
+

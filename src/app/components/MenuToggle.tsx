@@ -4,10 +4,12 @@ import Image from "next/image";
 import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
+import { useRouter,usePathname } from 'next/navigation';
+
 
 const MenuToggle = () => {
     const router = useRouter();
+    const pathname = usePathname();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -89,7 +91,7 @@ const MenuToggle = () => {
 
             {/* MENU */}
             {isMenuOpen && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-10 bg-black/20 backdrop-blur-sm">
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-90 bg-black/20 backdrop-blur-sm">
                     <div ref={menuRef} className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
                         <div className="flex w-full h-full"></div>
                         <div className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -102,7 +104,15 @@ const MenuToggle = () => {
                             DASHBOARD
                         </div>
                         <div className="flex w-full h-full"></div>
-                        <div onClick={() => router.push('/Pages')} className="flex flex-col justify-center items-center w-full h-full text-white">
+                        <div onClick={() => {
+                            if (pathname === '/Pages') {
+                                // รีหน้าแบบ force reload
+                                window.location.reload(); // ✅ ทำให้ component re-fetch หรือ reload server component
+                            } else {
+                                router.push('/Pages'); // ✅ เปลี่ยนหน้า
+                            }
+                        }}
+                            className="flex flex-col justify-center items-center w-full h-full text-white">
                             <BsUpcScan className="size-30 text-white" />
                             SCAN PRODUCT
                         </div>
@@ -113,7 +123,7 @@ const MenuToggle = () => {
                         </div>
                         <div className="flex w-full h-full"></div>
                     </div>
-                </div>
+                </div >
             )}
 
             {/* Showing Position */}

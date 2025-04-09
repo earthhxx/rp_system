@@ -1,10 +1,20 @@
-"use client"
-import Image from "next/image";
+"use client";
 import React, { useState, useRef, useEffect } from "react";
 import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
 import { GoCheckCircle, GoSkipFill } from "react-icons/go";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { count } from "console";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import axios from 'axios';
+
+type DataItem = {
+  id: number;
+  R_UserName: string;
+  R_Model: string;
+  R_Line: string;
+  Datetime: string;
+  R_PDF: string;
+};
+
 
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
@@ -17,6 +27,59 @@ const checkreflowpage = () => {
   const [employeeId, setEmployeeId] = useState("");
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [data, setData] = useState<DataItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+//   const formatDateTime = (datetimeString: string | number | Date) => {
+//     const date = new Date(datetimeString);
+//     const padZero = (num: number) => String(num).padStart(2, '0');
+
+//     const year = date.getFullYear();
+//     const month = padZero(date.getMonth() + 1);
+//     const day = padZero(date.getDate());
+//     const hours = padZero(date.getHours());
+//     const minutes = padZero(date.getMinutes());
+//     const seconds = padZero(date.getSeconds());
+//     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+// };
+
+  useEffect(() => {
+    axios.get("http://192.168.130.253:5000/api/data")
+      .then(response => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleShowPdf = (base64: string) => {
+    const blob = b64toBlob(base64, 'application/pdf');
+    const url: string = URL.createObjectURL(blob);  // Use string, not String
+    setPdfUrl(url);  // Set the state with the primitive string
+  };
+  
+
+  const b64toBlob = (base64: string, mime: string): Blob => {
+    const byteChars = atob(base64);
+    const byteArrays: Uint8Array[] = [];
+
+    for (let i = 0; i < byteChars.length; i += 512) {
+        const slice = byteChars.slice(i, i + 512);
+        const byteNumbers = new Array(slice.length);
+        for (let j = 0; j < slice.length; j++) {
+            byteNumbers[j] = slice.charCodeAt(j);
+        }
+        byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    return new Blob(byteArrays, { type: mime });
+};
+
+  if (loading) return <div>Loading...</div>;
+
 
   useEffect(() => {
     if (isCardOpen && !scannerRef.current) {
@@ -238,7 +301,7 @@ const checkreflowpage = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Success Message */}
           <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
             <div className="flex justify-center items-center "> ! SUCCESS ! ${employeeId} </div>
@@ -331,13 +394,20 @@ const checkreflowpage = () => {
 
       {/* Image Section */}
       <div className="flex-grow w-full overflow-hidden">
-        <Image
-          src="/images/Test Reflow Temp_page-0001.jpg"
-          alt="Menu Image"
-          width={819}
-          height={1093}
-          className="w-full h-full"
-        />
+        {/* แสดง PDF เมื่อเลือกแล้ว */}
+        {pdfUrl && (
+          <>
+            <div className='show-close'>
+              <h2>แสดง PDF</h2>
+              <button className='close-pdf' onClick={() => setPdfUrl(null)}>X</button>
+            </div>
+            <div style={{ height: '600px' }}>
+              <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+                <Viewer fileUrl={pdfUrl} />
+              </Worker>
+            </div>
+          </>
+        )}
       </div>
     </div >
   );

@@ -19,7 +19,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
 .check-circle {
   stroke-dasharray: 157;
   stroke-dashoffset: 157;
@@ -51,3 +50,4 @@ body {
     stroke-dashoffset: 0;
   }
 }
+
