@@ -44,7 +44,7 @@ const checkreflowpage = () => {
 // };
 
   useEffect(() => {
-    axios.get("http://192.168.130.253:5000/api/data")
+    axios.get("/api/show-data")
       .then(response => {
         setData(response.data);
         setLoading(false);
