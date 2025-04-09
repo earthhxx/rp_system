@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';  // ใช้ NextApiRequest และ NextApiResponse
+import { NextApiRequest, NextApiResponse } from 'next';
 import sql from 'mssql';
 
-// กำหนดค่าเชื่อมต่อฐานข้อมูล
 const dbConfig1 = {
   user: "sa",
   password: "B1mUmNU9",
@@ -13,42 +12,45 @@ const dbConfig1 = {
   },
 };
 
-// ฟังก์ชันในการเชื่อมต่อกับฐานข้อมูล
 async function getDatabaseConnection() {
   try {
-    await sql.connect(dbConfig1);  // เชื่อมต่อกับฐานข้อมูล
-  } catch (error: any) {  // ประกาศ error เป็นชนิด any
+    await sql.connect(dbConfig1);
+  } catch (error: any) {
     throw new Error("เชื่อมต่อฐานข้อมูลล้มเหลว: " + error.message);
   }
 }
 
-// handler สำหรับ API
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {  // ใช้ NextApiRequest และ NextApiResponse
-  if (req.method === 'GET') {
-    try {
-      await getDatabaseConnection();  // เชื่อมต่อฐานข้อมูล
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    const { employeeId } = req.body;
 
-      // ทำการ query ข้อมูลจากฐานข้อมูล
+    if (!employeeId) {
+      return res.status(400).json({ error: 'Missing employeeId' });
+    }
+
+    try {
+      await getDatabaseConnection();
+
       const result = await sql.query(`
-        SELECT [id], [R_UserName], [R_Model], [R_Line], [R_PDF], [Datetime]
+        SELECT TOP 1 [id], [R_UserName], [R_Model], [R_Line], [R_PDF], [Datetime]
         FROM [DASHBOARD].[dbo].[REFLOW_TEMP_STANDARD]
+        WHERE R_UserName = '${employeeId}'
+        ORDER BY [Datetime] DESC
       `);
 
-      // แปลงข้อมูลในคอลัมน์ R_PDF เป็น base64 string
-      result.recordset.forEach(item => {
-        item.R_PDF = item.R_PDF.toString('base64');  // แปลง PDF เป็น base64 string
-      });
+      const record = result.recordset[0];
 
-      // ส่งผลลัพธ์กลับไปยัง client
-      res.status(200).json(result.recordset);
-    } catch (error: any) {  // ประกาศ error เป็นชนิด any
-      console.error(error);  // แสดงข้อผิดพลาดใน console
-      res.status(500).send('Error fetching data');  // ส่งข้อผิดพลาดกลับไป
-    } finally {
-    
+      if (record) {
+        record.R_PDF = record.R_PDF.toString('base64'); // แปลงเป็น base64
+        res.status(200).json(record);
+      } else {
+        res.status(404).json({ error: 'No data found for this employeeId' });
+      }
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).send('Error fetching data');
     }
   } else {
-    // หากไม่ใช่ GET method ให้ส่ง status 405 Method Not Allowed
     res.status(405).json({ error: "Method Not Allowed" });
   }
 }

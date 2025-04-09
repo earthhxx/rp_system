@@ -30,53 +30,57 @@ const checkreflowpage = () => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-//   const formatDateTime = (datetimeString: string | number | Date) => {
-//     const date = new Date(datetimeString);
-//     const padZero = (num: number) => String(num).padStart(2, '0');
+  //   const formatDateTime = (datetimeString: string | number | Date) => {
+  //     const date = new Date(datetimeString);
+  //     const padZero = (num: number) => String(num).padStart(2, '0');
 
-//     const year = date.getFullYear();
-//     const month = padZero(date.getMonth() + 1);
-//     const day = padZero(date.getDate());
-//     const hours = padZero(date.getHours());
-//     const minutes = padZero(date.getMinutes());
-//     const seconds = padZero(date.getSeconds());
-//     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-// };
+  //     const year = date.getFullYear();
+  //     const month = padZero(date.getMonth() + 1);
+  //     const day = padZero(date.getDate());
+  //     const hours = padZero(date.getHours());
+  //     const minutes = padZero(date.getMinutes());
+  //     const seconds = padZero(date.getSeconds());
+  //     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  // };
 
   useEffect(() => {
-    axios.get("/api/show-data")
-      .then(response => {
-        setData(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
-  }, []);
+    if (employeeId) {
+      setLoading(true);
+      axios.get(`/api/show-data`, { params: { employeeId } })
+        .then(response => {
+          setData(response.data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error("Error fetching data:", error);
+          setLoading(false);
+        });
+    }
+  }, [employeeId]);
+
 
   const handleShowPdf = (base64: string) => {
     const blob = b64toBlob(base64, 'application/pdf');
     const url: string = URL.createObjectURL(blob);  // Use string, not String
     setPdfUrl(url);  // Set the state with the primitive string
   };
-  
+
 
   const b64toBlob = (base64: string, mime: string): Blob => {
     const byteChars = atob(base64);
     const byteArrays: Uint8Array[] = [];
 
     for (let i = 0; i < byteChars.length; i += 512) {
-        const slice = byteChars.slice(i, i + 512);
-        const byteNumbers = new Array(slice.length);
-        for (let j = 0; j < slice.length; j++) {
-            byteNumbers[j] = slice.charCodeAt(j);
-        }
-        byteArrays.push(new Uint8Array(byteNumbers));
+      const slice = byteChars.slice(i, i + 512);
+      const byteNumbers = new Array(slice.length);
+      for (let j = 0; j < slice.length; j++) {
+        byteNumbers[j] = slice.charCodeAt(j);
+      }
+      byteArrays.push(new Uint8Array(byteNumbers));
     }
 
     return new Blob(byteArrays, { type: mime });
-};
+  };
 
   if (loading) return <div>Loading...</div>;
 
