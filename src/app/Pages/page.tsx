@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
-import { GoCheckCircle, GoSkipFill } from "react-icons/go";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import axios from 'axios';

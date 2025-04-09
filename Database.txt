@@ -1,0 +1,34 @@
+Tabel REFLOW_Log and REFLOW_Status
+
+insert and update
+
+insert into REFLOW_Log (,[Log_Line]
+      ,[Log_Model]
+      ,[Log_ProOrder]
+      ,[Log_Status]
+      ,[Log_User]
+      ,[Datetime])  values (@1,@2,@3,@4,@5,@datetime)
+
+
+update [REFLOW_Status]
+  set ST_Model='@1' , ST_Prod='@2', st_Status ='@3' , ST_datetime='@datetime'
+  WHERE ST_Line ='Select'
+
+
+
+
+
+
+
+
+
+database 192.168.120.2
+
+ค้นหาโมเดล ด้วยหมายเลข Production
+SELECT [productOrderNo],[productName],[ProcessLine] FROM [tb_ProductOrders]where productOrderNo='202504070017'
+
+
+database 192.168.120.9
+
+ค้นหา file PDF ด้วย line กับ Model
+SELECT [R_Model],[R_Line],[R_PDF] FROM [REFLOW_TEMP_STANDARD] where R_Line='SMT-5' and R_Model='EUV9NS019AA'
