@@ -45,7 +45,7 @@ const checkreflowpage = () => {
   useEffect(() => {
     if (employeeId) {
       setLoading(true);
-      axios.get(`/api/show-data`, { params: { employeeId } })
+      axios.get(`/api/scan-to-db2`, { params: { employeeId } })
         .then(response => {
           setData(response.data);
           setLoading(false);

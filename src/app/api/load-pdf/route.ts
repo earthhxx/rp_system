@@ -4,19 +4,17 @@ import { createConnection } from '@/lib/test'; // เปลี่ยน path ใ
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const employeeid = searchParams.get('employeeid');
+    const model = searchParams.get('R_Model');
+    const line = searchParams.get('R_Line');
 
-    if (!employeeid) {
+    if (!model || !line) {
       return NextResponse.json({ success: false, message: 'Missing employeeid query parameter' }, { status: 400 });
     }
 
     const pool = await createConnection();
 
-    const [rows]: any = await pool.query(
-      'SELECT productOrderNo, productName, ProcessLine FROM tb_ProductOrders WHERE productOrderNo = ?',
-      [employeeid]
-    );
-
+    const [rows]: any = await pool.query(`SELECT [R_Model],[R_Line],[R_PDF] FROM [REFLOW_TEMP_STANDARD] where R_Line= @line and R_Model= @model`);
+    
     if (rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
