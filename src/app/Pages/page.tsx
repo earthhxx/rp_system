@@ -27,11 +27,9 @@ const checkreflowpage = () => {
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data, setData] = useState<DataItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (productOrderNo) { // เปลี่ยนจาก employeeId
-      setLoading(true);
       fetch(`/api/scan-to-db2`)
         .then((res) => {
           if (!res.ok) {
@@ -44,7 +42,6 @@ const checkreflowpage = () => {
           console.error('DB Query Error:', error);
         })
         .finally(() => {
-          setLoading(false);
         });
     }
   }, [productOrderNo]); // เปลี่ยนจาก employee_id
@@ -71,7 +68,6 @@ const checkreflowpage = () => {
     return new Blob(byteArrays, { type: mime });
   };
 
-  if (loading) return <div>Loading...</div>;
 
   useEffect(() => {
     if (isCardOpen && !scannerRef.current) {
