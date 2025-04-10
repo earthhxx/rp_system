@@ -7,18 +7,25 @@ export async function GET(req: NextRequest) {
     const model = searchParams.get('R_Model');
     const line = searchParams.get('R_Line');
 
+    // ตรวจสอบว่าได้รับพารามิเตอร์หรือไม่
     if (!model || !line) {
-      return NextResponse.json({ success: false, message: 'Missing employeeid query parameter' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Missing R_Model or R_Line query parameter' }, { status: 400 });
     }
 
     const pool = await createConnection();
 
-    const [rows]: any = await pool.query(`SELECT [R_Model],[R_Line],[R_PDF] FROM [REFLOW_TEMP_STANDARD] where R_Line= @line and R_Model= @model`);
+    // ใช้ ? สำหรับการแทนค่าพารามิเตอร์ใน MySQL
+    const [rows]: any = await pool.query(
+      'SELECT R_Model, R_Line, R_PDF FROM REFLOW_TEMP_STANDARD WHERE R_Line = ? AND R_Model = ?',
+      [line, model]
+    );
     
+    // ตรวจสอบผลลัพธ์ว่าไม่พบข้อมูล
     if (rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
 
+    // ส่งผลลัพธ์กลับไป
     return NextResponse.json({ success: true, data: rows[0] });
   } catch (error) {
     console.error('DB Query Error:', error);
