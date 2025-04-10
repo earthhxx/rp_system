@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { BsClipboard2DataFill, BsUpcScan } from "react-icons/bs";
+import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
-import axios from 'axios';
 
 type DataItem = {
   id: number;
@@ -22,29 +21,29 @@ const checkreflowpage = () => {
   const [submitStage, setSubmitStage] = useState<SubmitStage>("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [productOrderNo, setProductOrderNo] = useState(""); // เปลี่ยนจาก employeeId
+  const [productOrderNo, setProductOrderNo] = useState(""); 
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data, setData] = useState<DataItem[]>([]);
 
   useEffect(() => {
-    if (productOrderNo) { // เปลี่ยนจาก employeeId
-      fetch(`/api/scan-to-db2`)
+    if (productOrderNo) { 
+      fetch(`/api/scan-to-db-120-2`)
         .then((res) => {
           if (!res.ok) {
             throw new Error(`Failed to fetch data`);
           }
           return res.json();
         })
-        .then((data) => setProductOrderNo(data.data)) // เปลี่ยนจาก employeeId
+        .then((data) => setProductOrderNo(data.data)) 
         .catch((error) => {
           console.error('DB Query Error:', error);
         })
         .finally(() => {
         });
     }
-  }, [productOrderNo]); // เปลี่ยนจาก employee_id
+  }, [productOrderNo]);
 
   const handleShowPdf = (base64: string) => {
     const blob = b64toBlob(base64, 'application/pdf');
