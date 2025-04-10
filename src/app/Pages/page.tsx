@@ -16,6 +16,7 @@ type DataItem120_9 = {
   R_PDF: string; // Assuming this is base64 or URL of the PDF
 };
 
+//api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -29,6 +30,8 @@ const checkreflowpage = () => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data120_2, setData120_2] = useState<DataItem120_2[]>([]);
   const [data120_9, setData120_9] = useState<DataItem120_9[]>([]);
+
+  
 
   // Fetching Data 120-2
   useEffect(() => {
