@@ -1,3 +1,4 @@
+//https://localhost:3000/api/load-pdf-to-db-120-9?R_Line=SMT-5&R_Model=EUV9NS019AA
 import { NextRequest, NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db-120-9';
 import sql from 'mssql'; 

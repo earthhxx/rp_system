@@ -4,12 +4,15 @@ import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 
-type DataItem = {
-  id: number;
-  R_UserName: string;
+type DataItem120_2 = {
+  productOrderNo: string;
+  productName: string;
+  ProcessLine: string;
+};
+
+type DataItem120_9 = {
   R_Model: string;
   R_Line: string;
-  Datetime: string;
   R_PDF: string;
 };
 
@@ -25,7 +28,8 @@ const checkreflowpage = () => {
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [data, setData] = useState<DataItem[]>([]);
+  const [data120_2, setData120_2] = useState<DataItem120_2[]>([]);
+  const [data120_9, setData120_9] = useState<DataItem120_9[]>([]);
 
   useEffect(() => {
     if (productOrderNo) { 
