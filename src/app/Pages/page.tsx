@@ -13,15 +13,14 @@ type DataItem120_2 = {
 type DataItem120_9 = {
   R_Model: string;
   R_Line: string;
-  R_PDF: string;
+  R_PDF: string; // Assuming this is base64 or URL of the PDF
 };
 
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(true);
-  type SubmitStage = "waiting" | "CHECKED";
-  const [submitStage, setSubmitStage] = useState<SubmitStage>("waiting");
+  const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED">("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [productOrderNo, setProductOrderNo] = useState(""); 
@@ -31,30 +30,36 @@ const checkreflowpage = () => {
   const [data120_2, setData120_2] = useState<DataItem120_2[]>([]);
   const [data120_9, setData120_9] = useState<DataItem120_9[]>([]);
 
+  // Fetching Data 120-2
   useEffect(() => {
-    if (productOrderNo) { 
-      fetch(`/api/scan-to-db-120-2`)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`Failed to fetch data`);
-          }
-          return res.json();
-        })
-        .then((data) => setProductOrderNo(data.data)) 
-        .catch((error) => {
-          console.error('DB Query Error:', error);
-        })
-        .finally(() => {
-        });
+    if (productOrderNo) {
+      fetch(`/api/scan-to-db-120-2?productOrderNo=${productOrderNo}`)
+        .then((res) => res.json())
+        .then((data) => setData120_2(data.data))
+        .catch((error) => console.error(error));
     }
   }, [productOrderNo]);
 
-  //useEffect if var in DataItem_120_2  
+  // Fetching Data 120-9 and triggering PDF display
+  useEffect(() => {
+    if (data120_2.length > 0) {
+      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2[0].ProcessLine}&R_Model=${data120_2[0].productName}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setData120_9(data.data);
+          if (data.length > 0) {
+            handleShowPdf(data[0].R_PDF); // Pass the PDF data from 120-9 to the viewer
+          }
+        })
+        .catch((error) => console.error('Failed to load PDF:', error));
+    }
+  }, [data120_2]);
 
+  // Function to convert Base64 to Blob and generate PDF URL
   const handleShowPdf = (base64: string) => {
     const blob = b64toBlob(base64, 'application/pdf');
     const url: string = URL.createObjectURL(blob);
-    setPdfUrl(url);
+    setPdfUrl(url); // Set the PDF URL to display
   };
 
   const b64toBlob = (base64: string, mime: string): Blob => {
@@ -282,9 +287,9 @@ const checkreflowpage = () => {
             </div>
           </div>
 
-          {/* Success Message */}
-          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-            <div className="flex justify-center items-center "> ! SUCCESS ! ${productOrderNo} </div>
+         {/* Success Message */}
+         <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
+            <div className="flex justify-center items-center"> ! SUCCESS ! {productOrderNo} </div>
           </div>
         </div>
       )}
@@ -372,14 +377,13 @@ const checkreflowpage = () => {
         )
       }
 
-      {/* Image Section */}
+      {/* PDF Section */}
       <div className="flex-grow w-full overflow-hidden">
-        {/* แสดง PDF เมื่อเลือกแล้ว */}
         {pdfUrl && (
           <>
-            <div className='show-close'>
+            <div className="show-close">
               <h2>แสดง PDF</h2>
-              <button className='close-pdf' onClick={() => setPdfUrl(null)}>X</button>
+              <button className="close-pdf" onClick={() => setPdfUrl(null)}>X</button>
             </div>
             <div style={{ height: '600px' }}>
               <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
@@ -389,7 +393,7 @@ const checkreflowpage = () => {
           </>
         )}
       </div>
-    </div >
+    </div>
   );
 };
 
