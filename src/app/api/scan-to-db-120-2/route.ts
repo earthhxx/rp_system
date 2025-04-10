@@ -1,3 +1,4 @@
+//https://localhost:3000/api/scan-to-db-120-2?productOrderNo=202504070017
 import { NextRequest, NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db-120-2'; // สมมติว่าเป็นฟังก์ชันเชื่อมต่อฐานข้อมูล
 import sql from 'mssql'; // นำเข้า mssql
