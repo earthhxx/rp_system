@@ -14,7 +14,6 @@ type DataItem = {
   R_PDF: string;
 };
 
-
 const checkreflowpage = () => {
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -23,47 +22,38 @@ const checkreflowpage = () => {
   const [submitStage, setSubmitStage] = useState<SubmitStage>("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [employeeId, setEmployeeId] = useState("");
+  const [productOrderNo, setProductOrderNo] = useState(""); // เปลี่ยนจาก employeeId
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  //   const formatDateTime = (datetimeString: string | number | Date) => {
-  //     const date = new Date(datetimeString);
-  //     const padZero = (num: number) => String(num).padStart(2, '0');
-
-  //     const year = date.getFullYear();
-  //     const month = padZero(date.getMonth() + 1);
-  //     const day = padZero(date.getDate());
-  //     const hours = padZero(date.getHours());
-  //     const minutes = padZero(date.getMinutes());
-  //     const seconds = padZero(date.getSeconds());
-  //     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  // };
 
   useEffect(() => {
-    if (employeeId) {
+    if (productOrderNo) { // เปลี่ยนจาก employeeId
       setLoading(true);
-      axios.get(`/api/scan-to-db2`, { params: { employeeId } })
-        .then(response => {
-          setData(response.data);
-          setLoading(false);
+      fetch(`/api/scan-to-db2`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch data`);
+          }
+          return res.json();
         })
-        .catch(error => {
-          console.error("Error fetching data:", error);
+        .then((data) => setProductOrderNo(data.data)) // เปลี่ยนจาก employeeId
+        .catch((error) => {
+          console.error('DB Query Error:', error);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
-  }, [employeeId]);
-
+  }, [productOrderNo]); // เปลี่ยนจาก employee_id
 
   const handleShowPdf = (base64: string) => {
     const blob = b64toBlob(base64, 'application/pdf');
-    const url: string = URL.createObjectURL(blob);  // Use string, not String
-    setPdfUrl(url);  // Set the state with the primitive string
+    const url: string = URL.createObjectURL(blob);
+    setPdfUrl(url);
   };
-
 
   const b64toBlob = (base64: string, mime: string): Blob => {
     const byteChars = atob(base64);
@@ -83,7 +73,6 @@ const checkreflowpage = () => {
 
   if (loading) return <div>Loading...</div>;
 
-
   useEffect(() => {
     if (isCardOpen && !scannerRef.current) {
       scannerRef.current = new Html5QrcodeScanner(
@@ -98,7 +87,7 @@ const checkreflowpage = () => {
           if (inputRef.current) {
             inputRef.current.value = decodedText;
           }
-          setEmployeeId(decodedText);
+          setProductOrderNo(decodedText); // เปลี่ยนจาก employeeId
 
           // เคลียร์ scanner และปิดกล้อง
           scannerRef.current.clear().then(() => {
@@ -127,7 +116,6 @@ const checkreflowpage = () => {
     };
   }, [isCardOpen]);
 
-
   let buttonClass = "";
   let buttonClassL = "";
   let buttonContent = null;
@@ -155,9 +143,8 @@ const checkreflowpage = () => {
 
   switch (submitStage) {
     case "waiting":
-
       buttonClass = "bg-yellow-400 text-black";
-      buttonClassL = "bg-yellow-400/50"
+      buttonClassL = "bg-yellow-400/50";
       buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center w-86">
@@ -185,24 +172,19 @@ const checkreflowpage = () => {
               </svg>
               <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..กำลังวัดโปรไฟล์..</div>
             </div>
-            <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl">
-            </div>
+            <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
           </div>
-
         </>
       );
       break;
     case "CHECKED":
       buttonClass = "";
-      buttonClassL = "bg-green-300/10"
-      buttonContent =
+      buttonClassL = "bg-green-300/10";
+      buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center w-86 ps-4 pe-4">
             <div className="flex items-center">
-              <svg
-                className="w-42 h-42"
-                viewBox="0 0 56 56"
-              >
+              <svg className="w-42 h-42" viewBox="0 0 56 56">
                 {/* วงกลม */}
                 <circle
                   className="check-circle "
@@ -213,7 +195,6 @@ const checkreflowpage = () => {
                   stroke="#4ade80"
                   strokeWidth="4"
                 />
-
                 {/* เครื่องหมายถูก */}
                 <path
                   className="check-mark"
@@ -228,21 +209,16 @@ const checkreflowpage = () => {
             </div>
           </div>
         </>
+      );
       break;
   }
 
-
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        cardRef.current &&
-        !cardRef.current.contains(event.target as Node)
-      ) {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         setIsCardOpen(false);
       }
     };
-
 
     if (isCardOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -307,7 +283,7 @@ const checkreflowpage = () => {
 
           {/* Success Message */}
           <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-            <div className="flex justify-center items-center "> ! SUCCESS ! ${employeeId} </div>
+            <div className="flex justify-center items-center "> ! SUCCESS ! ${productOrderNo} </div>
           </div>
         </div>
       )}
@@ -362,9 +338,9 @@ const checkreflowpage = () => {
               <input
                 ref={inputRef}
                 type="text"
-                value={employeeId}
+                value={productOrderNo}
                 id="employee_id"
-                onChange={(e) => setEmployeeId(e.target.value)}
+                onChange={(e) => setProductOrderNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
               />
@@ -380,7 +356,7 @@ const checkreflowpage = () => {
                       setShowBar(false);
                       setIsCardOpen(false);
                       console.log("CHECKED");
-                      console.log("Scanned ID:", employeeId);
+                      console.log("Scanned ID:", productOrderNo);
                     }
                     else {
                       window.location.reload();
