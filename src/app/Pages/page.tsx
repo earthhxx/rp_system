@@ -49,6 +49,8 @@ const checkreflowpage = () => {
     }
   }, [productOrderNo]);
 
+  //useEffect if var in DataItem_120_2  
+
   const handleShowPdf = (base64: string) => {
     const blob = b64toBlob(base64, 'application/pdf');
     const url: string = URL.createObjectURL(blob);
