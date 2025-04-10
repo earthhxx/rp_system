@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: DASHBOARD
+      MYSQL_USER: dashboard_user
+      MYSQL_PASSWORD: dashboard_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - dashboardnet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: dashboard_user
+      PMA_PASSWORD: dashboard_pass
+    depends_on:
+      - mysql
+    networks:
+      - dashboardnet
+
+volumes:
+  mysql_data:
+
+networks:
+  dashboardnet:
+    driver: bridge
