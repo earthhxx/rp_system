@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-2'; // เปลี่ยน path ให้ตรงกับตำแหน่งของ db.js หรือ test.js
+import { createConnection } from '@/lib/db-120-9';
+import sql from 'mssql'; 
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,12 +15,14 @@ export async function GET(req: NextRequest) {
 
     const pool = await createConnection();
 
-    // ใช้ ? สำหรับการแทนค่าพารามิเตอร์ใน MySQL
-    const [rows]: any = await pool.query(
-      'SELECT R_Model, R_Line, R_PDF FROM REFLOW_TEMP_STANDARD WHERE R_Line = ? AND R_Model = ?',
-      [line, model]
-    );
-    
+    // ใช้ SQL Server query และคำสั่งสำหรับ query
+    const result = await pool.request()
+      .input('R_Model', sql.NVarChar, model) // ใช้ input เพื่อหลีกเลี่ยง SQL Injection
+      .input('R_Line', sql.NVarChar, line)
+      .query('SELECT R_Model, R_Line, R_PDF FROM REFLOW_TEMP_STANDARD WHERE R_Line = @R_Line AND R_Model = @R_Model');
+
+    const rows = result.recordset;
+
     // ตรวจสอบผลลัพธ์ว่าไม่พบข้อมูล
     if (rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
