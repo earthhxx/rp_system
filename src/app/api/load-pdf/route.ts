@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/test'; // เปลี่ยน path ให้ตรงกับตำแหน่งของ db.js หรือ test.js
+import { createConnection } from '@/lib/db-120-2'; // เปลี่ยน path ให้ตรงกับตำแหน่งของ db.js หรือ test.js
 
 export async function GET(req: NextRequest) {
   try {
