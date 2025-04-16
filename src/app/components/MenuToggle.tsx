@@ -10,10 +10,12 @@ const MenuToggle = () => {
     const router = useRouter();
     const pathname = usePathname();
     const [homeStage, sethomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
+    const [isScanCardOpen, setIsScanCardOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
+    
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -117,6 +119,52 @@ const MenuToggle = () => {
             </div>
         </div>
     );
+
+    const scanCard = () => {
+        if (!isScanCardOpen) return null;
+        const inputRef = useRef<HTMLInputElement>(null);
+        const cardRef = useRef<HTMLDivElement>(null);
+        const [productOrderNo, setProductOrderNo] = useState(""); 
+    
+        return (
+            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
+                <div
+                    ref={cardRef}
+                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
+                >
+                    <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={productOrderNo}
+                        id="employee_id"
+                        onChange={(e) => setProductOrderNo(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="รหัสพนักงาน"
+                    />
+                    <div className="flex w-full h-full items-center">
+                        <span className="flex w-1/2 h-32 justify-center">
+                            <BsUpcScan className="size-32 text-white" />
+                        </span>
+                        <div
+                            onClick={() => {
+                                if (homeStage === "menuOpen") {
+                                    console.log("homeStage => scanCard");
+                                    console.log("Scanned ID:", productOrderNo);
+                                } else {
+                                    window.location.reload();
+                                }
+                            }}
+                            className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
+                        >
+                            SUBMIT
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+    
 
     // ---- Main Return ---- //
 
