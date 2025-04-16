@@ -131,7 +131,7 @@ const checkreflowpage = () => {
 
   useEffect(() => {
     if (submitStage === "CHECKED") {
-      setTopper(false); // ซ่อน topper เมื่อ submitStage เป็น CHECKED
+      // setTopper(false); // ซ่อน topper เมื่อ submitStage เป็น CHECKED
       const timer = setTimeout(() => {
         setTopper(true); // แสดง topper หลังจาก 3 วินาที
       }, 2000);

@@ -14,9 +14,7 @@ const Home = () => {
                       height={250}
                       className="w-full h-full rounded-xl"
                     />
-
             </div>
-            
             <div className="flex w-full justify-center p-4"> The menu will open  </div>
             
         </div>
