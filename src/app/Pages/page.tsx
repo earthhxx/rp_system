@@ -96,7 +96,7 @@ const checkreflowpage = () => {
           if (inputRef.current) {
             inputRef.current.value = decodedText;
           }
-          setProductOrderNo(decodedText); // เปลี่ยนจาก employeeId
+          setProductOrderNo(decodedText);
 
           // เคลียร์ scanner และปิดกล้อง
           scannerRef.current.clear().then(() => {

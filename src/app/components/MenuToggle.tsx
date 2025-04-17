@@ -5,6 +5,7 @@ import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 const MenuToggle = () => {
     const router = useRouter();
@@ -18,6 +19,9 @@ const MenuToggle = () => {
     const [isCardOpen, setIsCardOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const cardRef = useRef<HTMLDivElement>(null);
+
+
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -53,6 +57,38 @@ const MenuToggle = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [homeStage]);
+
+    useEffect(() => {
+        if (homeStage === "scan") {
+            const scanner = new Html5QrcodeScanner(
+                "qr-reader",
+                { fps: 10, qrbox: 250 },
+                false // verbose
+            );
+
+            scanner.render(
+                (decodedText, decodedResult) => {
+                    console.log("Success", decodedText);
+                    setProductOrderNo(decodedText);
+                    setHomeStage("home");
+                    scanner.clear();
+                },
+                (errorMessage) => {
+                    console.warn("Error", errorMessage);
+                }
+            );
+
+
+            return () => {
+                scanner.clear().catch((error) => console.error("Clear failed", error));
+            };
+        }
+    }, [homeStage]);
+
+
+
+
+
 
     const renderHomeButton = () => (
         <motion.div
@@ -131,20 +167,20 @@ const MenuToggle = () => {
                     className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
                 >
                     <div className="flex justify-center items-center w-full text-white">
-                        Please enter your Employee ID :
+                        Please enter Product ID :
                     </div>
                     <div className="flex justify-center items-center w-full text-white">
-                        โปรดใส่รหัสพนักงานของคุณ :
+                        โปรดใส่รหัสผลิตภัณฑ์ของคุณ :
                     </div>
                     <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
                     <input
                         ref={inputRef}
                         type="text"
                         value={productOrderNo}
-                        id="employee_id"
+                        id="product_id"
                         onChange={(e) => setProductOrderNo(e.target.value)}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="รหัสพนักงาน"
+                        placeholder="product id..."
                     />
                     <div className="flex w-full h-full items-center">
                         <span className="flex w-1/2 h-32 justify-center">
@@ -155,6 +191,7 @@ const MenuToggle = () => {
                                 console.log("Scanned ID:", productOrderNo);
                                 setHomeStage("home");
                                 setProductOrderNo("");
+                                router.push('/Pages');
                             }}
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
                         >
@@ -170,7 +207,7 @@ const MenuToggle = () => {
         <>
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
-            {renderScanCard()}
+            {homeStage === "scan" && renderScanCard()}
 
             <div className="absolute bottom-5 left-5 text-white">
                 Position: {`X: ${position.x}, Y: ${position.y}`}
