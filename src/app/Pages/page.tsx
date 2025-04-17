@@ -5,23 +5,13 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { useSearchParams } from 'next/navigation';
 
-type DataItem120_2 = {
-  productOrderNo: string;
-  productName: string;
-  ProcessLine: string;
-};
 
-type DataItem120_9 = {
-  R_Model: string;
-  R_Line: string;
-  R_PDF: string;
-};
 
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
 
-
+  const [isLoading120_9, setIsLoading120_9] = useState(true);
   const searchParams = useSearchParams();
   const ProductOrderNo = searchParams.get('productOrderNo');
   const [isCardOpen, setIsCardOpen] = useState(false);
@@ -39,9 +29,17 @@ const checkreflowpage = () => {
 
   const [isLoading120_2, setIsLoading120_2] = useState(true);
 
-
-
-
+  type DataItem120_2 = {
+    productOrderNo: string;
+    productName: string;
+    ProcessLine: string;
+  };
+  
+  type DataItem120_9 = {
+    R_Model: string;
+    R_Line: string;
+    R_PDF: string;
+  };
 
 
   // Fetching Data 120-2
@@ -72,10 +70,12 @@ const checkreflowpage = () => {
     console.log("🧪 data120_2 useEffect:", data120_2);
 
     if (
+      
       data120_2 !== null &&
       typeof data120_2.ProcessLine === "string" &&
       typeof data120_2.productName === "string"
     ) {
+      setIsLoading120_9(true);
       fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`)
         .then((res) => res.json())
         .then((data) => {
@@ -84,46 +84,44 @@ const checkreflowpage = () => {
             setData120_9(result); // result เป็น object เดียว
         
             if (result.R_PDF) {
-              handleShowPdf(result.R_PDF);
+              handleShowPdfFromBytes(result.R_PDF);
             } else {
               console.warn('No PDF in result');
             }
           } else {
             console.warn('No data received from API or no R_Line found');
           }
-        })        
+          setIsLoading120_9(false);
+        })
         .catch((error) => console.error("❌ Failed to fetch 120-9:", error));
-    } else {
-      console.warn("❗ Missing ProcessLine or productName in data120_2", data120_2);
-    }
+    } 
   }, [data120_2]);
-
-
-
-
-
-  // Function to convert Base64 to Blob and generate PDF URL
-  const handleShowPdf = (base64: string) => {
-    const blob = b64toBlob(base64, 'application/pdf');
-    const url: string = URL.createObjectURL(blob);
-    setPdfUrl(url); // Set the PDF URL to display
-  };
-
-  const b64toBlob = (base64: string, mime: string): Blob => {
-    const byteChars = atob(base64);
-    const byteArrays: Uint8Array[] = [];
-
-    for (let i = 0; i < byteChars.length; i += 512) {
-      const slice = byteChars.slice(i, i + 512);
-      const byteNumbers = new Array(slice.length);
-      for (let j = 0; j < slice.length; j++) {
-        byteNumbers[j] = slice.charCodeAt(j);
-      }
-      byteArrays.push(new Uint8Array(byteNumbers));
+ 
+  useEffect(() => {
+    if (data120_9?.R_PDF && Array.isArray(data120_9.R_PDF)) {
+      console.log("📥 Got PDF byte array:", data120_9.R_PDF.length, "bytes");
+      handleShowPdfFromBytes(data120_9.R_PDF);
     }
+  }, [data120_9]);
+  
+  
 
-    return new Blob(byteArrays, { type: mime });
+  
+
+
+
+  const handleShowPdfFromBytes = (bytes: number[]) => {
+    try {
+      const uint8Array = new Uint8Array(bytes);
+      const blob = new Blob([uint8Array], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    } catch (err) {
+      console.error("❌ Error generating PDF from bytes:", err);
+    }
   };
+  
+  
 
 
   useEffect(() => {
@@ -283,10 +281,11 @@ const checkreflowpage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCardOpen]);
-
+  if (isLoading120_2 || isLoading120_9) {
   return (
 
-    <div className="flex flex-col h-screen w-full bg-blue-100">
+    <div className="flex flex-col h-screen w-full bg-blue-100">\
+    ⏳ Loading Data...
       {SetTopper && (
         <div className="flex flex-col justify-center items-center relative">
           {/* Header Box */}
@@ -435,7 +434,7 @@ const checkreflowpage = () => {
       }
 
       {/* PDF Section */}
-      <div className="flex-grow w-full overflow-hidden">
+      <div className="absolute flex-grow w-full overflow-hidden">
         {pdfUrl && (
           <>
             <div className="show-close">
@@ -452,6 +451,7 @@ const checkreflowpage = () => {
       </div>
     </div>
   );
+}
 };
 
 export default checkreflowpage;
