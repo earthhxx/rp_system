@@ -188,11 +188,12 @@ const MenuToggle = () => {
                         </span>
                         <div
                             onClick={() => {
-                                console.log("Scanned ID:", productOrderNo);
-                                setHomeStage("home");
-                                setProductOrderNo("");
-                                router.push('/Pages');
+                              console.log("Scanned ID:", productOrderNo);
+                              setHomeStage("home");
+                              const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
+                              router.push(`/Pages?productOrderNo=${query}`);
                             }}
+                          
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
                         >
                             SUBMIT

@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { useSearchParams } from 'next/navigation';
+
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -13,18 +15,20 @@ type DataItem120_2 = {
 type DataItem120_9 = {
   R_Model: string;
   R_Line: string;
-  R_PDF: string; // Assuming this is base64 or URL of the PDF
+  R_PDF: string;
 };
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
+  const searchParams = useSearchParams();
+  const productOrderNo = searchParams.get('productOrderNo');
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(true);
   const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED">("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [productOrderNo, setProductOrderNo] = useState(""); 
+  const [EmployeeNo, setProductOrderNo] = useState(""); 
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -347,7 +351,7 @@ const checkreflowpage = () => {
               <input
                 ref={inputRef}
                 type="text"
-                value={productOrderNo}
+                value={EmployeeNo}
                 id="employee_id"
                 onChange={(e) => setProductOrderNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -365,7 +369,7 @@ const checkreflowpage = () => {
                       setShowBar(false);
                       setIsCardOpen(false);
                       console.log("CHECKED");
-                      console.log("Scanned ID:", productOrderNo);
+                      console.log("Scanned ID:", EmployeeNo);
                     }
                     else {
                       window.location.reload();
