@@ -34,21 +34,21 @@ const MenuToggle = () => {
         const handleClickOutside = (event: MouseEvent) => {
             const isClickOutsideMenu = menuRef.current && !menuRef.current.contains(event.target as Node);
             const isClickOutsideCard = cardRef.current && !cardRef.current.contains(event.target as Node);
-    
+
             // ถ้าเปิดเมนูอยู่ แล้วคลิกข้างนอก ให้ปิดเมนู
             if (homeStage === "menuOpen" && isClickOutsideMenu) {
                 setIsMenuOpen(false);
                 setHomeStage("home");
             }
-    
+
             // ถ้าอยู่หน้า scan แล้วคลิกข้างนอก card ให้กลับ home
             if (homeStage === "scan" && isClickOutsideCard) {
                 setHomeStage("home");
             }
         };
-    
+
         document.addEventListener("mousedown", handleClickOutside);
-    
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
