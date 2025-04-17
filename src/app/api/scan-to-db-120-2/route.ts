@@ -6,19 +6,22 @@ import sql from 'mssql'; // นำเข้า mssql
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const productOrderNo = searchParams.get('productOrderNo'); // เปลี่ยนเป็น productOrderNo แทน employeeid
+    const productOrderNo = searchParams.get('ProductOrderNo');
+
+    console.log('Received productOrderNo:', productOrderNo); // <-- log นี้ช่วยดูว่าพารามิเตอร์มาจริง
 
     if (!productOrderNo) {
-      return NextResponse.json({ success: false, message: 'Missing productOrderNo query parameter' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Missing productOrderNo' }, { status: 400 });
     }
 
-    // การเชื่อมต่อกับ SQL Server
-    const pool = await createConnection(); // ฟังก์ชันนี้ต้องถูกปรับเพื่อใช้กับ mssql
+    const pool = await createConnection();
+    console.log('Database connected.');
 
-    // Query ข้อมูลจาก SQL Server
     const result = await pool.request()
-      .input('productOrderNo', sql.NVarChar, productOrderNo) // ป้อนค่าที่รับจาก query string
+      .input('productOrderNo', sql.NVarChar, productOrderNo)
       .query('SELECT productOrderNo, productName, ProcessLine FROM tb_ProductOrders WHERE productOrderNo = @productOrderNo');
+
+    console.log('Query result:', result.recordset);
 
     if (result.recordset.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
@@ -27,6 +30,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, data: result.recordset[0] });
   } catch (error) {
     console.error('DB Query Error:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Internal Server Error', error: String(error) }, { status: 500 });
   }
 }
+

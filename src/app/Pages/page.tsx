@@ -6,61 +6,82 @@ import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { useSearchParams } from 'next/navigation';
 
 
-type DataItem120_2 = {
-  productOrderNo: string;
-  productName: string;
-  ProcessLine: string;
-};
-
-type DataItem120_9 = {
-  R_Model: string;
-  R_Line: string;
-  R_PDF: string;
-};
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
   const searchParams = useSearchParams();
-  const productOrderNo = searchParams.get('productOrderNo');
+  const ProductOrderNo = searchParams.get('productOrderNo');
+  console.log(ProductOrderNo);
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(true);
   const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED">("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [EmployeeNo, setProductOrderNo] = useState(""); 
+  const [EmployeeNo, setProductOrderNo] = useState("");
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [data120_2, setData120_2] = useState<DataItem120_2[]>([]);
   const [data120_9, setData120_9] = useState<DataItem120_9[]>([]);
+  console.log(data120_2);
+  console.log(data120_9);
 
+  type DataItem120_2 = {
+    productOrderNo: string;
+    productModel: string;
+    ProcessLine: string;
+  };
   
+  type DataItem120_9 = {
+    R_Model: string;
+    R_Line: "SMT-5";
+    R_PDF: string;
+  };
+
 
   // Fetching Data 120-2
   useEffect(() => {
-    if (productOrderNo) {
-      fetch(`/api/scan-to-db-120-2?productOrderNo=${productOrderNo}`)
+    if (ProductOrderNo) {
+      fetch(`/api/scan-to-db-120-2?ProductOrderNo=${ProductOrderNo}`)
         .then((res) => res.json())
         .then((data) => setData120_2(data.data))
         .catch((error) => console.error(error));
     }
-  }, [productOrderNo]);
+  }, [ProductOrderNo]);
 
   // Fetching Data 120-9 and triggering PDF display
   useEffect(() => {
-    if (data120_2.length > 0) {
-      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2[0].ProcessLine}&R_Model=${data120_2[0].productName}`)
+    if (data120_2.length > 0 && data120_2[0].ProcessLine && data120_2[0].productModel) {
+      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2[0].ProcessLine}&R_Model=${data120_2[0].productModel}`)
         .then((res) => res.json())
         .then((data) => {
-          setData120_9(data.data);
-          if (data.length > 0) {
-            handleShowPdf(data[0].R_PDF); // Pass the PDF data from 120-9 to the viewer
+          if (data && data.data && data.data.length > 0) {
+            setData120_9(data.data); // set the data to state
+            if (data.data[0].R_PDF) {
+              handleShowPdf(data.data[0].R_PDF); // Pass the PDF data from 120-9 to the viewer
+            } else {
+              console.warn('No PDF data available');
+            }
+          } else {
+            console.warn('No data received from API or no R_Line found');
           }
         })
         .catch((error) => console.error('Failed to load PDF:', error));
+    } else {
+      console.error('Missing ProcessLine or productName in data120_2');
     }
   }, [data120_2]);
+  
+  // Check if data120_9 is defined and contains the expected data
+  if (data120_9 && data120_9[0] && data120_9[0].R_Line) {
+    console.log('R_Line:', data120_9[0].R_Line);  // Debugging to check R_Line value
+  } else {
+    console.error('R_Line is missing or undefined');
+  }
+  
+
+
 
   // Function to convert Base64 to Blob and generate PDF URL
   const handleShowPdf = (base64: string) => {
@@ -294,9 +315,9 @@ const checkreflowpage = () => {
             </div>
           </div>
 
-         {/* Success Message */}
-         <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-            <div className="flex justify-center items-center"> ! SUCCESS ! {productOrderNo} </div>
+          {/* Success Message */}
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
+            <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div>
           </div>
         </div>
       )}
@@ -310,17 +331,17 @@ const checkreflowpage = () => {
                 {/* row1 */}
                 <div className="flex w-full justify-start items-center">
                   <div className="flex text-xl justify-start items-center">
-                    <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">SMT-13</div>
+                    <div className="flex text-white drop-shadow-2xl font-bold text-[25px]"></div>
                   </div>
                 </div>
                 {/* row2 */}
                 <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">NPVV051DX1BM8BO</div>
+                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]"></div>
                 </div>
                 {/* row3 */}
                 <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
                   <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
-                  <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">202504030036</div>
+                  <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]"></div>
                 </div>
               </div>
             )}

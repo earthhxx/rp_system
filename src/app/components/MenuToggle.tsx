@@ -70,7 +70,6 @@ const MenuToggle = () => {
                 (decodedText, decodedResult) => {
                     console.log("Success", decodedText);
                     setProductOrderNo(decodedText);
-                    setHomeStage("home");
                     scanner.clear();
                 },
                 (errorMessage) => {
