@@ -87,7 +87,7 @@ const checkreflowpage = () => {
 
             if (result.R_PDF) {
               handleShowPdf(result.R_PDF);
-              
+
             } else {
               console.warn('No PDF in result');
             }
@@ -100,49 +100,32 @@ const checkreflowpage = () => {
     }
   }, [data120_2]);
 
- 
 
 
-  const handleShowPdf = (raw: any) => {
-    console.log("🧪 PDF raw input:", raw);
+
+  const handleShowPdf = (base64: string) => {
+    // 🧪 ตรวจว่า base64 มี prefix หรือยัง
+    const cleanedBase64 = base64.startsWith('data:') ? base64.split(',')[1] : base64;
   
-    try {
-      let blob: Blob;
+    // แปลง Base64 เป็น Blob
+    const byteArray = new Uint8Array(atob(cleanedBase64).split("").map(c => c.charCodeAt(0)));
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
   
-      // ✅ เช็คว่าเป็น Buffer object (Node.js style)
-      if (raw?.type === 'Buffer' && Array.isArray(raw?.data)) {
-        console.log("📦 Handling as Node.js Buffer (from API)");
-        const byteArray = new Uint8Array(raw.data);
-        blob = new Blob([byteArray], { type: 'application/pdf' });
+    // สร้าง URL สำหรับ PDF
+    const newPdfUrl = URL.createObjectURL(blob);
   
-      } else if (typeof raw === 'string') {
-        console.log("📄 Handling as base64 string");
-        const base64 = raw.startsWith('data:') ? raw.split(',')[1] : raw;
-  
-        const byteChars = atob(base64);
-        const byteArrays: Uint8Array[] = [];
-  
-        for (let i = 0; i < byteChars.length; i += 512) {
-          const slice = byteChars.slice(i, i + 512);
-          const byteNumbers = Array.from(slice).map(c => c.charCodeAt(0));
-          byteArrays.push(new Uint8Array(byteNumbers));
-        }
-  
-        blob = new Blob(byteArrays, { type: 'application/pdf' });
-  
-      } else {
-        throw new Error("Unsupported PDF format: " + typeof raw);
-      }
-  
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
-      console.log("✅ PDF blob created:", url);
-    } catch (e) {
-      console.error("❌ Failed to decode PDF:", e);
-    }
+    // ตั้งค่า newPdfUrl
+    setPdfUrl(newPdfUrl);
   };
   
+  // useEffect เพื่อลบ URL เก่าก่อนตั้งค่าใหม่
+  useEffect(() => {
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl); // ลบ URL เก่าหลังจากใช้งาน
+    }
+  }, [pdfUrl]); // ตรวจสอบเมื่อ pdfUrl อัปเดต
   
+
 
 
   useEffect(() => {
@@ -456,16 +439,14 @@ const checkreflowpage = () => {
 
         {/* PDF Section */}
         {pdfUrl && (
-          <div className="w-full h-[600px]">
-            <iframe
-              src={pdfUrl}
-              title="PDF Viewer"
-              width="100%"
-              height="100%"
-              className="rounded-lg shadow-md"
-            ></iframe>
+          <div className="w-full h-[600px] border border-gray-400">
+            <iframe src={pdfUrl} width="100%" height="100%" title="PDF Preview" />
           </div>
+          
         )}
+        <a href={pdfUrl || '#'} download="test.pdf" className="text-blue-500 underline mt-4 block">
+  🔽 Download PDF
+</a>
       </div>
     );
   }
