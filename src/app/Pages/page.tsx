@@ -5,13 +5,25 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { useSearchParams } from 'next/navigation';
 
+type DataItem120_2 = {
+  productOrderNo: string;
+  productName: string;
+  ProcessLine: string;
+};
+
+type DataItem120_9 = {
+  R_Model: string;
+  R_Line: string;
+  R_PDF: string;
+};
 
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
+
+
   const searchParams = useSearchParams();
   const ProductOrderNo = searchParams.get('productOrderNo');
-  console.log(ProductOrderNo);
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(true);
@@ -22,64 +34,71 @@ const checkreflowpage = () => {
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [data120_2, setData120_2] = useState<DataItem120_2[]>([]);
-  const [data120_9, setData120_9] = useState<DataItem120_9[]>([]);
-  console.log(data120_2);
-  console.log(data120_9);
+  const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
+  const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
 
-  type DataItem120_2 = {
-    productOrderNo: string;
-    productModel: string;
-    ProcessLine: string;
-  };
-  
-  type DataItem120_9 = {
-    R_Model: string;
-    R_Line: "SMT-5";
-    R_PDF: string;
-  };
+  const [isLoading120_2, setIsLoading120_2] = useState(true);
+
+
+
+
 
 
   // Fetching Data 120-2
   useEffect(() => {
     if (ProductOrderNo) {
-      fetch(`/api/scan-to-db-120-2?ProductOrderNo=${ProductOrderNo}`)
+      setIsLoading120_2(true); // ⏳ เริ่มโหลด
+      fetch(`/api/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
         .then((res) => res.json())
-        .then((data) => setData120_2(data.data))
-        .catch((error) => console.error(error));
+        .then((data) => {
+          console.log("Fetched Data from 120-2:", data);
+          setData120_2(data.data);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch 120-2:", error);
+        })
+        .finally(() => {
+          setIsLoading120_2(false); // ✅ โหลดเสร็จแล้ว
+        });
     }
   }, [ProductOrderNo]);
 
-  // Fetching Data 120-9 and triggering PDF display
+
+
+
+
+
   useEffect(() => {
-    if (data120_2.length > 0 && data120_2[0].ProcessLine && data120_2[0].productModel) {
-      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2[0].ProcessLine}&R_Model=${data120_2[0].productModel}`)
+    console.log("🧪 data120_2 useEffect:", data120_2);
+
+    if (
+      data120_2 !== null &&
+      typeof data120_2.ProcessLine === "string" &&
+      typeof data120_2.productName === "string"
+    ) {
+      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`)
         .then((res) => res.json())
         .then((data) => {
-          if (data && data.data && data.data.length > 0) {
-            setData120_9(data.data); // set the data to state
-            if (data.data[0].R_PDF) {
-              handleShowPdf(data.data[0].R_PDF); // Pass the PDF data from 120-9 to the viewer
+          if (data && data.data) {
+            const result = data.data; // ไม่ใช่ array
+            setData120_9(result); // result เป็น object เดียว
+        
+            if (result.R_PDF) {
+              handleShowPdf(result.R_PDF);
             } else {
-              console.warn('No PDF data available');
+              console.warn('No PDF in result');
             }
           } else {
             console.warn('No data received from API or no R_Line found');
           }
-        })
-        .catch((error) => console.error('Failed to load PDF:', error));
+        })        
+        .catch((error) => console.error("❌ Failed to fetch 120-9:", error));
     } else {
-      console.error('Missing ProcessLine or productName in data120_2');
+      console.warn("❗ Missing ProcessLine or productName in data120_2", data120_2);
     }
   }, [data120_2]);
-  
-  // Check if data120_9 is defined and contains the expected data
-  if (data120_9 && data120_9[0] && data120_9[0].R_Line) {
-    console.log('R_Line:', data120_9[0].R_Line);  // Debugging to check R_Line value
-  } else {
-    console.error('R_Line is missing or undefined');
-  }
-  
+
+
 
 
 
@@ -266,8 +285,8 @@ const checkreflowpage = () => {
   }, [isCardOpen]);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-blue-100">
 
+    <div className="flex flex-col h-screen w-full bg-blue-100">
       {SetTopper && (
         <div className="flex flex-col justify-center items-center relative">
           {/* Header Box */}
@@ -322,44 +341,54 @@ const checkreflowpage = () => {
         </div>
       )}
 
-      {
-        showChecked && (
-          <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
-            {showBar && (
-
-              < div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
-                {/* row1 */}
-                <div className="flex w-full justify-start items-center">
-                  <div className="flex text-xl justify-start items-center">
-                    <div className="flex text-white drop-shadow-2xl font-bold text-[25px]"></div>
+      {isLoading120_2 ? (
+        // กำลังโหลดข้อมูล
+        <div className="flex h-screen justify-center items-center text-2xl text-blue-600">
+          Loading...
+        </div>
+      ) : data120_2 && showChecked ? (
+        // โหลดเสร็จแล้ว + ต้องการแสดงผล
+        <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
+          {showBar && (
+            <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
+              {/* row1 */}
+              <div className="flex w-full justify-start items-center">
+                <div className="flex text-xl justify-start items-center">
+                  <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">
+                    {data120_9?.R_Line}
                   </div>
                 </div>
-                {/* row2 */}
-                <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]"></div>
-                </div>
-                {/* row3 */}
-                <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
-                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">Production No:</div>
-                  <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]"></div>
+              </div>
+              {/* row2 */}
+              <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">
+                  {data120_9?.R_Model}
                 </div>
               </div>
-            )}
-
-            {/* box2 */}
-            <div className="flex h-full w-80 items-center justify-center">
-              <button
-                onClick={() => setIsCardOpen(true)}
-                type="button"
-                className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300  ${buttonClass}`}
-              >
-                {buttonContent}
-              </button>
+              {/* row3 */}
+              <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">
+                  Production No:
+                </div>
+                <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">
+                  {ProductOrderNo}
+                </div>
+              </div>
             </div>
-          </div>
-        )
-      }
+          )}
 
+          {/* box2 */}
+          <div className="flex h-full w-80 items-center justify-center">
+            <button
+              onClick={() => setIsCardOpen(true)}
+              type="button"
+              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
+            >
+              {buttonContent}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {/* CARD */}
       {
