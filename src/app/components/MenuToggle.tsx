@@ -9,13 +9,15 @@ import { useRouter, usePathname } from "next/navigation";
 const MenuToggle = () => {
     const router = useRouter();
     const pathname = usePathname();
-    const [homeStage, sethomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
-    const [isScanCardOpen, setIsScanCardOpen] = useState(false);
+    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
-    
+    const [productOrderNo, setProductOrderNo] = useState("");
+    const [isCardOpen, setIsCardOpen] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -30,25 +32,27 @@ const MenuToggle = () => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            const isClickOutsideMenu = menuRef.current && !menuRef.current.contains(event.target as Node);
+            const isClickOutsideCard = cardRef.current && !cardRef.current.contains(event.target as Node);
+    
+            // ถ้าเปิดเมนูอยู่ แล้วคลิกข้างนอก ให้ปิดเมนู
+            if (homeStage === "menuOpen" && isClickOutsideMenu) {
                 setIsMenuOpen(false);
-                //set etc false here
-                sethomeStage("home");
+                setHomeStage("home");
+            }
+    
+            // ถ้าอยู่หน้า scan แล้วคลิกข้างนอก card ให้กลับ home
+            if (homeStage === "scan" && isClickOutsideCard) {
+                setHomeStage("home");
             }
         };
-
-        if (isMenuOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
+    
+        document.addEventListener("mousedown", handleClickOutside);
+    
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [isMenuOpen]);
-
-    // ---- Components for each stage ---- //
+    }, [homeStage]);
 
     const renderHomeButton = () => (
         <motion.div
@@ -68,7 +72,7 @@ const MenuToggle = () => {
                     className="fixed flex flex-col size-15 bg-white blur-[4] rounded-2xl justify-center items-center mr-[2px] cursor-pointer z-20"
                     onClick={() => {
                         setIsMenuOpen(true);
-                        sethomeStage("menuOpen");
+                        setHomeStage("menuOpen");
                     }}
                 >
                     <Image src="/images/LOGO3.png" alt="Menu Image" width={50} height={50} draggable={false} />
@@ -99,13 +103,10 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-                        if (pathname === "/Pages") {
-                            window.location.reload();
-                        } else {
-                            router.push("/Pages");
-                        }
+                        setHomeStage("scan");
+                        setIsMenuOpen(false);
                     }}
-                    className="flex flex-col justify-center items-center w-full h-full text-white"
+                    className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
                     <BsUpcScan className="size-30 text-white" />
                     SCAN PRODUCT
@@ -120,18 +121,21 @@ const MenuToggle = () => {
         </div>
     );
 
-    const scanCard = () => {
-        if (!isScanCardOpen) return null;
-        const inputRef = useRef<HTMLInputElement>(null);
-        const cardRef = useRef<HTMLDivElement>(null);
-        const [productOrderNo, setProductOrderNo] = useState(""); 
-    
+    const renderScanCard = () => {
+        if (homeStage !== "scan") return null;
+
         return (
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
                 <div
                     ref={cardRef}
                     className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
                 >
+                    <div className="flex justify-center items-center w-full text-white">
+                        Please enter your Employee ID :
+                    </div>
+                    <div className="flex justify-center items-center w-full text-white">
+                        โปรดใส่รหัสพนักงานของคุณ :
+                    </div>
                     <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
                     <input
                         ref={inputRef}
@@ -148,12 +152,9 @@ const MenuToggle = () => {
                         </span>
                         <div
                             onClick={() => {
-                                if (homeStage === "menuOpen") {
-                                    console.log("homeStage => scanCard");
-                                    console.log("Scanned ID:", productOrderNo);
-                                } else {
-                                    window.location.reload();
-                                }
+                                console.log("Scanned ID:", productOrderNo);
+                                setHomeStage("home");
+                                setProductOrderNo("");
                             }}
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
                         >
@@ -164,14 +165,12 @@ const MenuToggle = () => {
             </div>
         );
     };
-    
-
-    // ---- Main Return ---- //
 
     return (
         <>
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
+            {renderScanCard()}
 
             <div className="absolute bottom-5 left-5 text-white">
                 Position: {`X: ${position.x}, Y: ${position.y}`}
