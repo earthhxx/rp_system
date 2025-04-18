@@ -3,14 +3,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
+
 import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 
 
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
-import { Document, Page, pdfjs } from "react-pdf";
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 
 
@@ -30,7 +28,6 @@ type DataItem120_9 = {
 const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
-  const toolbarPluginInstance = toolbarPlugin();
   const [pdfWarning, setPdfWarning] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
   const searchParams = useSearchParams();
@@ -45,10 +42,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const scannerRef = useRef<any>(null);
   const [topper, setTopper] = useState(false);
 
-  
+
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
 
-  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
@@ -67,7 +63,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       handleShowPdf(base64); // ใช้ function ที่คุณเขียนไว้แล้ว
     }
   }, [base64]);
-  
+
 
   // Fetching Data 120-2
   useEffect(() => {
@@ -106,16 +102,30 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         }
 
         setData120_9(data);
+        console.log("data before if data.R_PDF", data);
 
-        if (data.R_PDF && /^JVBER/.test(atob(data.R_PDF.substring(0, 10)))) {
-          handleShowPdf(data.R_PDF);
-        } else {
-          setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
+        // เช็คค่า R_PDF ที่ได้รับมา
+        if (!data.R_PDF) {
+          setPdfWarning("ไม่พบข้อมูล R_PDF ในฐานข้อมูล");
+          return;
         }
-      } catch (error) {
-        console.error("❌ API Error:", error);
-        setPdfWarning("เกิดข้อผิดพลาดในการโหลด PDF");
-      } finally {
+
+        // แปลง base64 ก่อนแล้วเช็คว่าเริ่มต้นด้วย "JVBER"
+        try {
+          const decoded = atob(data.R_PDF);
+          console.log("Decoded base64:", decoded.substring(0, 50));  // ดูแค่บางส่วนพอ
+
+          if (decoded.startsWith("%PDF-")) {
+            handleShowPdf(data.R_PDF);
+          } else {
+            setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
+          }
+        } catch (e) {
+          console.error("Base64 decode error:", e);
+          setPdfWarning("ข้อมูล PDF ไม่สามารถแปลงได้");
+        }
+      }
+      finally {
         setIsLoading120_9(false);
       }
     };
@@ -126,21 +136,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   // 👉 ฟังก์ชันแปลง base64 → blob → objectURL
   const handleShowPdf = (base64: string) => {
     try {
-      const byteChars = atob(base64);
-      const byteNumbers = Array.from(byteChars, char => char.charCodeAt(0));
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-
-      // เคลียร์ URL เก่าก่อน
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
-      }
-
-      const newUrl = URL.createObjectURL(blob);
-      setPdfUrl(newUrl);
-      console.log("📦 PDF Blob created:", blob.size, "URL:", newUrl);
+      const dataUri = `data:application/pdf;base64,${base64}`;
+      setPdfUrl(dataUri);
+      console.log("✅ Data URI set for PDF", pdfUrl);
     } catch (err) {
-      console.error("❌ Failed to convert base64 to PDF Blob:", err);
+      console.error("❌ Failed to convert base64 to data URI:", err);
       setPdfWarning("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
@@ -152,14 +152,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
 
 
-
-
   useEffect(() => {
-    return () => {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
-      }
-    };
+    if (pdfUrl) {
+      console.log("📎 PDF URL is ready:", pdfUrl);
+    }
   }, [pdfUrl]);
 
 
@@ -329,7 +325,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     <div className="flex flex-col h-screen w-full bg-blue-100">
       ⏳ Loading Data...
       {topper && (
-        <div className="flex flex-col justify-center items-center relative">
+        <div className="flex flex-col justify-center items-center relative z-90">
           {/* Header Box */}
           <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
             {/* Box1 */}
@@ -488,17 +484,22 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         )
       }
       {isLoading120_9 && <p>🔄 กำลังโหลด PDF...</p>}
-      {pdfWarning && <p className="text-red-500">{pdfWarning}</p>}
+      {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
       {pdfUrl && (
-        <iframe
-          src={pdfUrl}
-          width="100%"
-          height="800px"
-          className="border rounded-md shadow"
-        />
-      )}
-
-    </div>
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-40 flex justify-center items-center">
+          <div className="bg-white w-4/5 h-[80%] rounded-xl p-4 shadow-lg relative">
+            <button onClick={() => setPdfUrl(null)} className="absolute top-2 right-4 text-red-600 font-bold">✕</button>
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+              <div className=" h-screen w-screen z-20">
+                <Viewer fileUrl={pdfUrl} />
+              </div>
+            </Worker>
+  
+          </div>
+        </div>
+    )}
+    </div >
+    
   );
 };
 
