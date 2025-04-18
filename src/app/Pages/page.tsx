@@ -4,10 +4,15 @@ import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
-import { pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
+import { Document, Page, pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -22,7 +27,7 @@ type DataItem120_9 = {
 };
 
 //api if !datalocal check status = ??? else back to layout
-const checkreflowpage = () => {
+const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
   const toolbarPluginInstance = toolbarPlugin();
@@ -38,8 +43,9 @@ const checkreflowpage = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
   const scannerRef = useRef<any>(null);
-  const [SetTopper, setTopper] = useState(false);
+  const [topper, setTopper] = useState(false);
 
+  
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -50,6 +56,18 @@ const checkreflowpage = () => {
 
 
 
+  useEffect(() => {
+    if (base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      handleShowPdf(base64); // ใช้ function ที่คุณเขียนไว้แล้ว
+    }
+  }, [base64]);
+  
 
   // Fetching Data 120-2
   useEffect(() => {
@@ -310,7 +328,7 @@ const checkreflowpage = () => {
 
     <div className="flex flex-col h-screen w-full bg-blue-100">
       ⏳ Loading Data...
-      {SetTopper && (
+      {topper && (
         <div className="flex flex-col justify-center items-center relative">
           {/* Header Box */}
           <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
