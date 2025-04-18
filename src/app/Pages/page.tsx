@@ -102,7 +102,6 @@ const checkreflowpage = () => {
       console.error("Base64 PDF data is missing");
       return;
     }
-  
     try {
       const blob = b64toBlob(base64, "application/pdf");
       console.log("📦 Blob size:", blob.size);
@@ -110,12 +109,12 @@ const checkreflowpage = () => {
       const url = URL.createObjectURL(blob);
       console.log("🔗 Blob URL:", url);
   
-      setPdfUrl(url); // ✅ move this into the try block
-      console.log("📄 generated blob URL:", url);
+      setPdfUrl(url); // ✅ moved inside try block only when success
     } catch (err) {
       console.error("❌ Failed to show PDF", err);
     }
   };
+  
   
 
   function b64toBlob(base64: string, mime: string): Blob {
