@@ -4,10 +4,29 @@ import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
+
+type DataItem120_2 = {
+  productOrderNo: string;
+  productName: string;
+  ProcessLine: string;
+};
+
+type DataItem120_9 = {
+  R_Model: string;
+  R_Line: string;
+  R_PDF: string;
+};
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
-
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedLine, setSelectedLine] = useState<string | null>(null);
+  const toolbarPluginInstance = toolbarPlugin();
+  const [pdfWarning, setPdfWarning] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
   const searchParams = useSearchParams();
   const ProductOrderNo = searchParams.get('productOrderNo');
@@ -17,26 +36,19 @@ const checkreflowpage = () => {
   const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED">("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [EmployeeNo, setProductOrderNo] = useState("");
+  const [EmployeeNo, setEmployeeNo] = useState("");
   const scannerRef = useRef<any>(null);
   const [SetTopper, setTopper] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
-  const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const [isLoading120_2, setIsLoading120_2] = useState(true);
+  const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  type DataItem120_2 = {
-    productOrderNo: string;
-    productName: string;
-    ProcessLine: string;
-  };
 
-  type DataItem120_9 = {
-    R_Model: string;
-    R_Line: string;
-    R_PDF: string;
-  };
 
 
   // Fetching Data 120-2
@@ -59,89 +71,78 @@ const checkreflowpage = () => {
   }, [ProductOrderNo]);
 
   useEffect(() => {
-    console.log("🧪 data120_2 useEffect:", data120_2);
+    if (!data120_2) return;
 
-    if (
-
-      data120_2 !== null &&
-      typeof data120_2.ProcessLine === "string" &&
-      typeof data120_2.productName === "string"
-    ) {
+    const fetchPdfData = async () => {
       setIsLoading120_9(true);
-      fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.data) {
-            const result = data.data; // ไม่ใช่ array
-            setData120_9(result); // result เป็น object เดียว
+      setPdfWarning('');
+      setPdfUrl(null);
 
-            if (result.R_PDF) {
-              try {
-                handleShowPdf(result.R_PDF);
-              } catch (e) {
-                console.error("🚨 Error showing PDF:", e);
-              }
+      try {
+        const res = await fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
+        const { data, success, message } = await res.json();
 
-            } else {
-              console.warn('No PDF in result');
-            }
-          } else {
-            console.warn('No data received from API or no R_Line found');
-          }
-          setIsLoading120_9(false);
-        })
-        .catch((error) => console.error("❌ Failed to fetch 120-9:", error));
-    }
-  }, [data120_2]);
-
-
-
-
-  const handleShowPdf = (base64: string) => {
-    if (!base64) {
-      console.error("Base64 PDF data is missing");
-      return;
-    }
-    try {
-      const blob = b64toBlob(base64, "application/pdf");
-      console.log("📦 Blob size:", blob.size);
-  
-      const url = URL.createObjectURL(blob);
-      console.log("🔗 Blob URL:", url);
-  
-      setPdfUrl(url); // ✅ moved inside try block only when success
-    } catch (err) {
-      console.error("❌ Failed to show PDF", err);
-    }
-  };
-  
-  
-
-  function b64toBlob(base64: string, mime: string): Blob {
-    try {
-      const byteChars = atob(base64);
-      const byteArrays: Uint8Array[] = [];
-
-      for (let i = 0; i < byteChars.length; i += 512) {
-        const slice = byteChars.slice(i, i + 512);
-        const byteNumbers = new Array(slice.length);
-
-        for (let j = 0; j < slice.length; j++) {
-          byteNumbers[j] = slice.charCodeAt(j);
+        if (!success || !data) {
+          setPdfWarning(message || 'ไม่พบข้อมูลจาก API');
+          return;
         }
 
-        byteArrays.push(new Uint8Array(byteNumbers));
+        setData120_9(data);
+
+        if (data.R_PDF && /^JVBER/.test(atob(data.R_PDF.substring(0, 10)))) {
+          handleShowPdf(data.R_PDF);
+        } else {
+          setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
+        }
+      } catch (error) {
+        console.error("❌ API Error:", error);
+        setPdfWarning("เกิดข้อผิดพลาดในการโหลด PDF");
+      } finally {
+        setIsLoading120_9(false);
+      }
+    };
+
+    fetchPdfData();
+  }, [data120_2]);
+
+  // 👉 ฟังก์ชันแปลง base64 → blob → objectURL
+  const handleShowPdf = (base64: string) => {
+    try {
+      const byteChars = atob(base64);
+      const byteNumbers = Array.from(byteChars, char => char.charCodeAt(0));
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+      // เคลียร์ URL เก่าก่อน
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
       }
 
-      return new Blob(byteArrays, { type: mime });
-    } catch (error) {
-      console.error("Error converting base64 to Blob:", error);
-      return new Blob([], { type: mime }); // Return empty blob on error
+      const newUrl = URL.createObjectURL(blob);
+      setPdfUrl(newUrl);
+      console.log("📦 PDF Blob created:", blob.size, "URL:", newUrl);
+    } catch (err) {
+      console.error("❌ Failed to convert base64 to PDF Blob:", err);
+      setPdfWarning("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
-  }
+  };
 
 
 
+
+
+
+
+
+
+
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
 
 
 
@@ -159,7 +160,9 @@ const checkreflowpage = () => {
           if (inputRef.current) {
             inputRef.current.value = decodedText;
           }
-          setProductOrderNo(decodedText);
+          setEmployeeNo(decodedText);
+
+
 
           // เคลียร์ scanner และปิดกล้อง
           scannerRef.current.clear().then(() => {
@@ -215,6 +218,7 @@ const checkreflowpage = () => {
 
   switch (submitStage) {
     case "waiting":
+
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
       buttonContent = (
@@ -302,180 +306,183 @@ const checkreflowpage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCardOpen]);
-  if (isLoading120_2 || isLoading120_9) {
-    return (
+  return (
 
-      <div className="flex flex-col h-screen w-full bg-blue-100">\
-        ⏳ Loading Data...
-        {SetTopper && (
-          <div className="flex flex-col justify-center items-center relative">
-            {/* Header Box */}
-            <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
-              {/* Box1 */}
-              <div className="flex flex-col max-h-full justify-center items-center">
-                {/* Row2 */}
-                <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                  <div className="font-roboto text-4xl text-white w-full font-bold">CYN-1231213123-DAS-DK</div>
-                </div>
-              </div>
-              {/* Box2 */}
-              <div className="flex h-full items-center justify-center">
-                <button
-                  onClick={() => setIsCardOpen(true)}
-                  type="button"
-                  className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
-                >
-                  <svg
-                    className="w-20 h-20"
-                    viewBox="0 0 56 56"
-                  >
-                    {/* วงกลม */}
-                    <circle
-                      className="check-circle "
-                      cx="26"
-                      cy="26"
-                      r="23"
-                      fill="none"
-                      stroke="#4ade80"
-                      strokeWidth="4"
-                    />
-                    {/* เครื่องหมายถูก */}
-                    <path
-                      className="check-mark"
-                      fill="none"
-                      stroke="#4ade80"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14 27 L22 35 L38 19"
-                    />
-                  </svg>
-                </button>
+    <div className="flex flex-col h-screen w-full bg-blue-100">
+      ⏳ Loading Data...
+      {SetTopper && (
+        <div className="flex flex-col justify-center items-center relative">
+          {/* Header Box */}
+          <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+            {/* Box1 */}
+            <div className="flex flex-col max-h-full justify-center items-center">
+              {/* Row2 */}
+              <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
+                <div className="font-roboto text-4xl text-white w-full font-bold">CYN-1231213123-DAS-DK</div>
               </div>
             </div>
-
-            {/* Success Message */}
-            <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-              <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div>
-            </div>
-          </div>
-        )}
-
-        {isLoading120_2 ? (
-          // กำลังโหลดข้อมูล
-          <div className="flex justify-center items-center text-2xl text-blue-600">
-            Loading...
-          </div>
-        ) : data120_2 && showChecked ? (
-          // โหลดเสร็จแล้ว + ต้องการแสดงผล
-          <div className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}>
-            {showBar && (
-              <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
-                {/* row1 */}
-                <div className="flex w-full justify-start items-center">
-                  <div className="flex text-xl justify-start items-center">
-                    <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">
-                      {data120_9?.R_Line}
-                    </div>
-                  </div>
-                </div>
-                {/* row2 */}
-                <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
-                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">
-                    {data120_9?.R_Model}
-                  </div>
-                </div>
-                {/* row3 */}
-                <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
-                  <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">
-                    Production No:
-                  </div>
-                  <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">
-                    {ProductOrderNo}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* box2 */}
-            <div className="flex h-full w-80 items-center justify-center">
+            {/* Box2 */}
+            <div className="flex h-full items-center justify-center">
               <button
                 onClick={() => setIsCardOpen(true)}
                 type="button"
-                className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
+                className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
               >
-                {buttonContent}
+                <svg
+                  className="w-20 h-20"
+                  viewBox="0 0 56 56"
+                >
+                  {/* วงกลม */}
+                  <circle
+                    className="check-circle "
+                    cx="26"
+                    cy="26"
+                    r="23"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="4"
+                  />
+                  {/* เครื่องหมายถูก */}
+                  <path
+                    className="check-mark"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M14 27 L22 35 L38 19"
+                  />
+                </svg>
               </button>
             </div>
           </div>
-        ) : null}
 
-        {/* CARD */}
-        {
-          isCardOpen && (
-            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-                <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={EmployeeNo}
-                  id="employee_id"
-                  onChange={(e) => setProductOrderNo(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="รหัสพนักงาน"
-                />
-                <div className="flex w-full h-full items-center">
+          {/* Success Message */}
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
+            <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div>
+          </div>
+        </div>
+      )}
 
-                  <span className="flex w-1/2 h-32 justify-center">
-                    <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                  </span>
-                  <div
-                    onClick={() => {
-                      if (submitStage === "waiting") {
-                        setSubmitStage("CHECKED");
-                        setShowBar(false);
-                        setIsCardOpen(false);
-                        console.log("CHECKED");
-                        console.log("Scanned ID:", EmployeeNo);
-                      }
-                      else {
-                        window.location.reload();
-                      }
-                    }}
-                    className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
-                    SUBMIT
+      {isLoading120_9 ? (
+        <div className="flex justify-center items-center text-2xl text-blue-600">
+          Loading...
+        </div>
+      ) : !data120_9 ? (
+        <div className="flex justify-center items-center text-2xl text-red-600">
+          ❌ ไม่มีข้อมูลจาก 120-9
+        </div>
+      ) : !showChecked ? (
+        <div className="flex justify-center items-center text-2xl text-yellow-600">
+          ℹ️ ยังไม่เปิดการแสดงผล (showChecked = false)
+        </div>
+      ) : (
+        // แสดงผลหลัก
+        <div
+          className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
+        >
+          {showBar ? (
+            <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
+              {/* row1 */}
+              <div className="flex w-full justify-start items-center">
+                <div className="flex text-xl justify-start items-center">
+                  <div className="flex text-white drop-shadow-2xl font-bold text-[25px]">
+                    {data120_9?.R_Line || "ไม่มีข้อมูล R_Line"}
                   </div>
                 </div>
               </div>
+
+              {/* row2 */}
+              <div className="flex w-full mt-10 text-xl text-center justify-center items-center">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[40px]">
+                  {data120_9?.R_Model || "ไม่มีข้อมูล R_Model"}
+                </div>
+              </div>
+
+              {/* row3 */}
+              <div className="flex flex-col w-full mt-6 text-xl text-center justify-end items-end">
+                <div className="font-roboto text-white drop-shadow-2xl font-bold text-[25px]">
+                  Production No:
+                </div>
+                <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">
+                  {ProductOrderNo || "ไม่พบ ProductOrderNo"}
+                </div>
+              </div>
             </div>
-          )
-        }
-        {pdfUrl ? (
-          <>
-            <div className='show-close'>
-              <h2>แสดง PDF</h2>
-              <button className='close-pdf' onClick={() => setPdfUrl(null)}>X</button>
-            </div>
-            <div style={{ height: '600px' }}>
-              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                <Viewer fileUrl={pdfUrl} />
-              </Worker>
-            </div>
-          </>
-        ) : (
-          <div className="text-gray-500">No PDF loaded</div>
-        )}
+          ) : (
+            <div className="text-white">🔇 showBar ถูกปิด</div>
+          )}
+
+          {/* box2 */}
+          <div className="flex h-full w-80 items-center justify-center">
+            <button
+              onClick={() => setIsCardOpen(true)}
+              type="button"
+              className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
+            >
+              {buttonContent}
+            </button>
+          </div>
+        </div>
+      )}
 
 
-        <a href={pdfUrl || '#'} download="test.pdf" className="text-blue-500 underline mt-4 block">
-          🔽 Download PDF
-        </a>
-      </div>
-    );
-  }
+      {/* CARD */}
+      {
+        isCardOpen && (
+          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
+            <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+              <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={EmployeeNo}
+                onChange={(e) => setEmployeeNo(e.target.value)}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="รหัสพนักงาน"
+              />
+              <div className="flex w-full h-full items-center">
+
+                <span className="flex w-1/2 h-32 justify-center">
+                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                </span>
+                <div
+                  onClick={() => {
+                    if (submitStage === "waiting") {
+                      setSubmitStage("CHECKED");
+                      setShowBar(false);
+                      setIsCardOpen(false);
+                      console.log("CHECKED");
+                      console.log("Scanned ID:", EmployeeNo);
+                    }
+                    else {
+                      window.location.reload();
+                    }
+                  }}
+                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  SUBMIT
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+      {isLoading120_9 && <p>🔄 กำลังโหลด PDF...</p>}
+      {pdfWarning && <p className="text-red-500">{pdfWarning}</p>}
+      {pdfUrl && (
+        <iframe
+          src={pdfUrl}
+          width="100%"
+          height="800px"
+          className="border rounded-md shadow"
+        />
+      )}
+
+    </div>
+  );
 };
 
 export default checkreflowpage;
+

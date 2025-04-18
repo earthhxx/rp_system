@@ -1,7 +1,13 @@
-//https://localhost:3000/api/load-pdf-to-db-120-9?R_Line=SMT-5&R_Model=EUV9NS019AA
 import { NextRequest, NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db-120-9';
 import sql from 'mssql';
+
+// Define type for record from database
+interface ReflowRecord {
+  R_Model: string;
+  R_Line: string;
+  R_PDF: string | null;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,39 +15,57 @@ export async function GET(req: NextRequest) {
     const model = searchParams.get('R_Model');
     const line = searchParams.get('R_Line');
 
-    // ตรวจสอบว่าได้รับพารามิเตอร์หรือไม่
+    // Validate input
     if (!model || !line) {
-      return NextResponse.json({ success: false, message: 'Missing R_Model or R_Line query parameter' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Missing R_Model or R_Line query parameter' },
+        { status: 400 }
+      );
     }
 
+    // Log input in development mode only
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Fetching PDF for:', { model, line });
+    }
+
+    // Connect to SQL Server
     const pool = await createConnection();
 
-    // ใช้ SQL Server query และคำสั่งสำหรับ query
+    // Query the database
     const result = await pool.request()
-      .input('R_Model', sql.NVarChar, model) // ใช้ input เพื่อหลีกเลี่ยง SQL Injection
+      .input('R_Model', sql.NVarChar, model)
       .input('R_Line', sql.NVarChar, line)
-      .query('SELECT R_Model, R_Line, R_PDF FROM REFLOW_TEMP_STANDARD WHERE R_Line = @R_Line AND R_Model = @R_Model');
+      .query(`
+        SELECT R_Model, R_Line, R_PDF 
+        FROM REFLOW_TEMP_STANDARD 
+        WHERE R_Line = @R_Line AND R_Model = @R_Model
+      `);
 
-    const rows = result.recordset;
+    const rows = result.recordset as ReflowRecord[];
 
-    // ตรวจสอบผลลัพธ์ว่าไม่พบข้อมูล
     if (rows.length === 0) {
-      return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: 'PDF not found for specified model and line' },
+        { status: 404 }
+      );
     }
 
-    // แปลงข้อมูล R_PDF จาก VarBinary เป็น Base64
-    result.recordset.forEach(item => {
-      if (item.R_PDF) {
-        item.R_PDF = item.R_PDF.toString('base64');
-      } else {
-        item.R_PDF = null; // หรือเว้นไว้, หรือใส่ '' ก็ได้แล้วแต่ต้องการ
-      }
-    });
+    // Convert R_PDF to base64
+    const processedRows = rows.map(item => ({
+      ...item,
+      R_PDF: item.R_PDF && Buffer.isBuffer(item.R_PDF)
+        ? item.R_PDF.toString('base64')
+        : null,
+    }));
 
-    // ส่งผลลัพธ์กลับไป
-    return NextResponse.json({ success: true, data: rows[0] });
+    // Return only first record (if needed)
+    return NextResponse.json({ success: true, data: processedRows[0] });
+
   } catch (error) {
     console.error('DB Query Error:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
