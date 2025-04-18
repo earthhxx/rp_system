@@ -4,10 +4,10 @@ import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 
-import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
-
+import { zoomPlugin } from '@react-pdf-viewer/zoom';
 
 
 
@@ -41,7 +41,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [EmployeeNo, setEmployeeNo] = useState("");
   const scannerRef = useRef<any>(null);
   const [topper, setTopper] = useState(false);
-
+  const zoomPluginInstance = zoomPlugin();
 
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
 
@@ -323,7 +323,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   return (
 
     <div className="flex flex-col h-screen w-full bg-blue-100">
-      ⏳ Loading Data...
       {topper && (
         <div className="flex flex-col justify-center items-center relative z-90">
           {/* Header Box */}
@@ -393,7 +392,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       ) : (
         // แสดงผลหลัก
         <div
-          className={`fixed z-90 top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
+          className={`fixed z-40 top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
         >
           {showBar ? (
             <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
@@ -444,7 +443,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       {/* CARD */}
       {
         isCardOpen && (
-          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
@@ -487,12 +486,18 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
       {pdfUrl && (
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <button onClick={() => setPdfUrl(null)} className="absolute top-2 right-4 text-red-600 font-bold">✕</button>
-          <div className="absolute h-screen w-screen z-0">
-            <Viewer fileUrl={pdfUrl} />
+          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+            <div className="w-full h-full ">
+              <Viewer
+                fileUrl={pdfUrl}
+                defaultScale={SpecialZoomLevel.PageFit}
+                plugins={[zoomPluginInstance]}
+              />
+            </div>
           </div>
         </Worker>
       )}
+
     </div >
 
   );
