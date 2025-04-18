@@ -30,6 +30,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
 
+    
+    
+
     // ส่งข้อมูลกลับ
     return NextResponse.json({ success: true, data: result.recordset[0] });
 

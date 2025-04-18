@@ -1,7 +1,7 @@
 //https://localhost:3000/api/load-pdf-to-db-120-9?R_Line=SMT-5&R_Model=EUV9NS019AA
 import { NextRequest, NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db-120-9';
-import sql from 'mssql'; 
+import sql from 'mssql';
 
 export async function GET(req: NextRequest) {
   try {
@@ -28,6 +28,15 @@ export async function GET(req: NextRequest) {
     if (rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
+
+    // แปลงข้อมูล R_PDF จาก VarBinary เป็น Base64
+    result.recordset.forEach(item => {
+      if (item.R_PDF) {
+        item.R_PDF = item.R_PDF.toString('base64');
+      } else {
+        item.R_PDF = null; // หรือเว้นไว้, หรือใส่ '' ก็ได้แล้วแต่ต้องการ
+      }
+    });
 
     // ส่งผลลัพธ์กลับไป
     return NextResponse.json({ success: true, data: rows[0] });

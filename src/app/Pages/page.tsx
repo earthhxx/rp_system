@@ -4,11 +4,6 @@ import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
-import { Anybody } from "next/font/google";
-
-
-
-
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
@@ -63,11 +58,6 @@ const checkreflowpage = () => {
     }
   }, [ProductOrderNo]);
 
-
-
-
-
-
   useEffect(() => {
     console.log("🧪 data120_2 useEffect:", data120_2);
 
@@ -86,7 +76,11 @@ const checkreflowpage = () => {
             setData120_9(result); // result เป็น object เดียว
 
             if (result.R_PDF) {
-              handleShowPdf(result.R_PDF);
+              try {
+                handleShowPdf(result.R_PDF);
+              } catch (e) {
+                console.error("🚨 Error showing PDF:", e);
+              }
 
             } else {
               console.warn('No PDF in result');
@@ -104,27 +98,51 @@ const checkreflowpage = () => {
 
 
   const handleShowPdf = (base64: string) => {
-    // 🧪 ตรวจว่า base64 มี prefix หรือยัง
-    const cleanedBase64 = base64.startsWith('data:') ? base64.split(',')[1] : base64;
+    if (!base64) {
+      console.error("Base64 PDF data is missing");
+      return;
+    }
   
-    // แปลง Base64 เป็น Blob
-    const byteArray = new Uint8Array(atob(cleanedBase64).split("").map(c => c.charCodeAt(0)));
-    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    try {
+      const blob = b64toBlob(base64, "application/pdf");
+      console.log("📦 Blob size:", blob.size);
   
-    // สร้าง URL สำหรับ PDF
-    const newPdfUrl = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
+      console.log("🔗 Blob URL:", url);
   
-    // ตั้งค่า newPdfUrl
-    setPdfUrl(newPdfUrl);
+      setPdfUrl(url); // ✅ move this into the try block
+      console.log("📄 generated blob URL:", url);
+    } catch (err) {
+      console.error("❌ Failed to show PDF", err);
+    }
   };
   
-  // useEffect เพื่อลบ URL เก่าก่อนตั้งค่าใหม่
-  useEffect(() => {
-    if (pdfUrl) {
-      URL.revokeObjectURL(pdfUrl); // ลบ URL เก่าหลังจากใช้งาน
+
+  function b64toBlob(base64: string, mime: string): Blob {
+    try {
+      const byteChars = atob(base64);
+      const byteArrays: Uint8Array[] = [];
+
+      for (let i = 0; i < byteChars.length; i += 512) {
+        const slice = byteChars.slice(i, i + 512);
+        const byteNumbers = new Array(slice.length);
+
+        for (let j = 0; j < slice.length; j++) {
+          byteNumbers[j] = slice.charCodeAt(j);
+        }
+
+        byteArrays.push(new Uint8Array(byteNumbers));
+      }
+
+      return new Blob(byteArrays, { type: mime });
+    } catch (error) {
+      console.error("Error converting base64 to Blob:", error);
+      return new Blob([], { type: mime }); // Return empty blob on error
     }
-  }, [pdfUrl]); // ตรวจสอบเมื่อ pdfUrl อัปเดต
-  
+  }
+
+
+
 
 
 
@@ -346,7 +364,7 @@ const checkreflowpage = () => {
 
         {isLoading120_2 ? (
           // กำลังโหลดข้อมูล
-          <div className="flex h-screen justify-center items-center text-2xl text-blue-600">
+          <div className="flex justify-center items-center text-2xl text-blue-600">
             Loading...
           </div>
         ) : data120_2 && showChecked ? (
@@ -436,17 +454,26 @@ const checkreflowpage = () => {
             </div>
           )
         }
-
-        {/* PDF Section */}
-        {pdfUrl && (
-          <div className="w-full h-[600px] border border-gray-400">
-            <iframe src={pdfUrl} width="100%" height="100%" title="PDF Preview" />
-          </div>
-          
+        {pdfUrl ? (
+          <>
+            <div className='show-close'>
+              <h2>แสดง PDF</h2>
+              <button className='close-pdf' onClick={() => setPdfUrl(null)}>X</button>
+            </div>
+            <div style={{ height: '600px' }}>
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                <Viewer fileUrl={pdfUrl} />
+              </Worker>
+            </div>
+          </>
+        ) : (
+          <div className="text-gray-500">No PDF loaded</div>
         )}
+
+
         <a href={pdfUrl || '#'} download="test.pdf" className="text-blue-500 underline mt-4 block">
-  🔽 Download PDF
-</a>
+          🔽 Download PDF
+        </a>
       </div>
     );
   }
