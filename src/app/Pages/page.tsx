@@ -393,7 +393,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       ) : (
         // แสดงผลหลัก
         <div
-          className={`fixed top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
+          className={`fixed z-90 top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
         >
           {showBar ? (
             <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
@@ -444,7 +444,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       {/* CARD */}
       {
         isCardOpen && (
-          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
+          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
@@ -486,20 +486,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       {isLoading120_9 && <p>🔄 กำลังโหลด PDF...</p>}
       {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
       {pdfUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-40 flex justify-center items-center">
-          <div className="bg-white w-4/5 h-[80%] rounded-xl p-4 shadow-lg relative">
-            <button onClick={() => setPdfUrl(null)} className="absolute top-2 right-4 text-red-600 font-bold">✕</button>
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-              <div className=" h-screen w-screen z-20">
-                <Viewer fileUrl={pdfUrl} />
-              </div>
-            </Worker>
-  
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+          <button onClick={() => setPdfUrl(null)} className="absolute top-2 right-4 text-red-600 font-bold">✕</button>
+          <div className="absolute h-screen w-screen z-0">
+            <Viewer fileUrl={pdfUrl} />
           </div>
-        </div>
-    )}
+        </Worker>
+      )}
     </div >
-    
+
   );
 };
 
