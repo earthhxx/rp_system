@@ -24,7 +24,7 @@ type DataItem120_9 = {
   R_PDF: string;
 };
 
-type DataItemStatus120_9 = {
+type DataItem120_9_Status = {
   ST_Line: string;
   ST_Model: string;
   ST_Prod: string;
@@ -54,6 +54,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
+  const [Data120_9_status, setData120_9_status] = useState<DataItem120_9_Status | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
 
@@ -75,7 +76,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (ProductOrderNo) {
       setIsLoading120_2(true); // ⏳ เริ่มโหลด
-      fetch(`/api/129-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
+      fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
         .then((res) => res.json())
         .then((data) => {
           console.log("Fetched Data from 120-2:", data);
@@ -93,6 +94,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (!data120_2) return;
 
+
     const fetchPdfData = async () => {
       setIsLoading120_9(true);
       setPdfWarning('');
@@ -100,13 +102,18 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
       try {
         const res = await fetch(`/api/120-9/checkflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
+        const res2 = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-
+        const { data2, success2, message2 } = await res2.json();
         if (!success || !data) {
-          setPdfWarning(message || 'ไม่พบข้อมูลจาก API');
+          setPdfWarning(message || 'ไม่พบข้อมูลจาก API load-pdf-data');
           return;
         }
-
+        if (!success2 || !data2) {
+          setPdfWarning(message2 || 'ไม่พบข้อมูลจาก API select-REFLOW_Status');
+          return;
+        }
+        setData120_9_status(data2);
         setData120_9(data);
         console.log("data before if data.R_PDF", data);
 
@@ -115,6 +122,21 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           setPdfWarning("ไม่พบข้อมูล R_PDF ในฐานข้อมูล");
           return;
         }
+        if (data2.ST_Status === "null" && data2.ST_Prod === "null"){
+          setSubmitStage("waiting");
+          //insert table status in database to waiting prod model time
+        }
+        if (data2.ST_Status === "waiting"){
+          setSubmitStage("waiting")
+        }
+        if (data2.ST_Status === "CHECKED"){
+          setSubmitStage("CHECKED")
+        }
+        else {
+          console.log('error')
+        }
+        
+        
 
         // แปลง base64 ก่อนแล้วเช็คว่าเริ่มต้นด้วย "JVBER"
         try {
