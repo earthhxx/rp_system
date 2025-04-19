@@ -51,7 +51,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
 
   const updateReflowStatus = async () => {
-    const res = await fetch('/api/120-9/checkreflow/update-status', {
+    const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Status: submitStage
       };
   
-      const res = await fetch('/api/120-9/checkreflow/log-status', {
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_Status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
