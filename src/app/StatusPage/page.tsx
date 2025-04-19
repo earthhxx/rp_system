@@ -81,9 +81,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: submitStage
+        
       };
   
-      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_Status', {
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
