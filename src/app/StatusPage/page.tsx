@@ -24,10 +24,16 @@ type DataItem120_9 = {
   R_PDF: string;
 };
 
+type DataItemStatus120_9 = {
+  ST_Line: string;
+  ST_Model: string;
+  ST_Prod: string;
+  ST_Status:string;
+};
+
+
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = ({ base64 }: { base64: string }) => {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const [selectedLine, setSelectedLine] = useState<string | null>(null);
   const [pdfWarning, setPdfWarning] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
   const searchParams = useSearchParams();
@@ -69,7 +75,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (ProductOrderNo) {
       setIsLoading120_2(true); // ⏳ เริ่มโหลด
-      fetch(`/api/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
+      fetch(`/api/129-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
         .then((res) => res.json())
         .then((data) => {
           console.log("Fetched Data from 120-2:", data);
@@ -93,7 +99,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setPdfUrl(null);
 
       try {
-        const res = await fetch(`/api/load-pdf-to-db-120-9?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
+        const res = await fetch(`/api/120-9/checkflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
         const { data, success, message } = await res.json();
 
         if (!success || !data) {
