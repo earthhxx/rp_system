@@ -48,6 +48,45 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
+
+  const submitLogToReflow120_9 = async () => {
+    if (!data120_2 || !submitStage) {
+      console.warn("Missing required fields to submit log");
+      return;
+    }
+  
+    try {
+      const payload = {
+        R_Line: data120_2.ProcessLine,
+        R_Model: data120_2.productName,
+        productOrderNo: ProductOrderNo,
+        ST_Status: submitStage
+      };
+  
+      const res = await fetch('/api/120-9/checkreflow/log-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok || !result.success) {
+        console.error("Log submit failed:", result.message);
+      } else {
+        console.log("Log submitted successfully");
+      }
+  
+    } catch (error) {
+      console.error("Error submitting log:", error);
+    }
+  };
+  
+
+
 
   useEffect(() => {
     if (base64) {
@@ -129,32 +168,36 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-  
-        if (!success || !data) {
+    
+        if (!success || !data || data.length === 0) {
           console.warn("โหลดสถานะล้มเหลว:", message);
           return;
         }
-  
-        // TODO: ตรวจสอบหรือแสดงผลสถานะจาก data
-        console.log("REFLOW Status:", data);
-  
-        // ตัวอย่างการใช้ข้อมูลเพื่อเปลี่ยนสถานะ
-        const status = data[0]?.ST_Status;
-        const prod = data[0]?.ST_Prod;
-  
-        if ((!status || status === "null") && (!prod || prod === "null")) {
+    
+        const statusItem: DataItem120_9_Status = data[0];
+        setStatusData120_9(statusItem); // <- เก็บค่าเข้า state
+    
+        // ตรวจสอบเพื่อเปลี่ยนสถานะ
+        const { ST_Status, ST_Prod } = statusItem;
+    
+        if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("waiting");
-        } else if ((!status || status === "waiting") && (!prod || prod === ProductOrderNo)) {
+          submitLogToReflow120_9();
+        } else if ((!ST_Status || ST_Status === "waiting") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("waiting");
-        } else if ((status === "CHECKED")  && (!prod || prod === ProductOrderNo)){
+          submitLogToReflow120_9();
+        } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("CHECKED");
+          submitLogToReflow120_9();
         } else {
-          console.warn("สถานะไม่รู้จัก:", status);
+          console.warn("สถานะไม่รู้จัก:", ST_Status);
         }
+    
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
       }
     };
+    
     fetchPdfData();
     fetchReflowStatus();
   
