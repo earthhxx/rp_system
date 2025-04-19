@@ -104,6 +104,42 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.error("Error submitting log:", error);
     }
   };
+
+  const submitLogToReflow120_9_CHECK = async () => {
+    if (!data120_2 || !submitStage) {
+      console.warn("Missing required fields to submit log");
+      return;
+    }
+  
+    try {
+      const payload = {
+        R_Line: data120_2.ProcessLine,
+        R_Model: data120_2.productName,
+        productOrderNo: ProductOrderNo,
+        ST_Status: submitStage
+        
+      };
+  
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_CHECK', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok || !result.success) {
+        console.error("Log submit failed:", result.message);
+      } else {
+        console.log("Log submitted successfully");
+      }
+  
+    } catch (error) {
+      console.error("Error submitting log:", error);
+    }
+  };
   
 
 
