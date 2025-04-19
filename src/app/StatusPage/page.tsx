@@ -3,14 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
-
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
-
-
-
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -48,16 +44,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const scannerRef = useRef<any>(null);
   const [topper, setTopper] = useState(false);
   const zoomPluginInstance = zoomPlugin();
-
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
-
-
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
-  const [Data120_9_status, setData120_9_status] = useState<DataItem120_9_Status | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-
-
 
   useEffect(() => {
     if (base64) {
@@ -70,7 +60,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       handleShowPdf(base64); // ใช้ function ที่คุณเขียนไว้แล้ว
     }
   }, [base64]);
-
 
   // Fetching Data 120-2
   useEffect(() => {
@@ -162,17 +151,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         } else {
           console.warn("สถานะไม่รู้จัก:", status);
         }
-  
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
       }
     };
-  
     fetchPdfData();
     fetchReflowStatus();
   
   }, [data120_2]);
-  
+
 
   // 👉 ฟังก์ชันแปลง base64 → blob → objectURL
   const handleShowPdf = (base64: string) => {
@@ -186,20 +173,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   };
 
-
-
-
-
-  
-
-
   useEffect(() => {
     if (pdfUrl) {
       console.log("📎 PDF URL is ready:", pdfUrl);
     }
   }, [pdfUrl]);
-
-
 
   useEffect(() => {
     if (isCardOpen && !scannerRef.current) {
