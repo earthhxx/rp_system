@@ -508,7 +508,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         </div>
       ) : !showChecked ? (
         <div className="flex justify-center items-center text-2xl text-yellow-600">
-          ℹ️ ยังไม่เปิดการแสดงผล (showChecked = false)
         </div>
       ) : (
         // แสดงผลหลัก
@@ -550,7 +549,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           {/* box2 */}
           <div className="flex h-full w-80 items-center justify-center">
             <button
-              onClick={() => setIsCardOpen(true)}
+              onClick={() => {setIsCardOpen(true);}}
               type="button"
               className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
             >
@@ -586,6 +585,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   onClick={() => {
                     if (submitStage === "waiting") {
                       setSubmitStage("CHECKED");
+                      submitLogToReflow120_9_CHECK(); 
+                      updateReflowStatus();
                       setShowBar(false);
                       setIsCardOpen(false);
                       console.log("CHECKED");
