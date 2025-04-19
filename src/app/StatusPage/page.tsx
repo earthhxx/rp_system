@@ -50,6 +50,25 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
 
+  const updateReflowStatus = async () => {
+    const res = await fetch('/api/120-9/checkreflow/update-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ST_Line: data120_2?.ProcessLine,
+        ST_Model: data120_2?.productName,
+        ST_Prod: ProductOrderNo,
+        ST_Status: submitStage
+      })
+    });
+  
+    const result = await res.json();
+    console.log(result);
+  };
+  
+
   const submitLogToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
       console.warn("Missing required fields to submit log");
@@ -183,12 +202,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
+          updateReflowStatus();
         } else if ((!ST_Status || ST_Status === "waiting") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
+          updateReflowStatus();
         } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("CHECKED");
           submitLogToReflow120_9();
+          updateReflowStatus();
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
         }
