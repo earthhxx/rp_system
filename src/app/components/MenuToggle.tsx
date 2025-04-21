@@ -4,13 +4,21 @@ import Image from "next/image";
 import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
-import { useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, } from "next/navigation";
 import { Html5QrcodeScanner } from "html5-qrcode";
+
+interface ReflowStatus {
+    ST_Line: string;
+    ST_Model: string;
+    ST_Prod: string;
+    ST_Status: string;
+}
 
 const MenuToggle = () => {
     const router = useRouter();
     const pathname = usePathname();
-    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
+    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen" | "closeprod">("home");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
@@ -18,9 +26,110 @@ const MenuToggle = () => {
     const [productOrderNo, setProductOrderNo] = useState("");
     const [isCardOpen, setIsCardOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const inputProdRef = useRef<HTMLInputElement>(null);
     const cardRef = useRef<HTMLDivElement>(null);
+    const cardProdRef = useRef<HTMLDivElement>(null);
+
+    const [statusData, setStatusData] = useState<ReflowStatus | null>(null);
+    const [error, setError] = useState("");
 
 
+    const searchParams = useSearchParams();
+    const ProductOrderNos = searchParams.get('ProductOrderNos');
+    console.log("product in menu", ProductOrderNos);
+
+
+    const [EmployeeNo, setEmployeeNo] = useState("");
+    const [employeeName, setEmployeeName] = useState("");
+    const [employeeUserName, setEmployeeUserName] = useState("");
+
+    useEffect(() => {
+        const fetchStatusData = async () => {
+            console.log("product in menu", ProductOrderNos);
+            try {
+                const res = await fetch(`https://localhost:3000/api/120-9/checkreflow/select-product-status-for-close?ProductOrderNos=${ProductOrderNos}`);
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    setStatusData(result.data[0]); // ใช้ record แรก
+                    console.log('after setdata ',result.data[0]);
+                } else {
+                    setError(result.message || "No data found");
+                }
+            } catch (err) {
+                setError("Failed to fetch data");
+                console.error("Error fetching reflow status:", err);
+            }
+        };
+
+        if (ProductOrderNos) {
+            fetchStatusData();
+        }
+    }, [ProductOrderNos]);
+
+    useEffect(() => {
+        const fetchEmployeeName = async () => {
+            const res = await fetch(`https://localhost:3000/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
+            const { success, data } = await res.json();
+            console.log(data);
+
+            if (success && data?.Name && data?.UserName) {
+                setEmployeeName(data.Name);
+                setEmployeeUserName(data.UserName);
+            }
+        };
+
+        if (EmployeeNo) fetchEmployeeName();
+    }, [EmployeeNo]);
+
+
+    const submitLogToReflow120_9_CLOSE = async () => {
+        try {
+            if (EmployeeNo === employeeUserName) {
+                console.log(statusData);
+                const payload = {
+                    R_Line: statusData?.ST_Line,
+                    R_Model: statusData?.ST_Model,
+                    productOrderNo: ProductOrderNos,
+                    ST_Status: "CLOSE",
+                    Log_User: EmployeeNo
+                };
+
+                const res = await fetch('/api/120-9/checkreflow/close-reflow-prod', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (!res.ok || !result.success) {
+                    console.error("Log close submit failed:", result.message);
+                } else {
+                    console.log("Log close submitted successfully");
+                }
+            }
+        } catch (error) {
+            console.error("Error close submitting log:", error);
+        }
+    };
+
+    const updateReflowStatus = async () => {
+        const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ST_Line: statusData?.ST_Line,
+                ST_Model: null,
+                ST_Prod: null,
+                ST_Status: null
+            })
+        })
+    };
 
 
     useEffect(() => {
@@ -126,7 +235,12 @@ const MenuToggle = () => {
                 className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
             >
                 <div className="flex w-full h-full"></div>
-                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                <div
+                    onClick={() => {
+                        setHomeStage("closeprod");
+                        setIsMenuOpen(false);
+                    }}
+                    className="flex flex-col justify-center items-center w-full h-full text-white">
                     <GoCheckCircle className="size-30 text-white" />
                     SUBMIT PRODUCT
                 </div>
@@ -160,7 +274,7 @@ const MenuToggle = () => {
         if (homeStage !== "scan") return null;
 
         return (
-            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-30 bg-black/20 backdrop-blur-sm">
+            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
                 <div
                     ref={cardRef}
                     className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
@@ -187,12 +301,60 @@ const MenuToggle = () => {
                         </span>
                         <div
                             onClick={() => {
-                              console.log("Scanned ID:", productOrderNo);
-                              setHomeStage("home");
-                              const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
-                              router.push(`/StatusPage?productOrderNo=${query}`);
+                                console.log("Scanned ID:", productOrderNo);
+                                setHomeStage("home");
+                                const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
+                                const query2 = encodeURIComponent(productOrderNo);
+                                router.push(`/StatusPage?productOrderNo=${query}&ProductOrderNos=${query2}`);
                             }}
-                          
+
+                            className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
+                        >
+                            SUBMIT
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const rendercloseProdCard = () => {
+        if (homeStage !== "closeprod") return null;
+
+        return (
+            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
+                <div
+                    ref={cardProdRef}
+                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
+                >
+                    <div className="flex justify-center items-center w-full text-white">
+                        Please enter Employee ID :
+                    </div>
+                    <div className="flex justify-center items-center w-full text-white">
+                        โปรดใส่รหัสพนักงานของคุณ :
+                    </div>
+                    <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+                    <input
+                        ref={inputProdRef}
+                        type="text"
+                        value={EmployeeNo}
+                        id="Employee_id"
+                        onChange={(e) => setEmployeeNo(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Employee id..."
+                    />
+                    <div className="flex w-full h-full items-center">
+                        <span className="flex w-1/2 h-32 justify-center">
+                            <BsUpcScan className="size-32 text-white" />
+                        </span>
+                        <div
+                            onClick={() => {
+                                console.log("Scanned ID:", EmployeeNo);
+                                submitLogToReflow120_9_CLOSE();
+                                updateReflowStatus();
+                                setHomeStage("home");
+                            }}
+
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
                         >
                             SUBMIT
@@ -208,6 +370,8 @@ const MenuToggle = () => {
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
             {homeStage === "scan" && renderScanCard()}
+            {homeStage === "closeprod" && rendercloseProdCard()}
+
 
             <div className="absolute bottom-5 left-5 text-white">
                 Position: {`X: ${position.x}, Y: ${position.y}`}
