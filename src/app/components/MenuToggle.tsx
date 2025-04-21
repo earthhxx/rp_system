@@ -36,7 +36,7 @@ const MenuToggle = () => {
 
     const searchParams = useSearchParams();
     const ProductOrderNos = searchParams.get('ProductOrderNos');
-    console.log("product in menu", ProductOrderNos);
+    
 
 
     const [EmployeeNo, setEmployeeNo] = useState("");
@@ -45,7 +45,7 @@ const MenuToggle = () => {
 
     useEffect(() => {
         const fetchStatusData = async () => {
-            console.log("product in menu", ProductOrderNos);
+           
             try {
                 const res = await fetch(`https://localhost:3000/api/120-9/checkreflow/select-product-status-for-close?ProductOrderNos=${ProductOrderNos}`);
                 const result = await res.json();
@@ -85,7 +85,9 @@ const MenuToggle = () => {
 
     const submitLogToReflow120_9_CLOSE = async () => {
         try {
-            if (EmployeeNo === employeeUserName) {
+            if (EmployeeNo === employeeUserName &&
+                statusData?.ST_Status !== "waiting" &&
+                statusData?.ST_Status !== null) {
                 console.log(statusData);
                 const payload = {
                     R_Line: statusData?.ST_Line,
@@ -111,8 +113,11 @@ const MenuToggle = () => {
                     console.log("Log close submitted successfully");
                 }
             }
+            else{
+                console.error("make sure your're not in waiting status:",error);
+            }
         } catch (error) {
-            console.error("Error close submitting log:", error);
+            console.error("Error close submitting log ", error);
         }
     };
 
