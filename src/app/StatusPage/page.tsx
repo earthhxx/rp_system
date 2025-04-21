@@ -24,7 +24,7 @@ type DataItem120_9_Status = {
   ST_Line: string;
   ST_Model: string;
   ST_Prod: string;
-  ST_Status:string;
+  ST_Status: string;
 };
 
 
@@ -49,6 +49,24 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
+  const [employeeName, setEmployeeName] = useState("");
+  const [employeeUserName,setEmployeeUserName] = useState("");
+
+  useEffect(() => {
+    const fetchEmployeeName = async () => {
+      const res = await fetch(`https://localhost:3000/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
+      const { success, data } = await res.json();
+      console.log(data);
+
+      if (success && data?.Name && data?.UserName) {
+        setEmployeeName(data.Name);
+        setEmployeeUserName(data.UserName);
+      }
+    };
+
+    if (EmployeeNo) fetchEmployeeName();
+  }, [EmployeeNo]);
+
 
   const updateReflowStatus = async () => {
     const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
@@ -63,27 +81,27 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Status: submitStage
       })
     });
-  
+
     const result = await res.json();
     console.log(result);
   };
-  
+
 
   const submitLogToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
       console.warn("Missing required fields to submit log");
       return;
     }
-  
+
     try {
       const payload = {
         R_Line: data120_2.ProcessLine,
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: submitStage
-        
+
       };
-  
+
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log', {
         method: 'POST',
         headers: {
@@ -91,15 +109,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         },
         body: JSON.stringify(payload)
       });
-  
+
       const result = await res.json();
-  
+
       if (!res.ok || !result.success) {
         console.error("Log submit failed:", result.message);
       } else {
         console.log("Log submitted successfully");
       }
-  
+
     } catch (error) {
       console.error("Error submitting log:", error);
     }
@@ -110,7 +128,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.warn("Missing required fields to submit log");
       return;
     }
-  
+
     try {
       const payload = {
         R_Line: data120_2.ProcessLine,
@@ -119,7 +137,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Status: submitStage,
         Log_User: EmployeeNo
       };
-  
+
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_CHECKED', {
         method: 'POST',
         headers: {
@@ -127,20 +145,20 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         },
         body: JSON.stringify(payload)
       });
-  
+
       const result = await res.json();
-  
+
       if (!res.ok || !result.success) {
         console.error("Log submit failed:", result.message);
       } else {
         console.log("Log submitted successfully");
       }
-  
+
     } catch (error) {
       console.error("Error submitting log:", error);
     }
   };
-  
+
 
 
 
@@ -177,29 +195,29 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   useEffect(() => {
     if (!data120_2) return;
-  
+
     const fetchPdfData = async () => {
       setIsLoading120_9(true);
       setPdfWarning('');
       setPdfUrl(null);
-  
+
       try {
         const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
         const { data, success, message } = await res.json();
-  
+
         if (!success || !data) {
           setPdfWarning(message || 'ไม่พบข้อมูลจาก API load-pdf-data');
           return;
         }
-  
+
         setData120_9(data);
-  
+
         // ตรวจสอบและแสดง PDF
         if (!data.R_PDF) {
           setPdfWarning("ไม่พบข้อมูล R_PDF ในฐานข้อมูล");
           return;
         }
-  
+
         try {
           const decoded = atob(data.R_PDF);
           if (decoded.startsWith("%PDF-")) {
@@ -211,7 +229,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           console.error("Base64 decode error:", e);
           setPdfWarning("ข้อมูล PDF ไม่สามารถแปลงได้");
         }
-  
+
       } catch (error) {
         console.error("โหลด PDF ล้มเหลว:", error);
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
@@ -219,23 +237,23 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setIsLoading120_9(false);
       }
     };
-  
+
     const fetchReflowStatus = async () => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-    
+
         if (!success || !data || data.length === 0) {
           console.warn("โหลดสถานะล้มเหลว:", message);
           return;
         }
-    
+
         const statusItem: DataItem120_9_Status = data[0];
         setStatusData120_9(statusItem); // <- เก็บค่าเข้า state
-    
+
         // ตรวจสอบเพื่อเปลี่ยนสถานะ
         const { ST_Status, ST_Prod } = statusItem;
-    
+
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
@@ -251,15 +269,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
         }
-    
+
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
       }
     };
-    
+
     fetchPdfData();
     fetchReflowStatus();
-  
+
   }, [data120_2]);
 
 
@@ -549,7 +567,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           {/* box2 */}
           <div className="flex h-full w-80 items-center justify-center">
             <button
-              onClick={() => {setIsCardOpen(true);}}
+              onClick={() => { setIsCardOpen(true); }}
               type="button"
               className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
             >
@@ -583,18 +601,26 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    if (submitStage === "waiting") {
-                      setSubmitStage("CHECKED");
-                      submitLogToReflow120_9_CHECK(); 
-                      updateReflowStatus();
-                      setShowBar(false);
-                      setIsCardOpen(false);
-                      console.log("CHECKED");
-                      console.log("Scanned ID:", EmployeeNo);
+                    console.log(employeeName)
+                    if (EmployeeNo  === employeeUserName) {
+                      
+                      if (submitStage === "waiting") {
+                        setSubmitStage("CHECKED");
+                        submitLogToReflow120_9_CHECK();
+                        updateReflowStatus();
+                        setShowBar(false);
+                        setIsCardOpen(false);
+                        console.log("CHECKED");
+                        console.log("Scanned ID:", EmployeeNo);
+                      }
+                      else {
+                        window.location.reload();
+                      }
+
                     }
-                    else {
-                      window.location.reload();
-                    }
+                  else {
+                    console.log("employeeName != EmployeeNo")
+                  }
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
