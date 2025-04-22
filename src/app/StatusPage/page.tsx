@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { BsUpcScan } from "react-icons/bs";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
+import { GoSkipFill, GoCheckCircle } from "react-icons/go";
+import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -50,13 +51,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
-  const [employeeUserName,setEmployeeUserName] = useState("");
+  const [employeeUserName, setEmployeeUserName] = useState("");
 
   useEffect(() => {
     const fetchEmployeeName = async () => {
       const res = await fetch(`https://localhost:3000/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
       const { success, data } = await res.json();
-     
+
 
       if (success && data?.Name && data?.UserName) {
         setEmployeeName(data.Name);
@@ -80,7 +81,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Prod: ProductOrderNo,
         ST_Status: "waiting"
       })
-      
+
     });
 
     const result = await res.json();
@@ -99,7 +100,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Prod: ProductOrderNo,
         ST_Status: "CHECKED"
       })
-      
+
     });
 
     const result = await res.json();
@@ -278,15 +279,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
           updateReflowStatus();
-          
+
         } else if ((!ST_Status || ST_Status === "waiting") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
           updateReflowStatus();
-          
+
         } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("CHECKED");
-          
+
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
         }
@@ -483,15 +484,42 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   return (
 
     <div className="flex flex-col h-screen w-full bg-blue-100">
+      <div></div>
+      <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
+      <div className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
+        <div className="flex flex-none h-10"></div>
+        <div className="flex flex-row justify-center items-center ">
+          <div className="flex w-full h-full justify-center">
+            <div className="flex flex-none"></div>
+            <div className="flex flex-col justify-center items-center">
+              <div className="flex flex-none"></div>
+              <GoSkipFill className="size-30 text-white" />
+              <div>CANCEL PRODUCT</div>
+            </div>
+            <div className="flex flex-none"></div>
+          </div>
+          <div className="flex w-full h-full justify-center">
+            <div className="flex flex-none"></div>
+            <div className="flex flex-col  justify-center items-center">
+              <div className="flex flex-none"></div>
+              <GoCheckCircle className="size-30 text-white" />
+              <div>SUBMIT PRODUCT</div>
+            </div>
+            <div className="flex flex-none "></div>
+          </div>
+        </div>
+        <div className="flex-none h-10"></div>
+      </div>
+      </div>
       {topper && (
-        <div className="flex flex-col justify-center items-center relative z-90">
+        <div className="flex flex-col justify-center items-center relative z-40">
           {/* Header Box */}
           <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
             {/* Box1 */}
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                <div className="font-roboto text-4xl text-white w-full font-bold">CYN-1231213123-DAS-DK</div>
+                <div className="font-roboto text-4xl text-white w-full font-bold">${ProductOrderNo}</div>
               </div>
             </div>
             {/* Box2 */}
@@ -623,11 +651,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 <div
                   onClick={() => {
                     console.log(employeeName)
-                    if (EmployeeNo  === employeeUserName) {
-                      
+                    if (EmployeeNo === employeeUserName) {
+
                       if (submitStage === "waiting") {
                         setSubmitStage("CHECKED");
-                        
+
                         submitLogToReflow120_9_CHECK();
                         updateReflowStatusCHECKED();
                         setShowBar(false);
@@ -640,9 +668,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       }
 
                     }
-                  else {
-                    console.log("employeeName != EmployeeNo")
-                  }
+                    else {
+                      console.log("employeeName != EmployeeNo")
+                    }
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT

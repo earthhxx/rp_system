@@ -150,8 +150,8 @@ const MenuToggle = () => {
                         setIsMenuOpen(false);
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <GoCheckCircle className="size-30 text-white" />
-                    SUBMIT PRODUCT
+                    {/* <GoCheckCircle className="size-30 text-white" />
+                    SUBMIT PRODUCT */}
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -171,8 +171,8 @@ const MenuToggle = () => {
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <GoSkipFill className="size-30 text-white" />
-                    CANCEL PRODUCT
+                    {/* <GoSkipFill className="size-30 text-white" />
+                    CANCEL PRODUCT */}
                 </div>
                 <div className="flex w-full h-full"></div>
             </div>
