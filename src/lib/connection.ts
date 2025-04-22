@@ -27,7 +27,7 @@ export const getDashboardConnection = async () => {
   pool_DASHBOARD = await new sql.ConnectionPool({
     user: 'sa',
     password: 'B1mUmNU9',
-    server: '192.168.120.2',
+    server: '192.168.120.9',
     database: 'DASHBOARD',
     options: {
       encrypt: false,
