@@ -134,7 +134,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Line: data120_2.ProcessLine,
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
-        ST_Status: submitStage,
+        ST_Status: "CHECKED",
         Log_User: EmployeeNo
       };
 
@@ -258,14 +258,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
           updateReflowStatus();
+          
         } else if ((!ST_Status || ST_Status === "waiting") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("waiting");
           submitLogToReflow120_9();
           updateReflowStatus();
+          
         } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("CHECKED");
-          submitLogToReflow120_9();
-          updateReflowStatus();
+          
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
         }
