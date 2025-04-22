@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-9';
+import { createConnection } from '@/lib/connection';
 import sql from 'mssql';
 
 // Define expected structure from request body
