@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
 import { createConnection } from '@/lib/connection';
+=======
+import { getDashboardConnection } from '@/lib/connection';
+>>>>>>> 9c2d17547e788b8ffb6d5afa370c8c59a7f15ffe
 import sql from 'mssql';
 
 // Define type for record from database
@@ -13,48 +17,43 @@ interface ReflowRecordStatus {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const ProductOrderNos = searchParams.get('ProductOrderNos');
+    const rawParam = searchParams.get('ProductOrderNos');
+    const ProductOrderNos = rawParam?.split(',').map(p => p.trim());
 
-    // Validate input
-    if (!ProductOrderNos) {
+    if (!ProductOrderNos || ProductOrderNos.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'Missing ProductOrderNos query parameter' },
+        { success: false, message: 'Missing or invalid ProductOrderNos' },
         { status: 400 }
       );
     }
 
-    
+    const pool = await getDashboardConnection();
+    const request = pool.request();
 
+    const inputPlaceholders = ProductOrderNos.map((_, i) => `@prod${i}`).join(', ');
+    ProductOrderNos.forEach((value, i) => {
+      request.input(`prod${i}`, sql.NVarChar, value);
+    });
 
-    // Connect to SQL Server
-    const pool = await createConnection();
-
-    // Query the database
-    const result = await pool.request()
-      .input('ProductOrderNos', sql.NVarChar, ProductOrderNos)
-      .query(`
-        SELECT ST_Line,ST_Model,ST_Prod,ST_Status
-        FROM REFLOW_Status
-        WHERE ST_Prod = @ProductOrderNos
-      `);
+    const result = await request.query(`
+      SELECT ST_Line, ST_Model, ST_Prod, ST_Status
+      FROM REFLOW_Status
+      WHERE ST_Prod IN (${inputPlaceholders})
+    `);
 
     const rows = result.recordset as ReflowRecordStatus[];
+
     if (rows.length === 0) {
-        return NextResponse.json(
-          { success: false, message: 'No data found for specified productOrderNo' },
-          { status: 404 }
-        );
-      }
-      
+      return NextResponse.json(
+        { success: false, message: 'No data found for provided ProductOrderNos' },
+        { status: 404 }
+      );
+    }
 
-
-   
-
-    // Return only first record (if needed)
-    return NextResponse.json({ success: true, data:rows });
+    return NextResponse.json({ success: true, data: rows });
 
   } catch (error) {
-    console.error('DB Query Error:', error);
+    console.error('🔥 DB Query Error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal Server Error' },
       { status: 500 }

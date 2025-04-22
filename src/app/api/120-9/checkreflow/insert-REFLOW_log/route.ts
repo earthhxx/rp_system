@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
 import { createConnection } from '@/lib/connection';
+=======
+import { getDashboardConnection } from '@/lib/connection';
+>>>>>>> 9c2d17547e788b8ffb6d5afa370c8c59a7f15ffe
 import sql from 'mssql';
 
 // Define type for incoming request
@@ -24,15 +28,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pool = await createConnection();
+    const pool = await getDashboardConnection();
 
     // Insert into database
     await pool.request()
-      .input('Log_Line', sql.NVarChar, R_Line)
-      .input('Log_Model', sql.NVarChar, R_Model)
-      .input('Log_ProOrder', sql.NVarChar, productOrderNo)
-      .input('Log_Status', sql.NVarChar, ST_Status)
-      .input('Datetime', sql.DateTime, new Date())
+      .input('Log_Line', sql.NVarChar, R_Line || '')
+      .input('Log_Model', sql.NVarChar, R_Model || '')
+      .input('Log_ProOrder', sql.NVarChar, productOrderNo || '')
+      .input('Log_Status', sql.NVarChar, ST_Status || '')
+      .input('Datetime', sql.DateTime, new Date() || '')
       .query(`
         INSERT INTO REFLOW_Log (Log_Line, Log_Model, Log_ProOrder, Log_Status, Datetime)
         VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status, @Datetime)

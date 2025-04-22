@@ -1,44 +1,44 @@
-//https://localhost:3000/api/scan-to-db-120-2?productOrderNo=202504070017
-import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-2'; // สมมติว่าเป็นฟังก์ชันเชื่อมต่อฐานข้อมูล
-import sql from 'mssql'; // นำเข้า mssql
+import { NextResponse } from 'next/server';
+import { getNewFCXTConnection } from '@/lib/connection';
+import sql from 'mssql';
 
 export async function GET(req: Request) {
   try {
-    // สร้าง URL จาก req.url
     const url = new URL(req.url);
-
-    // ดึงค่า productOrderNo จาก query string
     const productOrderNo = url.searchParams.get('productOrderNo');
-    console.log('Received productOrderNo:', productOrderNo);
-
-    // ถ้าไม่มีค่า productOrderNo
     if (!productOrderNo) {
-      return NextResponse.json({ success: false, message: 'Missing productOrderNo query parameter' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Missing productOrderNo' }, { status: 400 });
     }
 
-    // เชื่อมต่อฐานข้อมูล
-    const pool = await createConnection();
+    const pool = await getNewFCXTConnection();
 
-    // Query ข้อมูลจาก SQL Server
+    // 🔍 DEBUG SECTION
+    const dbNameResult = await pool.request().query('SELECT DB_NAME() AS dbName');
+    console.log('📌 [DEBUG] Connected to DB:', dbNameResult.recordset[0].dbName);
+
+    const tableCheck = await pool.request().query(`
+      SELECT TOP 1 * 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_NAME = 'tb_ProductOrders'
+    `);
+    console.log('📌 [DEBUG] Table exists:', tableCheck.recordset.length > 0);
+
+    // 🔍 Query จริง
     const result = await pool.request()
       .input('productOrderNo', sql.NVarChar, productOrderNo)
-      .query('SELECT productOrderNo, productName, ProcessLine FROM tb_ProductOrders WHERE productOrderNo = @productOrderNo');
+      .query(`
+        SELECT productOrderNo, productName, ProcessLine 
+        FROM [NewFCXT(IM Thailand)].[dbo].[tb_ProductOrders] 
+        WHERE productOrderNo = @productOrderNo
+      `);
 
-    // ถ้าไม่พบข้อมูล
     if (result.recordset.length === 0) {
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
 
-    
-    
-
-    // ส่งข้อมูลกลับ
     return NextResponse.json({ success: true, data: result.recordset[0] });
-
-  } catch (error) {
-    // ถ้าเกิด error
-    console.error('DB Query Error:', error);
+  } catch (error: any) {
+    console.error('❌ DB Query Error:', error?.message || error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
   }
 }
