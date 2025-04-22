@@ -6,8 +6,10 @@ import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
-import { GoSkipFill, GoCheckCircle } from "react-icons/go";
+import { GoSkipFill, GoCheckCircle} from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
+import { MdKeyboardArrowDown } from "react-icons/md";
+
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -484,7 +486,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   return (
 
     <div className="flex flex-col h-screen w-full bg-blue-100">
-      <div></div>
+      <div className="fixed mt-10 flex w-full justify-end">
+        <div className="flex flex-none w-20 text-2xl rounded-full bg-gray-800/70 backdrop-blur-md "> 
+        <MdKeyboardArrowDown className="size-30 text-white" />
+        </div>
+      </div>
       <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
       <div className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
         <div className="flex flex-none h-10"></div>
