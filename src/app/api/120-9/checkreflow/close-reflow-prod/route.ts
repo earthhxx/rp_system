@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-9';
+import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
 
 // Define type for incoming request
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pool = await createConnection();
+    const pool = await getDashboardConnection();
 
     // Insert into database
     await pool.request()

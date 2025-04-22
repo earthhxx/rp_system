@@ -510,8 +510,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
 
           {/* Success Message */}
-          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20">
-            <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div>
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20 z-10">
+            {/* <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div> */}
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-9';
+import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
 
 // Define type for record from database
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Connect to SQL Server
-    const pool = await createConnection();
+    const pool = await getDashboardConnection();
 
     // Query the database
     const result = await pool.request()

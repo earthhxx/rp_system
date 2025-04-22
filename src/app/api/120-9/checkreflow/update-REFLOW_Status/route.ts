@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db-120-9';
+import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
 
 // Define expected structure from request body
@@ -22,13 +22,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pool = await createConnection();
+    const pool = await getDashboardConnection();
 
     const result = await pool.request()
-      .input('ST_Line', sql.NVarChar, ST_Line)
-      .input('ST_Model', sql.NVarChar, ST_Model)
-      .input('ST_Prod', sql.NVarChar, ST_Prod)
-      .input('ST_Status', sql.NVarChar, ST_Status)
+      .input('ST_Line', sql.NVarChar, ST_Line || '')
+      .input('ST_Model', sql.NVarChar, ST_Model || '')
+      .input('ST_Prod', sql.NVarChar, ST_Prod || '')
+      .input('ST_Status', sql.NVarChar, ST_Status || '')
       .query(`
         UPDATE REFLOW_Status
         SET ST_Model = @ST_Model,
