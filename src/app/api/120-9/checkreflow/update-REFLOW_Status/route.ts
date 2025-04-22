@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-import { createConnection } from '@/lib/connection';
-=======
+
 import { getDashboardConnection } from '@/lib/connection';
->>>>>>> 9c2d17547e788b8ffb6d5afa370c8c59a7f15ffe
+
 import sql from 'mssql';
 
 // Define expected structure from request body
