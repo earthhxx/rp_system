@@ -37,9 +37,18 @@ export async function POST(req: NextRequest) {
             ST_Prod = @ST_Prod,
             ST_Status = @ST_Status
         WHERE ST_Line = @ST_Line
-      `);
 
-    return NextResponse.json({ success: true, message: 'Status updated successfully' });
+  SELECT ST_Status 
+  FROM REFLOW_Status 
+  WHERE ST_Line = @ST_Line;
+      `);
+      const newStatus = result.recordset?.[0]?.ST_Status;
+      return NextResponse.json({
+        success: true,
+        data: { newStatus },
+        message: `Status updated successfully: ${newStatus}`
+      });
+
 
   } catch (error) {
     console.error('DB Update Error:', error);

@@ -56,7 +56,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const fetchEmployeeName = async () => {
       const res = await fetch(`https://localhost:3000/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
       const { success, data } = await res.json();
-      console.log(data);
+     
 
       if (success && data?.Name && data?.UserName) {
         setEmployeeName(data.Name);
@@ -78,8 +78,28 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Line: data120_2?.ProcessLine,
         ST_Model: data120_2?.productName,
         ST_Prod: ProductOrderNo,
-        ST_Status: submitStage
+        ST_Status: "waiting"
       })
+      
+    });
+
+    const result = await res.json();
+    console.log(result);
+  };
+
+  const updateReflowStatusCHECKED = async () => {
+    const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ST_Line: data120_2?.ProcessLine,
+        ST_Model: data120_2?.productName,
+        ST_Prod: ProductOrderNo,
+        ST_Status: "CHECKED"
+      })
+      
     });
 
     const result = await res.json();
@@ -607,8 +627,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       
                       if (submitStage === "waiting") {
                         setSubmitStage("CHECKED");
+                        
                         submitLogToReflow120_9_CHECK();
-                        updateReflowStatus();
+                        updateReflowStatusCHECKED();
                         setShowBar(false);
                         setIsCardOpen(false);
                         console.log("CHECKED");
