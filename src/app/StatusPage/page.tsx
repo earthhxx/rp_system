@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, HTMLInputAutoCompleteAttribute } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
@@ -7,7 +7,7 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import { GoSkipFill, GoCheckCircle } from "react-icons/go";
-import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
+import { BsUpcScan } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
 
@@ -61,6 +61,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   const [isCardOpencancel, setisCardOpencancel] = useState(false);
   const cardRefcancel = useRef<HTMLInputElement>(null);
+
+  const [isCardOpenclosepro, setisCardOpenclosepro] = useState(false);
+  const cardRefClosepro = useRef<HTMLInputElement>(null);
 
   const zoomPluginInstance = zoomPlugin();
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
@@ -141,6 +144,21 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     console.log(result);
   };
 
+  const updateReflowStatusClosepro = async () => {
+    const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status_Closeprod', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ST_Line: data120_2?.ProcessLine
+      })
+
+    });
+
+    const result = await res.json();
+    console.log(result);
+  };
 
 
   //submit log state to waiting
@@ -227,7 +245,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Line: data120_2.ProcessLine,
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
-        ST_Status: submitStage,
+        ST_Status: 'Cancel',
+        Log_User: EmployeeNo
+      };
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        console.error("Log submit failed:", result.message);
+      } else {
+        console.log("Log submitted successfully");
+      }
+
+    } catch (error) {
+      console.error("Error submitting log:", error);
+    }
+  };
+
+  // //submit log state to cancel
+  const submitLogCloseprodToReflow120_9 = async () => {
+    if (!data120_2 || !submitStage) {
+      console.warn("Missing required fields to submit log");
+      return;
+    }
+
+    try {
+      const payload = {
+        R_Line: data120_2.ProcessLine,
+        R_Model: data120_2.productName,
+        productOrderNo: ProductOrderNo,
+        ST_Status: 'close',
         Log_User: EmployeeNo
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -583,6 +637,24 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpencancel]);
 
+  useEffect(() => {
+    const handleClickOutsideCloseprocard = (event: MouseEvent) => {
+      if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
+        setisCardOpenclosepro(false);
+      }
+    };
+    if (isCardOpenclosepro) {
+      document.addEventListener("mousedown", handleClickOutsideCloseprocard);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideCloseprocard);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideCloseprocard);
+    };
+  }, [isCardOpenclosepro]);
+
+  
+
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {
@@ -591,7 +663,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRefcancel} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">{employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
               <input
                 ref={inputRef}
@@ -616,23 +688,51 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       updateReflowStatusCancel();
                       // navigate
                       goToHome();
+                    }
+                    else {
+                      console.log("employeeName != EmployeeNo")
+                    }
+                  }}
+                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  SUBMIT
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
 
-                      
+{
+        isCardOpenclosepro && (
+          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+            <div ref={cardRefClosepro} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+              <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={EmployeeNo}
+                onChange={(e) => setEmployeeNo(e.target.value)}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="รหัสพนักงาน"
+              />
+              <div className="flex w-full h-full items-center">
 
-                      // if (submitStage === "CHECKED") {
-                        
-
-                      //   // submitLogToReflow120_9_CHECK();
-                      //   // updateReflowStatusCHECKED();
-                      //   // setShowBar(false);
-                      //   // setIsCardOpen(false);
-                      //   console.log("CANCEL");
-                      //   console.log("Scanned ID:", EmployeeNo);
-                      // }
-                      // else {
-                      //   console.log("error some thing wrong!")
-                      // }
-
+                <span className="flex w-1/2 h-32 justify-center">
+                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                </span>
+                <div
+                  onClick={() => {
+                    console.log(employeeName)
+                    if (EmployeeNo === employeeUserName) {
+                      // log
+                      submitLogCloseprodToReflow120_9();
+                      // update null
+                      updateReflowStatusClosepro();
+                      // navigate
+                      goToHome();
                     }
                     else {
                       console.log("employeeName != EmployeeNo")
@@ -650,7 +750,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
       <div>
         {arrowdownbutton && (
-          <div className="fixed mt-2 z-65 flex w-full justify-end">
+          <div className="fixed mt-4 mr-4 z-65 flex w-full justify-end">
             <div
               onClick={() => {
                 setArrowDownButtoncard(true);
@@ -822,7 +922,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">{employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
               <input
                 ref={inputRef}
