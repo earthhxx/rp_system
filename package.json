@@ -25,6 +25,7 @@
     "next-connect": "^1.0.0",
     "next-transpile-modules": "^10.0.1",
     "pdfjs-dist": "^3.11.174",
+    "postcss-import": "^16.1.0",
     "postcss-loader": "^8.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
