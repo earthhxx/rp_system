@@ -73,7 +73,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   useEffect(() => {
     const fetchEmployeeName = async () => {
-      const res = await fetch(`https://localhost:3000/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
+      const res = await fetch(`/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
       const { success, data } = await res.json();
 
 
@@ -822,6 +822,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div className="flex justify-center items-center w-full text-white">{employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
               <input
                 ref={inputRef}
