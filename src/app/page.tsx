@@ -18,7 +18,7 @@ const Home = () => {
             <div className="flex flex-row items-center">
                     <div className="font-kanit text-white flex w-full h-fit text-[98px] font-normal justify-center items-center"> วิธีใช้งาน </div>
                     <div className="flex flex-col text-xl text-white mt-4">
-                        <div className={`font-kanit flex w-full justify-start pt-4`}>1. แตะ หรือ คลิ๊ก IM Electronic</div>
+                        <div className={`font-kanit flex w-full justify-start pt-4`}>1. แตะ หรือ คลิ๊ก IM Electronic Logo</div>
                         <div className="font-kanit flex w-full justify-start pt-4">2. เมนูจะเปิดขึ้นมากลางหน้าจอ  </div>
                         <div className="font-kanit  flex w-full justify-start pt-4">3. แตะ หรือ คลิ๊ก เลือกฟังชั่นการทำงาน  </div>
                         <div className="flex">
