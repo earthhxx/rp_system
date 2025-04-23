@@ -3,7 +3,6 @@ import Image from "next/image";
 
 const Home = () => {
     return (
-
         <div className="flex flex-col h-screen w-screen justify-center items-center bg-blue-800">
             <div className="flex flex-row items-center">
                 <div className="font-kanit text-white flex w-full h-fit text-[70px] font-bold justify-center items-center"> HOW TO USE </div>

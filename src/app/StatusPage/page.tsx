@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect, HTMLInputAutoCompleteAttribute } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -52,7 +52,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
-  const scannerRef = useRef<any>(null);
+
+
+
+  const [cameras, setCameras] = useState<any[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const qrRegionId = "qr-reader";
+
   const [topper, setTopper] = useState(false);
 
   const [arrowdownbuttoncard, setArrowDownButtoncard] = useState(false);
@@ -443,50 +450,30 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   }, [pdfUrl]);
 
-  useEffect(() => {
-    if (isCardOpen && !scannerRef.current) {
-      scannerRef.current = new Html5QrcodeScanner(
-        "qr-reader",
-        { fps: 10, qrbox: 250 },
-        false
-      );
+  const startCamera = () => {
+    const html5QrCode = new Html5Qrcode(qrRegionId);
+    scannerRef.current = html5QrCode;
 
-      scannerRef.current.render(
-        (decodedText: string) => {
-          // เมื่อสแกนเจอ
-          if (inputRef.current) {
-            inputRef.current.value = decodedText;
-          }
-          setEmployeeNo(decodedText);
-
-
-
-          // เคลียร์ scanner และปิดกล้อง
-          scannerRef.current.clear().then(() => {
-            scannerRef.current = null;
-          }).catch((error: any) => {
-            console.error("Failed to clear scanner: ", error);
-          });
-
-          // ทำสิ่งอื่น เช่น submit อัตโนมัติ:
-          setSubmitStage("CHECKED");
-          setShowBar(false);
-          setIsCardOpen(false);
-        },
-        (errorMessage: string) => {
-          console.warn("Scan error:", errorMessage);
-        }
-      );
-    }
-
-    return () => {
-      // Cleanup ตอน unmount หรือปิด card
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch((e: any) => console.error(e));
-        scannerRef.current = null;
+    html5QrCode.start(
+      { facingMode: "environment" }, // ✅ กล้องหลังอัตโนมัติ
+      {
+        fps: 10,
+        qrbox: 250,
+      },
+      (decodedText) => {
+        setEmployeeNo(decodedText);
+        console.log("Decoded:", decodedText);
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+        });
+      },
+      (errorMessage) => {
+        console.warn("QR error:", errorMessage);
       }
-    };
-  }, [isCardOpen]);
+    ).catch(err => {
+      console.error("Camera start error:", err);
+    });
+  };
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -653,7 +640,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpenclosepro]);
 
-  
+
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
@@ -675,7 +662,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span className="flex w-1/2 h-32 justify-center">
+                <span
+                  onClick={startCamera}
+                  className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
                 <div
@@ -702,7 +691,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         )
       }
 
-{
+      {
         isCardOpenclosepro && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
             <div ref={cardRefClosepro} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
@@ -720,7 +709,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span className="flex w-1/2 h-32 justify-center">
+                <span
+                  onClick={startCamera}
+                  className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
                 <div
@@ -785,12 +776,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   </div>
                   <div className="flex w-full h-full justify-center">
                     <div className="flex flex-none"></div>
-                    <div 
-                    onClick={() => {
-                      setisCardOpenclosepro(false);
-                      setisCardOpenclosepro(true);
-                    }}
-                    className="flex flex-col  justify-center items-center">
+                    <div
+                      onClick={() => {
+                        setisCardOpenclosepro(false);
+                        setisCardOpenclosepro(true);
+                      }}
+                      className="flex flex-col  justify-center items-center">
                       <div className="flex flex-none"></div>
                       <GoCheckCircle className="size-30 text-white" />
                       <div>SUBMIT PRODUCT</div>
@@ -939,7 +930,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span className="flex w-1/2 h-32 justify-center">
+                <span
+                  onClick={startCamera}
+                  className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
                 <div

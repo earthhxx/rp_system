@@ -6,8 +6,7 @@ import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname, } from "next/navigation";
-import { Html5QrcodeScanner } from "html5-qrcode";
-
+import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 interface ReflowStatus {
     ST_Line: string;
     ST_Model: string;
@@ -17,21 +16,22 @@ interface ReflowStatus {
 
 const MenuToggle = () => {
     const router = useRouter();
-    const pathname = usePathname();
-    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen" >("home");
+
+    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
     const [productOrderNo, setProductOrderNo] = useState("");
-    const [isCardOpen, setIsCardOpen] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const inputProdRef = useRef<HTMLInputElement>(null);
+   
+ 
     const cardRef = useRef<HTMLDivElement>(null);
-    const cardProdRef = useRef<HTMLDivElement>(null);
-
-    const [statusData, setStatusData] = useState<ReflowStatus | null>(null);
-    const [error, setError] = useState("");
+   
+    
+    const scannerRef = useRef<Html5Qrcode | null>(null);
+    const qrRegionId = "qr-reader";
+    const inputRef = useRef<HTMLInputElement | null>(null);
+  
 
 
 
@@ -76,33 +76,30 @@ const MenuToggle = () => {
         };
     }, [homeStage]);
 
-    useEffect(() => {
-        if (homeStage === "scan") {
-            const scanner = new Html5QrcodeScanner(
-                "qr-reader",
-                { fps: 10, qrbox: 250 },
-                false // verbose
-            );
-
-            scanner.render(
-                (decodedText, decodedResult) => {
-                    console.log("Success", decodedText);
-                    setProductOrderNo(decodedText);
-                    scanner.clear();
-                },
-                (errorMessage) => {
-                    console.warn("Error", errorMessage);
-                }
-            );
-
-
-            return () => {
-                scanner.clear().catch((error) => console.error("Clear failed", error));
-            };
-        }
-    }, [homeStage]);
-
-
+    const startCamera = () => {
+        const html5QrCode = new Html5Qrcode(qrRegionId);
+        scannerRef.current = html5QrCode;
+    
+        html5QrCode.start(
+          { facingMode: "environment" }, // ✅ กล้องหลังอัตโนมัติ
+          {
+            fps: 30,
+            qrbox: { width: 300, height: 300 }            
+          },
+          (decodedText) => {
+            setProductOrderNo(decodedText);
+            console.log("Decoded:", decodedText);
+            html5QrCode.stop().then(() => {
+              html5QrCode.clear();
+            });
+          },
+          (errorMessage) => {
+            console.warn("QR error:", errorMessage);
+          }
+        ).catch(err => {
+          console.error("Camera start error:", err);
+        });
+      };
 
 
 
@@ -146,7 +143,7 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-                        
+
                         setIsMenuOpen(false);
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -194,7 +191,7 @@ const MenuToggle = () => {
                     <div className="flex justify-center items-center w-full text-white">
                         โปรดใส่รหัสผลิตภัณฑ์ของคุณ :
                     </div>
-                    <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+                    <div id="qr-reader" style={{ width: "100%", maxWidth: "250px", height: "250px" }} className="flex justify-center items-center" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -205,7 +202,9 @@ const MenuToggle = () => {
                         placeholder="product id..."
                     />
                     <div className="flex w-full h-full items-center">
-                        <span className="flex w-1/2 h-32 justify-center">
+                        <span
+                            onClick={startCamera}
+                            className="flex w-1/2 h-32 justify-center">
                             <BsUpcScan className="size-32 text-white" />
                         </span>
                         <div
@@ -213,8 +212,8 @@ const MenuToggle = () => {
                                 console.log("Scanned ID:", productOrderNo);
                                 setHomeStage("home");
                                 const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
-                                const query2 = encodeURIComponent(productOrderNo);
-                                router.push(`/StatusPage?productOrderNo=${query}&ProductOrderNos=${query2}`);
+
+                                router.push(`/StatusPage?productOrderNo=${query}`);
                             }}
 
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
@@ -227,14 +226,14 @@ const MenuToggle = () => {
         );
     };
 
-    
+
 
     return (
         <>
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
             {homeStage === "scan" && renderScanCard()}
-            
+
 
 
             <div className="absolute bottom-5 left-5 text-white">
