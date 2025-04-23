@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Menu from "./components/MenuToggle";
 import {Kanit} from "next/font/google";
 
 const kanitFont = Kanit({
     subsets:['thai'],
-    weight: "400",
+    weight: ["400","700"],
     variable:"--font-kanit",
 })
 
