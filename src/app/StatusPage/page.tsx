@@ -785,7 +785,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   </div>
                   <div className="flex w-full h-full justify-center">
                     <div className="flex flex-none"></div>
-                    <div className="flex flex-col  justify-center items-center">
+                    <div 
+                    onClick={() => {
+                      setisCardOpenclosepro(false);
+                      setisCardOpenclosepro(true);
+                    }}
+                    className="flex flex-col  justify-center items-center">
                       <div className="flex flex-none"></div>
                       <GoCheckCircle className="size-30 text-white" />
                       <div>SUBMIT PRODUCT</div>
@@ -807,7 +812,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                <div className="font-roboto text-4xl text-white w-full font-bold">${ProductOrderNo}</div>
+                <div className="font-roboto text-4xl text-white w-full font-bold">{ProductOrderNo}</div>
               </div>
             </div>
             {/* Box2 */}
@@ -847,7 +852,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
 
           {/* Success Message */}
-          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/20 z-10">
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/5 z-10">
             {/* <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div> */}
           </div>
         </div>
