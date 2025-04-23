@@ -6,7 +6,7 @@ import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
-import { GoSkipFill, GoCheckCircle} from "react-icons/go";
+import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
@@ -46,6 +46,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [EmployeeNo, setEmployeeNo] = useState("");
   const scannerRef = useRef<any>(null);
   const [topper, setTopper] = useState(false);
+  const [arrowdownbuttoncard, setArrowDownButtoncard] = useState(false);
+  const [arrowdownbutton, setArrowDownButton] = useState(true);
+  const cardarrowRef = useRef<HTMLDivElement>(null);
   const zoomPluginInstance = zoomPlugin();
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
   const [isLoading120_2, setIsLoading120_2] = useState(true);
@@ -483,40 +486,73 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCardOpen]);
-  return (
 
+  useEffect(() => {
+    const handleClickOutsidearrow = (event: MouseEvent) => {
+      if (cardarrowRef.current && !cardarrowRef.current.contains(event.target as Node)) {
+        setArrowDownButtoncard(false);
+        setArrowDownButton(true);
+      }
+    };
+    if (arrowdownbuttoncard) {
+      document.addEventListener("mousedown", handleClickOutsidearrow);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsidearrow);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsidearrow);
+    };
+  }, [arrowdownbuttoncard]);
+  return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
-      <div className="fixed mt-10 flex w-full justify-end">
-        <div className="flex flex-none w-20 text-2xl rounded-full bg-gray-800/70 backdrop-blur-md "> 
-        <MdKeyboardArrowDown className="size-30 text-white" />
-        </div>
-      </div>
-      <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
-      <div className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
-        <div className="flex flex-none h-10"></div>
-        <div className="flex flex-row justify-center items-center ">
-          <div className="flex w-full h-full justify-center">
-            <div className="flex flex-none"></div>
-            <div className="flex flex-col justify-center items-center">
-              <div className="flex flex-none"></div>
-              <GoSkipFill className="size-30 text-white" />
-              <div>CANCEL PRODUCT</div>
+
+
+      <div >
+        {arrowdownbutton && (
+          <div className="fixed mt-2 z-65 flex w-full justify-end">
+            <div
+              onClick={() => {
+                setArrowDownButtoncard(true);
+                setArrowDownButton(false);
+              }}
+              className="flex flex-none ">
+              <MdKeyboardArrowDown
+                className="size-10 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
             </div>
-            <div className="flex flex-none"></div>
           </div>
-          <div className="flex w-full h-full justify-center">
-            <div className="flex flex-none"></div>
-            <div className="flex flex-col  justify-center items-center">
-              <div className="flex flex-none"></div>
-              <GoCheckCircle className="size-30 text-white" />
-              <div>SUBMIT PRODUCT</div>
-            </div>
-            <div className="flex flex-none "></div>
-          </div>
-        </div>
-        <div className="flex-none h-10"></div>
+        )}
+
+        {arrowdownbuttoncard && (
+          <>
+            <div ref={cardarrowRef} className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
+              <div className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
+                <div className="flex flex-none h-10"></div>
+                <div className="flex flex-row justify-center items-center ">
+                  <div className="flex w-full h-full justify-center">
+                    <div className="flex flex-none"></div>
+                    <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-none"></div>
+                      <GoSkipFill className="size-30 text-white" />
+                      <div>CANCEL PRODUCT</div>
+                    </div>
+                    <div className="flex flex-none"></div>
+                  </div>
+                  <div className="flex w-full h-full justify-center">
+                    <div className="flex flex-none"></div>
+                    <div className="flex flex-col  justify-center items-center">
+                      <div className="flex flex-none"></div>
+                      <GoCheckCircle className="size-30 text-white" />
+                      <div>SUBMIT PRODUCT</div>
+                    </div>
+                    <div className="flex flex-none "></div>
+                  </div>
+                </div>
+                <div className="flex-none h-10"></div>
+              </div>
+            </div></>
+        )}
       </div>
-      </div>
+
       {topper && (
         <div className="flex flex-col justify-center items-center relative z-40">
           {/* Header Box */}
