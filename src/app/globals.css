@@ -47,11 +47,5 @@ body {
   to { stroke-dashoffset: 0; }
 }
 
-#qr-reader__dashboard_section video {
-  width: 552px !important;
-  height: 250px !important;
-  border-radius: 16px !important;
-  object-fit: cover !important;
-}
 
 
