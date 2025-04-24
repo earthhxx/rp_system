@@ -61,11 +61,13 @@ const MenuToggle = () => {
             if (homeStage === "menuOpen" && isClickOutsideMenu) {
                 setIsMenuOpen(false);
                 setHomeStage("home");
+       
             }
 
             // ถ้าอยู่หน้า scan แล้วคลิกข้างนอก card ให้กลับ home
             if (homeStage === "scan" && isClickOutsideCard) {
                 setHomeStage("home");
+                clearCamera();
             }
         };
 
@@ -130,6 +132,26 @@ const MenuToggle = () => {
         }
       };
       
+      const clearCamera = () => {
+        if (scannerRef.current) {
+            // ถ้าเป็น Html5Qrcode instance
+            if ("stop" in scannerRef.current) {
+                scannerRef.current
+                    .stop()      // หยุดกล้อง
+                    .then(() => scannerRef.current!.clear()) // ล้าง DOM และ memory
+                    .catch((e: Error) => console.error("Stop error:", e));
+            }
+            // ถ้าเป็น Html5QrcodeScanner instance
+            else {
+                (scannerRef.current as Html5QrcodeScanner)
+                    .clear()
+                    .then(() => {
+                        scannerRef.current = null;
+                    })
+                    .catch((e: Error) => console.error("Clear error:", e));
+            }
+        }
+    };
 
 
 
@@ -260,6 +282,7 @@ const MenuToggle = () => {
             </div>
         );
     };
+
 
 
     return (

@@ -449,7 +449,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.log("📎 PDF URL is ready:", pdfUrl);
     }
   }, [pdfUrl]);
-
   const startScan = async () => {
     const qrRegionId = "qr-reader";
     const html5QrCode = new Html5Qrcode(qrRegionId);
@@ -501,6 +500,27 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.error("Camera initialization error:", err);
     }
   };
+  
+  const clearCamera = () => {
+    if (scannerRef.current) {
+        // ถ้าเป็น Html5Qrcode instance
+        if ("stop" in scannerRef.current) {
+            scannerRef.current
+                .stop()      // หยุดกล้อง
+                .then(() => scannerRef.current!.clear()) // ล้าง DOM และ memory
+                .catch((e: Error) => console.error("Stop error:", e));
+        }
+        // ถ้าเป็น Html5QrcodeScanner instance
+        else {
+            (scannerRef.current as Html5QrcodeScanner)
+                .clear()
+                .then(() => {
+                    scannerRef.current = null;
+                })
+                .catch((e: Error) => console.error("Clear error:", e));
+        }
+    }
+};
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -604,6 +624,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         setIsCardOpen(false);
+        clearCamera();
       }
     };
 
@@ -623,6 +644,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       if (cardarrowRef.current && !cardarrowRef.current.contains(event.target as Node)) {
         setArrowDownButtoncard(false);
         setArrowDownButton(true);
+        
       }
     };
     if (arrowdownbuttoncard) {
@@ -639,6 +661,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const handleClickOutsidecardcancel = (event: MouseEvent) => {
       if (cardRefcancel.current && !cardRefcancel.current.contains(event.target as Node)) {
         setisCardOpencancel(false);
+        clearCamera();
       }
     };
     if (isCardOpencancel) {
@@ -655,6 +678,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const handleClickOutsideCloseprocard = (event: MouseEvent) => {
       if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
         setisCardOpenclosepro(false);
+        clearCamera();
       }
     };
     if (isCardOpenclosepro) {
@@ -678,7 +702,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
               <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
-              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+              <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
                 type="text"
@@ -725,7 +749,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
               <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
-              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+              <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
                 type="text"
@@ -946,7 +970,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
               <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
-              <div id="qr-reader" className="w-full h-60 rounded-lg bg-white my-4" />
+              <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
                 type="text"
