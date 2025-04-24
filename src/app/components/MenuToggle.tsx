@@ -61,7 +61,7 @@ const MenuToggle = () => {
             if (homeStage === "menuOpen" && isClickOutsideMenu) {
                 setIsMenuOpen(false);
                 setHomeStage("home");
-       
+
             }
 
             // ถ้าอยู่หน้า scan แล้วคลิกข้างนอก card ให้กลับ home
@@ -84,55 +84,61 @@ const MenuToggle = () => {
         const qrRegionId = "qr-reader";
         const html5QrCode = new Html5Qrcode(qrRegionId);
         scannerRef.current = html5QrCode;
-      
+
         try {
-          const devices = await Html5Qrcode.getCameras();
-      
-          if (!devices || devices.length === 0) {
-            console.error("ไม่พบกล้องบนอุปกรณ์");
-            return;
-          }
-      
-          // หากล้องที่ชื่อดูเหมือนกล้องหลัง
-          const backCam = devices.find((d) =>
-            d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
-          );
-      
-          const selectedDeviceId = backCam ? backCam.id : devices[0].id;
-      
-          await html5QrCode.start(
-            { deviceId: { exact: selectedDeviceId } },
-            {
-              fps: 10,
-              qrbox: (vw, vh) => {
-                const size = Math.min(vw, vh) * 0.8;
-                return { width: size, height: size };
-              },
-            },
-            (decodedText) => {
-              setProductOrderNo(decodedText);
-              if (inputRef.current) inputRef.current.value = decodedText;
-      
-              html5QrCode.stop().then(() => html5QrCode.clear());
-            },
-            (err) => console.warn("QR Scan Error:", err)
-          );
-      
-          setTimeout(() => {
-            const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
-            if (video) {
-              video.style.width = "400px";
-              video.style.height = "400px";
-              video.style.borderRadius = "12px";
-              video.style.objectFit = "cover";
+            const devices = await Html5Qrcode.getCameras();
+
+            if (!devices || devices.length === 0) {
+                console.error("ไม่พบกล้องบนอุปกรณ์");
+                return;
             }
-          }, 300);
+
+            // หากล้องที่ชื่อดูเหมือนกล้องหลัง
+            const backCam = devices.find((d) =>
+                d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
+            );
+
+            const selectedDeviceId = backCam ? backCam.id : devices[0].id;
+
+            await html5QrCode.start(
+                { deviceId: { exact: selectedDeviceId } },
+                {
+                    fps: 10,
+                    qrbox: (vw, vh) => {
+                        const size = Math.min(vw, vh) * 0.8;
+                        return { width: size, height: size };
+                    },
+                },
+                (decodedText) => {
+                    setProductOrderNo(decodedText);
+                    if (inputRef.current) inputRef.current.value = decodedText;
+
+                    html5QrCode.stop().then(() => html5QrCode.clear());
+                },
+                (err) => console.warn("QR Scan Error:", err)
+            );
+
+            setTimeout(() => {
+                const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
+                if (video) {
+                    video.style.width = "400px";
+                    video.style.height = "400px";
+                    video.style.borderRadius = "12px";
+                    video.style.objectFit = "cover";
+                }
+            }, 300);
         } catch (err) {
-          console.error("Camera initialization error:", err);
+            console.error("Camera initialization error:", err);
         }
-      };
-      
-      const clearCamera = () => {
+    };
+    const clearinputref = () => {
+        // เคลียร์ inputRef และ state
+        if (inputRef.current) {
+            inputRef.current.value = "";
+        }
+    };
+
+    const clearCamera = () => {
         if (scannerRef.current) {
             // ถ้าเป็น Html5Qrcode instance
             if ("stop" in scannerRef.current) {
@@ -152,10 +158,6 @@ const MenuToggle = () => {
             }
         }
     };
-
-
-
-
 
 
 
@@ -206,7 +208,9 @@ const MenuToggle = () => {
                     SUBMIT PRODUCT */}
                 </div>
                 <div className="flex w-full h-full"></div>
-                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                <div
+                    onClick={() => router.push('/Dashboard')}
+                    className="flex flex-col justify-center items-center w-full h-full text-white">
                     <BsClipboard2DataFill className="size-30 text-white" />
                     DASHBOARD
                 </div>
@@ -266,11 +270,7 @@ const MenuToggle = () => {
                         </span>
                         <div
                             onClick={() => {
-                                console.log("Scanned ID:", productOrderNo);
-                                setHomeStage("home");
-                                const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
-
-                                router.push(`/StatusPage?productOrderNo=${query}`);
+                                handleNextPageStatus();
                             }}
 
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
@@ -281,6 +281,19 @@ const MenuToggle = () => {
                 </div>
             </div>
         );
+    };
+
+    const handleNextPageStatus = () => {
+        const value = inputRef.current?.value.trim();
+
+        if (!value) {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+        setHomeStage("home");
+        const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
+        router.push(`/StatusPage?productOrderNo=${query}`);
+        clearinputref();
     };
 
 

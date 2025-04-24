@@ -453,22 +453,22 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const qrRegionId = "qr-reader";
     const html5QrCode = new Html5Qrcode(qrRegionId);
     scannerRef.current = html5QrCode;
-  
+
     try {
       const devices = await Html5Qrcode.getCameras();
-  
+
       if (!devices || devices.length === 0) {
         console.error("ไม่พบกล้องบนอุปกรณ์");
         return;
       }
-  
+
       // หากล้องที่ชื่อดูเหมือนกล้องหลัง
       const backCam = devices.find((d) =>
         d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
       );
-  
+
       const selectedDeviceId = backCam ? backCam.id : devices[0].id;
-  
+
       await html5QrCode.start(
         { deviceId: { exact: selectedDeviceId } },
         {
@@ -481,12 +481,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         (decodedText) => {
           setEmployeeNo(decodedText);
           if (inputRef.current) inputRef.current.value = decodedText;
-  
+
           html5QrCode.stop().then(() => html5QrCode.clear());
         },
         (err) => console.warn("QR Scan Error:", err)
       );
-  
+
       setTimeout(() => {
         const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
         if (video) {
@@ -500,27 +500,106 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.error("Camera initialization error:", err);
     }
   };
-  
+
   const clearCamera = () => {
     if (scannerRef.current) {
-        // ถ้าเป็น Html5Qrcode instance
-        if ("stop" in scannerRef.current) {
-            scannerRef.current
-                .stop()      // หยุดกล้อง
-                .then(() => scannerRef.current!.clear()) // ล้าง DOM และ memory
-                .catch((e: Error) => console.error("Stop error:", e));
-        }
-        // ถ้าเป็น Html5QrcodeScanner instance
-        else {
-            (scannerRef.current as Html5QrcodeScanner)
-                .clear()
-                .then(() => {
-                    scannerRef.current = null;
-                })
-                .catch((e: Error) => console.error("Clear error:", e));
-        }
+      // ถ้าเป็น Html5Qrcode instance
+      if ("stop" in scannerRef.current) {
+        scannerRef.current
+          .stop()      // หยุดกล้อง
+          .then(() => scannerRef.current!.clear()) // ล้าง DOM และ memory
+          .catch((e: Error) => console.error("Stop error:", e));
+      }
+      // ถ้าเป็น Html5QrcodeScanner instance
+      else {
+        (scannerRef.current as Html5QrcodeScanner)
+          .clear()
+          .then(() => {
+            scannerRef.current = null;
+          })
+          .catch((e: Error) => console.error("Clear error:", e));
+      }
     }
-};
+  };
+
+  const clearinputref = () => {
+    // เคลียร์ inputRef และ state
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
+  const handleNextPageStatuscancel = () => {
+    const value = inputRef.current?.value.trim();
+    if (!value) {
+      alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+      return;
+    }
+    if (EmployeeNo === employeeUserName) {
+      // log
+      submitLogcancelToReflow120_9();
+      // update null
+      updateReflowStatusCancel();
+      // navigate
+      goToHome();
+    }
+    else {
+      alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+      console.log("employeeName != EmployeeNo")
+    }
+    clearinputref();
+  };
+
+  const handleNextPageStatuscloseprod = () => {
+    const value = inputRef.current?.value.trim();
+    if (!value) {
+      alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+      return;
+    }
+    if (EmployeeNo === employeeUserName) {
+      // log
+      submitLogCloseprodToReflow120_9();
+      // update null
+      updateReflowStatusClosepro();
+      // navigate
+      goToHome();
+    }
+    else {
+      alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+      console.log("employeeName != EmployeeNo")
+    }
+
+    clearinputref();
+  };
+  const handleNextPageStatusCHECKED = () => {
+    const value = inputRef.current?.value.trim();
+    if (!value) {
+      alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+      return;
+    }
+    console.log(employeeName)
+    if (EmployeeNo === employeeUserName) {
+
+      if (submitStage === "waiting") {
+        setSubmitStage("CHECKED");
+        submitLogToReflow120_9_CHECK();
+        updateReflowStatusCHECKED();
+        setShowBar(false);
+        setIsCardOpen(false);
+        clearinputref();
+        console.log("CHECKED");
+        console.log("Scanned ID:", EmployeeNo);
+      }
+      else {
+        window.location.reload();
+      }
+
+    }
+    else {
+      alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+      console.log("employeeName != EmployeeNo")
+    }
+  };
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -639,12 +718,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpen]);
 
+
+
   useEffect(() => {
     const handleClickOutsidearrow = (event: MouseEvent) => {
       if (cardarrowRef.current && !cardarrowRef.current.contains(event.target as Node)) {
         setArrowDownButtoncard(false);
         setArrowDownButton(true);
-        
+
       }
     };
     if (arrowdownbuttoncard) {
@@ -662,6 +743,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       if (cardRefcancel.current && !cardRefcancel.current.contains(event.target as Node)) {
         setisCardOpencancel(false);
         clearCamera();
+        setArrowDownButton(true);
       }
     };
     if (isCardOpencancel) {
@@ -679,6 +761,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
         setisCardOpenclosepro(false);
         clearCamera();
+        setArrowDownButton(true);
       }
     };
     if (isCardOpenclosepro) {
@@ -720,18 +803,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    console.log(employeeName)
-                    if (EmployeeNo === employeeUserName) {
-                      // log
-                      submitLogcancelToReflow120_9();
-                      // update null
-                      updateReflowStatusCancel();
-                      // navigate
-                      goToHome();
-                    }
-                    else {
-                      console.log("employeeName != EmployeeNo")
-                    }
+                    handleNextPageStatuscancel();
+
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
@@ -767,18 +840,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    console.log(employeeName)
-                    if (EmployeeNo === employeeUserName) {
-                      // log
-                      submitLogCloseprodToReflow120_9();
-                      // update null
-                      updateReflowStatusClosepro();
-                      // navigate
-                      goToHome();
-                    }
-                    else {
-                      console.log("employeeName != EmployeeNo")
-                    }
+                    handleNextPageStatuscloseprod();
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
@@ -988,26 +1050,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    console.log(employeeName)
-                    if (EmployeeNo === employeeUserName) {
-
-                      if (submitStage === "waiting") {
-                        setSubmitStage("CHECKED");
-                        submitLogToReflow120_9_CHECK();
-                        updateReflowStatusCHECKED();
-                        setShowBar(false);
-                        setIsCardOpen(false);
-                        console.log("CHECKED");
-                        console.log("Scanned ID:", EmployeeNo);
-                      }
-                      else {
-                        window.location.reload();
-                      }
-
-                    }
-                    else {
-                      console.log("employeeName != EmployeeNo")
-                    }
+                    handleNextPageStatusCHECKED();
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
