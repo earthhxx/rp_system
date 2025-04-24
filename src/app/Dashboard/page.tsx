@@ -1,39 +1,114 @@
-"use client";
-import React, { useState, useRef, useEffect } from "react";
+'use client';
+import React, { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
-
-const MenuToggle = () => {
-    return (
-        <>
-        <div ></div>
-            <div className="flex-1 w-screen h-screen flex-col justify-center items-start bg-blue-800">
-                <div className="flex w-full h-50 text-5xl font-kanit  font-bold justify-center items-center">REFLOW PROFLIE DASHBOARD</div>
-                <div className="flex flex-none ps-4 pe-4">
-                    <div className="flex w-1/2 items-center justify-between px-4 py-3 space-x-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50">
-                        <div className="flex w-full justify-center items-center space-x-4">
-                            <div>
-                                <p className="text-sm font-medium text-gray-900">ProductOrderNo</p>
-                                <p className="text-xs text-gray-500">202508040022</p>
-                            </div>
-                        </div>
-                        <div className="flex w-full items-center justify-center space-x-4">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                <svg className="h-3 w-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Active
-                            </span>
-                        </div>
-                        <div className="flex w-full items-center justify-center space-x-4">
-                            <button type="button" className="text-sm text-blue-600 hover:underline">Edit</button>
-                            <button type="button" className="text-sm text-red-600 hover:underline">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </>
-    );
+type LineStatus = {
+    line: string;
+    model: string;
+    productOrderNo: string;
+    status: 'waiting' | 'checked' | 'null';
+    time: string;
 };
 
-export default MenuToggle;
+const STATUS_COLOR = {
+    waiting: 'bg-yellow-400 text-yellow-900',
+    checked: 'bg-blue-400 text-blue-900',
+    null: 'bg-gray-400 text-gray-900',
+};
+
+const PRODUCTION_GROUPS: Record<string, string[]> = {
+    'Production 1': ['SMT-1', 'SMT-5', 'SMT-10', 'SMT-11', 'SMT-12', 'SMT-13', 'SMT-14', 'SMT-15'],
+    'Production 2': ['SMT-2', 'SMT-3', 'SMT-4', 'SMT-6', 'SMT-7', 'SMT-8', 'SMT-9'],
+    'Production 3': ['SMT-18'],
+    'Production 4': ['SMT-21'],
+    'Production 5': ['SMT-19', 'SMT-20'],
+};
+
+export default function ActiveLinesDashboard() {
+    const [lines, setLines] = useState<LineStatus[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/mock-line-status');
+            const data = await res.json();
+            setLines(data);
+        } catch (err) {
+            console.error('Failed to fetch line status', err);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const groupLinesByProduction = () => {
+        return Object.entries(PRODUCTION_GROUPS).map(([groupName, lineList]) => {
+            const groupLines = lines.filter((line) => lineList.includes(line.line));
+            return { groupName, groupLines };
+        });
+    };
+
+    const allGroups = groupLinesByProduction();
+    const mainGroups = allGroups.filter(g => ['Production 1', 'Production 2'].includes(g.groupName));
+    const compactGroups = allGroups.filter(g => ['Production 3', 'Production 4', 'Production 5'].includes(g.groupName));
+
+    return (
+        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200">
+            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">Active SMT Lines</h1>
+
+            <div className="space-y-12">
+                {/* Main full-width groups */}
+                {mainGroups.map(({ groupName, groupLines }) => (
+                    <div key={groupName}>
+                        <h2 className="text-2xl font-semibold mb-4 text-blue-700">{groupName}</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {groupLines.map((line, index) => (
+                                <LineCard key={index} line={line} />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
+                {/* Compact grid for Production 3, 4, 5 */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {compactGroups.map(({ groupName, groupLines }) => (
+                        <div key={groupName} className="flex flex-col">
+                            <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
+                            <div className="flex flex-col gap-4">
+                                {groupLines.map((line, index) => (
+                                    <LineCard key={index} line={line} />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+function LineCard({ line }: { line: LineStatus }) {
+    return (
+        <div className="rounded-2xl shadow-md border border-blue-300 p-4 bg-white hover:shadow-lg transition-all">
+            <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-lg text-blue-900">{line.line}</span>
+                <span
+                    className={clsx(
+                        'px-2 py-1 text-xs font-medium rounded-full capitalize',
+                        STATUS_COLOR[line.status]
+                    )}
+                >
+                    {line.status}
+                </span>
+            </div>
+            <div className="text-sm text-gray-700">
+                <p><strong>Model:</strong> {line.model}</p>
+                <p><strong>Order No:</strong> {line.productOrderNo}</p>
+                <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
+            </div>
+        </div>
+    );
+}
