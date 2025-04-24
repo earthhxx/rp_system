@@ -79,27 +79,43 @@ const MenuToggle = () => {
     const startCamera = () => {
         const html5QrCode = new Html5Qrcode(qrRegionId);
         scannerRef.current = html5QrCode;
-    
-        html5QrCode.start(
-          { facingMode: "environment" }, // ✅ กล้องหลังอัตโนมัติ
-          {
-            fps: 30,
-            qrbox: { width: 300, height: 300 }            
-          },
-          (decodedText) => {
-            setProductOrderNo(decodedText);
-            console.log("Decoded:", decodedText);
-            html5QrCode.stop().then(() => {
-              html5QrCode.clear();
-            });
-          },
-          (errorMessage) => {
-            console.warn("QR error:", errorMessage);
-          }
-        ).catch(err => {
-          console.error("Camera start error:", err);
-        });
+      
+        html5QrCode
+          .start(
+            { facingMode: "environment" },
+            {
+              fps: 30,
+              qrbox: { width: 350, height: 350 },
+            },
+            (decodedText) => {
+              setProductOrderNo(decodedText);
+              console.log("Decoded:", decodedText);
+              html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+              });
+            },
+            (errorMessage) => {
+              console.warn("QR error:", errorMessage);
+            }
+          )
+          .then(() => {
+            // เมื่อกล้องเริ่มแล้ว เราค่อยจัด style
+            setTimeout(() => {
+              const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
+              if (video) {
+                video.style.width = "552px";
+                video.style.height = "250px";
+                video.style.borderRadius = "16px";
+                video.style.objectFit = "cover";
+              }
+            }, 300); // หน่วงนิดเพื่อรอ DOM พร้อม
+          })
+          .catch((err) => {
+            console.error("Camera start error:", err);
+          });
       };
+      
+      
 
 
 
@@ -183,7 +199,7 @@ const MenuToggle = () => {
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
                 <div
                     ref={cardRef}
-                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
+                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl h-fit p-6"
                 >
                     <div className="flex justify-center items-center w-full text-white">
                         Please enter Product ID :
@@ -191,7 +207,7 @@ const MenuToggle = () => {
                     <div className="flex justify-center items-center w-full text-white">
                         โปรดใส่รหัสผลิตภัณฑ์ของคุณ :
                     </div>
-                    <div id="qr-reader" style={{ width: "100%", maxWidth: "250px", height: "250px" }} className="flex justify-center items-center" />
+                    <div id="qr-reader" className="w-full h-60 rounded-lg" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -201,7 +217,7 @@ const MenuToggle = () => {
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="product id..."
                     />
-                    <div className="flex w-full h-full items-center">
+                    <div className="flex w-full h-fit items-center">
                         <span
                             onClick={startCamera}
                             className="flex w-1/2 h-32 justify-center">

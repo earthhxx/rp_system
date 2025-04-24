@@ -451,29 +451,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [pdfUrl]);
 
   const startCamera = () => {
-    const html5QrCode = new Html5Qrcode(qrRegionId);
-    scannerRef.current = html5QrCode;
-
-    html5QrCode.start(
-      { facingMode: "environment" }, // ✅ กล้องหลังอัตโนมัติ
-      {
-        fps: 10,
-        qrbox: 250,
-      },
-      (decodedText) => {
-        setEmployeeNo(decodedText);
-        console.log("Decoded:", decodedText);
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
-        });
-      },
-      (errorMessage) => {
-        console.warn("QR error:", errorMessage);
-      }
-    ).catch(err => {
-      console.error("Camera start error:", err);
-    });
-  };
+          const html5QrCode = new Html5Qrcode(qrRegionId);
+          scannerRef.current = html5QrCode;
+        
+          html5QrCode
+            .start(
+              { facingMode: "environment" },
+              {
+                fps: 30,
+                qrbox: { width: 350, height: 350 },
+              },
+              (decodedText) => {
+                setEmployeeNo(decodedText);
+                console.log("Decoded:", decodedText);
+                html5QrCode.stop().then(() => {
+                  html5QrCode.clear();
+                });
+              },
+              (errorMessage) => {
+                console.warn("QR error:", errorMessage);
+              }
+            )
+            .then(() => {
+              // เมื่อกล้องเริ่มแล้ว เราค่อยจัด style
+              setTimeout(() => {
+                const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
+                if (video) {
+                  video.style.width = "552px";
+                  video.style.height = "250px";
+                  video.style.borderRadius = "16px";
+                  video.style.objectFit = "cover";
+                }
+              }, 300); // หน่วงนิดเพื่อรอ DOM พร้อม
+            })
+            .catch((err) => {
+              console.error("Camera start error:", err);
+            });
+        };
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -915,7 +929,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       {
         isCardOpen && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-            <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+            <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
               <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
