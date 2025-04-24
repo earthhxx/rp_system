@@ -262,7 +262,6 @@ const MenuToggle = () => {
     };
 
 
-
     return (
         <>
             {homeStage === "home" && renderHomeButton()}
