@@ -450,44 +450,57 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   }, [pdfUrl]);
 
-  const startCamera = () => {
-          const html5QrCode = new Html5Qrcode(qrRegionId);
-          scannerRef.current = html5QrCode;
-        
-          html5QrCode
-            .start(
-              { facingMode: "environment" },
-              {
-                fps: 30,
-                qrbox: { width: 350, height: 350 },
-              },
-              (decodedText) => {
-                setEmployeeNo(decodedText);
-                console.log("Decoded:", decodedText);
-                html5QrCode.stop().then(() => {
-                  html5QrCode.clear();
-                });
-              },
-              (errorMessage) => {
-                console.warn("QR error:", errorMessage);
-              }
-            )
-            .then(() => {
-              // เมื่อกล้องเริ่มแล้ว เราค่อยจัด style
-              setTimeout(() => {
-                const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
-                if (video) {
-                  video.style.width = "552px";
-                  video.style.height = "250px";
-                  video.style.borderRadius = "16px";
-                  video.style.objectFit = "cover";
-                }
-              }, 300); // หน่วงนิดเพื่อรอ DOM พร้อม
-            })
-            .catch((err) => {
-              console.error("Camera start error:", err);
-            });
-        };
+  const startScan = async () => {
+    const qrRegionId = "qr-reader";
+    const html5QrCode = new Html5Qrcode(qrRegionId);
+    scannerRef.current = html5QrCode;
+  
+    try {
+      const devices = await Html5Qrcode.getCameras();
+  
+      if (!devices || devices.length === 0) {
+        console.error("ไม่พบกล้องบนอุปกรณ์");
+        return;
+      }
+  
+      // หากล้องที่ชื่อดูเหมือนกล้องหลัง
+      const backCam = devices.find((d) =>
+        d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
+      );
+  
+      const selectedDeviceId = backCam ? backCam.id : devices[0].id;
+  
+      await html5QrCode.start(
+        { deviceId: { exact: selectedDeviceId } },
+        {
+          fps: 10,
+          qrbox: (vw, vh) => {
+            const size = Math.min(vw, vh) * 0.8;
+            return { width: size, height: size };
+          },
+        },
+        (decodedText) => {
+          setEmployeeNo(decodedText);
+          if (inputRef.current) inputRef.current.value = decodedText;
+  
+          html5QrCode.stop().then(() => html5QrCode.clear());
+        },
+        (err) => console.warn("QR Scan Error:", err)
+      );
+  
+      setTimeout(() => {
+        const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
+        if (video) {
+          video.style.width = "400px";
+          video.style.height = "400px";
+          video.style.borderRadius = "12px";
+          video.style.objectFit = "cover";
+        }
+      }, 300);
+    } catch (err) {
+      console.error("Camera initialization error:", err);
+    }
+  };
 
   let buttonClass = "";
   let buttonClassL = "";
@@ -677,7 +690,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex w-full h-full items-center">
 
                 <span
-                  onClick={startCamera}
+                  onClick={startScan}
                   className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
@@ -724,7 +737,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex w-full h-full items-center">
 
                 <span
-                  onClick={startCamera}
+                  onClick={startScan}
                   className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>
@@ -945,7 +958,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <div className="flex w-full h-full items-center">
 
                 <span
-                  onClick={startCamera}
+                  onClick={startScan}
                   className="flex w-1/2 h-32 justify-center">
                   <BsUpcScan className="size-32 text-white"></BsUpcScan>
                 </span>

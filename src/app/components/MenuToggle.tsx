@@ -23,15 +23,15 @@ const MenuToggle = () => {
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
     const [productOrderNo, setProductOrderNo] = useState("");
-   
- 
+
+
     const cardRef = useRef<HTMLDivElement>(null);
-   
-    
+
+
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const qrRegionId = "qr-reader";
     const inputRef = useRef<HTMLInputElement | null>(null);
-  
+
 
 
 
@@ -76,46 +76,63 @@ const MenuToggle = () => {
         };
     }, [homeStage]);
 
-    const startCamera = () => {
+
+
+    const startScan = async () => {
+        const qrRegionId = "qr-reader";
         const html5QrCode = new Html5Qrcode(qrRegionId);
         scannerRef.current = html5QrCode;
       
-        html5QrCode
-          .start(
-            { facingMode: "environment" },
+        try {
+          const devices = await Html5Qrcode.getCameras();
+      
+          if (!devices || devices.length === 0) {
+            console.error("ไม่พบกล้องบนอุปกรณ์");
+            return;
+          }
+      
+          // หากล้องที่ชื่อดูเหมือนกล้องหลัง
+          const backCam = devices.find((d) =>
+            d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
+          );
+      
+          const selectedDeviceId = backCam ? backCam.id : devices[0].id;
+      
+          await html5QrCode.start(
+            { deviceId: { exact: selectedDeviceId } },
             {
-              fps: 30,
-              qrbox: { width: 350, height: 350 },
+              fps: 10,
+              qrbox: (vw, vh) => {
+                const size = Math.min(vw, vh) * 0.8;
+                return { width: size, height: size };
+              },
             },
             (decodedText) => {
               setProductOrderNo(decodedText);
-              console.log("Decoded:", decodedText);
-              html5QrCode.stop().then(() => {
-                html5QrCode.clear();
-              });
+              if (inputRef.current) inputRef.current.value = decodedText;
+      
+              html5QrCode.stop().then(() => html5QrCode.clear());
             },
-            (errorMessage) => {
-              console.warn("QR error:", errorMessage);
+            (err) => console.warn("QR Scan Error:", err)
+          );
+      
+          setTimeout(() => {
+            const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
+            if (video) {
+              video.style.width = "400px";
+              video.style.height = "400px";
+              video.style.borderRadius = "12px";
+              video.style.objectFit = "cover";
             }
-          )
-          .then(() => {
-            // เมื่อกล้องเริ่มแล้ว เราค่อยจัด style
-            setTimeout(() => {
-              const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
-              if (video) {
-                video.style.width = "552px";
-                video.style.height = "250px";
-                video.style.borderRadius = "16px";
-                video.style.objectFit = "cover";
-              }
-            }, 300); // หน่วงนิดเพื่อรอ DOM พร้อม
-          })
-          .catch((err) => {
-            console.error("Camera start error:", err);
-          });
+          }, 300);
+        } catch (err) {
+          console.error("Camera initialization error:", err);
+        }
       };
       
-      
+
+
+
 
 
 
@@ -196,7 +213,9 @@ const MenuToggle = () => {
         if (homeStage !== "scan") return null;
 
         return (
+
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+
                 <div
                     ref={cardRef}
                     className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl h-fit p-6"
@@ -207,7 +226,7 @@ const MenuToggle = () => {
                     <div className="flex justify-center items-center w-full text-white">
                         โปรดใส่รหัสผลิตภัณฑ์ของคุณ :
                     </div>
-                    <div id="qr-reader" className="w-full h-60 rounded-lg" />
+                    <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
                     <input
                         ref={inputRef}
                         type="text"
@@ -219,7 +238,7 @@ const MenuToggle = () => {
                     />
                     <div className="flex w-full h-fit items-center">
                         <span
-                            onClick={startCamera}
+                            onClick={startScan}
                             className="flex w-1/2 h-32 justify-center">
                             <BsUpcScan className="size-32 text-white" />
                         </span>
