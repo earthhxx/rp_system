@@ -52,7 +52,8 @@ export default function ActiveLinesDashboard() {
 
     const allGroups = groupLinesByProduction();
     const mainGroups = allGroups.filter(g => ['Production 1', 'Production 2'].includes(g.groupName));
-    const compactGroups = allGroups.filter(g => ['Production 3', 'Production 4', 'Production 5'].includes(g.groupName));
+    const compactGroups = allGroups.filter(g => ['Production 3', 'Production 4'].includes(g.groupName));
+    const compactGroups2 = allGroups.filter(g => ['Production 5'].includes(g.groupName));
 
     return (
         <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200">
@@ -71,18 +72,41 @@ export default function ActiveLinesDashboard() {
                     </div>
                 ))}
 
-                {/* Compact grid for Production 3, 4, 5 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {compactGroups.map(({ groupName, groupLines }) => (
-                        <div key={groupName} className="flex flex-col">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-                            <div className="flex flex-col gap-4">
-                                {groupLines.map((line, index) => (
-                                    <LineCard key={index} line={line} />
-                                ))}
+                {/* Compact grid for Production 3, 4 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-center items-center">
+                    <div className=" grid grid-cols-2 gap-4">
+                        {compactGroups.map(({ groupName, groupLines }) => (
+                            <div key={groupName} className="flex flex-col">
+                                <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
+                                <div className="flex flex-col gap-4">
+                                    {groupLines.map((line, index) => (
+                                        <LineCard key={index} line={line} />
+                                    ))}
+                                </div>
                             </div>
+                        ))}
+
+                    </div>
+
+                    {compactGroups2.map(({ groupName, groupLines }) => (
+                        <div key={groupName} className="grid grid-cols-1">
+                            <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
+                           
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    {groupLines.map((line, index) => (
+                                        <LineCard key={index} line={line} />
+                                    ))}
+                                </div>
+
+                          
+
                         </div>
                     ))}
+
+
+
+
                 </div>
             </div>
         </div>
