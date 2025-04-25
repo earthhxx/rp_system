@@ -120,26 +120,30 @@ function LineCard({ line }: { line: LineStatus }) {
     return (
         <div className="rounded-2xl shadow-md border border-blue-300  bg-white hover:shadow-lg transition-all">
             <div>
-                <div className="flex gap-4 items-center ps-4 pe-4 mb-2">
-                    <span className="w-30 justify-center items-center font-semibold text-lg text-blue-900">{line.line}</span>
-                    <div className="w-full justify-center items-center text-sm text-gray-700">
-                        <p><strong>Model:</strong> {line.model}</p>
-                        <p><strong>Order No:</strong> {line.productOrderNo}</p>
-                        <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
+                <div className="flex gap-4 text-center justify-center items-center ">
+                    <span className="w-50  font-semibold text-lg text-blue-900">{line.line}</span>
+                    <div className='flex flex-col w-full justify-center'>
+
+                        <div className="flex flex-col justify-center items-start w-full  text-sm mt-4 mb-4 text-gray-700">
+                            <p><strong>Model:</strong> {line.model}</p>
+                            <p><strong>Order No:</strong> {line.productOrderNo}</p>
+                            <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
+                        </div>
+                        <div className="flex ">
+                            <span
+                                className={clsx(
+                                    'w-full px-2 py-1 text-[18px] font-semibold font-kanit rounded-br-xl capitalize text-center',
+                                    STATUS_COLOR[line.status]
+                                )}
+                            >
+                                {line.status}
+                            </span>
+                        </div>
+
                     </div>
                 </div>
+            </div>
 
-            </div>
-            <div className="flex ">
-                <span
-                    className={clsx(
-                        'w-full px-2 py-1 text-[18px] font-semibold font-kanit rounded-b-xl capitalize text-center',
-                        STATUS_COLOR[line.status]
-                    )}
-                >
-                    {line.status}
-                </span>
-            </div>
 
         </div>
     );
