@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const statuses = ['waiting', 'checked', 'null','waitingResult','resulted'];
+  const statuses = ['waiting', 'checked','null'];
 
   const mockData = Array.from({ length: 21 }, (_, i) => ({
     line: `SMT-${i + 1}`,
