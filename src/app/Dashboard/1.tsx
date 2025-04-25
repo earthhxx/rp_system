@@ -6,7 +6,7 @@ type LineStatus = {
     line: string;
     model: string;
     productOrderNo: string;
-    status: 'waiting' | 'checked' | 'null' | 'waitingResult' | 'resulted';
+    status: 'waiting' | 'checked' | 'null';
     time: string;
 };
 
@@ -14,8 +14,6 @@ const STATUS_COLOR = {
     waiting: 'bg-yellow-400 text-yellow-900',
     checked: 'bg-blue-400 text-blue-900',
     null: 'bg-gray-400 text-gray-900',
-    waitingResult: 'bg-orange-400 text-orange-900',
-    resulted: 'bg-green-400 text-green-900',
 };
 
 const PRODUCTION_GROUPS: Record<string, string[]> = {
@@ -45,6 +43,7 @@ export default function ActiveLinesDashboard() {
         return () => clearInterval(interval);
     }, []);
 
+    // Group lines by their production group
     const groupLinesByProduction = () => {
         return Object.entries(PRODUCTION_GROUPS).map(([groupName, lineList]) => {
             const groupLines = lines.filter((line) => lineList.includes(line.line));
@@ -58,8 +57,8 @@ export default function ActiveLinesDashboard() {
     const compactGroups2 = allGroups.filter(g => ['Production 5'].includes(g.groupName));
 
     return (
-        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200 ">
-            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">REFLOW STATUS DASHBOARD</h1>
+        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200">
+            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">Active SMT Lines</h1>
 
             <div className="space-y-12">
                 {/* Main full-width groups */}
@@ -76,77 +75,69 @@ export default function ActiveLinesDashboard() {
 
                 {/* Compact grid for Production 3, 4 */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-center items-center">
-                    <div className=" grid grid-cols-2 gap-4">
-                        {compactGroups.map(({ groupName, groupLines }) => (
-                            <div key={groupName} className="flex flex-col">
-                                <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-                                <div className="flex flex-col gap-4">
-                                    {groupLines.map((line, index) => (
-                                        <LineCard key={index} line={line} />
-                                    ))}
-                                </div>
+                    {compactGroups.map(({ groupName, groupLines }) => (
+                        <div key={groupName} className="flex flex-col">
+                            <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
+                            <div className="flex flex-col gap-4">
+                                {groupLines.map((line, index) => (
+                                    <LineCard key={index} line={line} />
+                                ))}
                             </div>
-                        ))}
-
-                    </div>
+                        </div>
+                    ))}
 
                     {compactGroups2.map(({ groupName, groupLines }) => (
                         <div key={groupName} className="grid grid-cols-1">
                             <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-
-
                             <div className="grid grid-cols-2 gap-4">
                                 {groupLines.map((line, index) => (
                                     <LineCard key={index} line={line} />
                                 ))}
                             </div>
-
-
-
                         </div>
                     ))}
-
-
-
-
                 </div>
             </div>
         </div>
     );
 }
 
-
 function LineCard({ line }: { line: LineStatus }) {
     return (
-        <div className="rounded-2xl shadow-md border border-blue-300  bg-white hover:shadow-lg transition-all">
-            <div>
-                <div className="flex">
-                    <div className='flex w-[35%] justify-center items-center bg-blue-50'> 
-                        <div className=" font-semibold text-lg text-blue-900 ">{line.line}</div>
+        <div className="w-full">
+            {/* Status Badge */}
+            <div className={clsx(
+                'relative flex flex-col justify-between rounded-2xl shadow-lg border border-blue-200 bg-white transition hover:shadow-xl hover:scale-[1.01] duration-300', 
+                STATUS_COLOR[line.status]
+            )}>
+                <span
+                    className={clsx(
+                        'absolute -top-3 -left-3 px-3 py-1 text-xs font-bold rounded-full shadow-lg z-10',
+                        STATUS_COLOR[line.status]
+                    )}
+                >
+                    {line.status}
+                </span>
+
+                <div className="relative flex flex-col justify-center items-center p-4">
+                    <div className="flex text-blue-800 text-[32px] font-bold">{line.line}</div>
+                    <div className="h-[2px] bg-gray-200 w-[90%] mx-auto rounded-full" />
+                    <div className="flex flex-col justify-center text-black text-[16px] font-kanit">
+                        <div className="flex text-[28px]">{line.model}</div>
                     </div>
-                    <div className='flex flex-col w-full justify-center '>
 
-                        <div className="flex flex-col justify-center items-start w-full  text-sm mt-4 mb-4 text-gray-700">
-                            <p><strong>Model:</strong> {line.model}</p>
-                            <p><strong>Order No:</strong> {line.productOrderNo}</p>
-                            <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
-                        </div>
-                        <div className="flex ">
-                            <span
-                                className={clsx(
-                                    'w-full px-2 py-1 text-[18px] font-semibold font-kanit rounded-br-xl capitalize text-center',
-                                    STATUS_COLOR[line.status]
-                                )}
-                            >
-                                {line.status}
-                            </span>
-                        </div>
+                    <div className="absolute -bottom-12 right-0 text-blue-900 text-[30px] font-bold px-3 py-1">
+                        {line.time}
+                    </div>
+                </div>
 
+                <div className="flex flex-col justify-start text-black pe-4 ps-9">
+                    <p><span>Order:</span> {line.productOrderNo}</p>
+                    <div className="flex">
+                        <p>Start: {line.time}</p>
                     </div>
                 </div>
             </div>
-
-
         </div>
     );
 }
