@@ -10,6 +10,7 @@ import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
+import { FaFilePdf } from "react-icons/fa";
 
 
 type DataItem120_2 = {
@@ -48,7 +49,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-  const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED">("waiting");
+  const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED" |"waitingResult"|"resulted">("waiting");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
@@ -898,6 +899,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       <div className="flex flex-none"></div>
                       <GoCheckCircle className="size-30 text-white" />
                       <div>SUBMIT PRODUCT</div>
+                    </div>
+                    <div className="flex flex-none "></div>
+                  </div>
+                  <div className="flex w-full h-full justify-center">
+                    <div className="flex flex-none"></div>
+                    <div
+                      onClick={() => {
+                        
+                      }}
+                      className="flex flex-col  justify-center items-center">
+                      <div className="flex flex-none"></div>
+                      <FaFilePdf className="size-30 text-white" />
+                      <div>RESULT</div>
                     </div>
                     <div className="flex flex-none "></div>
                   </div>

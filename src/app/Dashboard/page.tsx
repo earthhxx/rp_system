@@ -6,7 +6,7 @@ type LineStatus = {
     line: string;
     model: string;
     productOrderNo: string;
-    status: 'waiting' | 'checked' | 'null';
+    status: 'waiting' | 'checked' | 'null' | 'waitingResult' | 'resulted';
     time: string;
 };
 
@@ -14,6 +14,8 @@ const STATUS_COLOR = {
     waiting: 'bg-yellow-400 text-yellow-900',
     checked: 'bg-blue-400 text-blue-900',
     null: 'bg-gray-400 text-gray-900',
+    waitingResult: 'bg-orange-400 text-orange-900',
+    resulted: 'bg-green-400 text-green-900',
 };
 
 const PRODUCTION_GROUPS: Record<string, string[]> = {
@@ -56,8 +58,8 @@ export default function ActiveLinesDashboard() {
     const compactGroups2 = allGroups.filter(g => ['Production 5'].includes(g.groupName));
 
     return (
-        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200">
-            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">Active SMT Lines</h1>
+        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200 ">
+            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">REFLOW STATUS DASHBOARD</h1>
 
             <div className="space-y-12">
                 {/* Main full-width groups */}
@@ -91,15 +93,15 @@ export default function ActiveLinesDashboard() {
                     {compactGroups2.map(({ groupName, groupLines }) => (
                         <div key={groupName} className="grid grid-cols-1">
                             <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-                           
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                    {groupLines.map((line, index) => (
-                                        <LineCard key={index} line={line} />
-                                    ))}
-                                </div>
 
-                          
+
+                            <div className="grid grid-cols-2 gap-4">
+                                {groupLines.map((line, index) => (
+                                    <LineCard key={index} line={line} />
+                                ))}
+                            </div>
+
+
 
                         </div>
                     ))}
@@ -116,23 +118,29 @@ export default function ActiveLinesDashboard() {
 
 function LineCard({ line }: { line: LineStatus }) {
     return (
-        <div className="rounded-2xl shadow-md border border-blue-300 p-4 bg-white hover:shadow-lg transition-all">
-            <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold text-lg text-blue-900">{line.line}</span>
+        <div className="rounded-2xl shadow-md border border-blue-300  bg-white hover:shadow-lg transition-all">
+            <div>
+                <div className="flex gap-4 items-center ps-4 pe-4 mb-2">
+                    <span className="w-30 justify-center items-center font-semibold text-lg text-blue-900">{line.line}</span>
+                    <div className="w-full justify-center items-center text-sm text-gray-700">
+                        <p><strong>Model:</strong> {line.model}</p>
+                        <p><strong>Order No:</strong> {line.productOrderNo}</p>
+                        <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
+                    </div>
+                </div>
+
+            </div>
+            <div className="flex ">
                 <span
                     className={clsx(
-                        'px-2 py-1 text-xs font-medium rounded-full capitalize',
+                        'w-full px-2 py-1 text-[18px] font-semibold font-kanit rounded-b-xl capitalize text-center',
                         STATUS_COLOR[line.status]
                     )}
                 >
                     {line.status}
                 </span>
             </div>
-            <div className="text-sm text-gray-700">
-                <p><strong>Model:</strong> {line.model}</p>
-                <p><strong>Order No:</strong> {line.productOrderNo}</p>
-                <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
-            </div>
+
         </div>
     );
 }
