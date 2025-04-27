@@ -200,7 +200,6 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-
                         setIsMenuOpen(false);
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -212,7 +211,7 @@ const MenuToggle = () => {
                     onClick={() => router.push('/Dashboard')}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <BsClipboard2DataFill className="size-30 text-white" />
-                    DASHBOARD
+                    MEASUREMENT REALTIME
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -223,7 +222,7 @@ const MenuToggle = () => {
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
                     <BsUpcScan className="size-30 text-white" />
-                    SCAN PRODUCT
+                    SEARCH STANDARD
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
