@@ -18,30 +18,16 @@ interface ReflowStatus {
 
 const MenuToggle = () => {
     const router = useRouter();
-
     const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
     const [productOrderNo, setProductOrderNo] = useState("");
-
-
     const cardRef = useRef<HTMLDivElement>(null);
-
-
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const qrRegionId = "qr-reader";
     const inputRef = useRef<HTMLInputElement | null>(null);
-
-
-
-
-
-
-
-
-
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -79,8 +65,6 @@ const MenuToggle = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [homeStage]);
-
-
 
     const startScan = async () => {
         const qrRegionId = "qr-reader";
@@ -161,8 +145,6 @@ const MenuToggle = () => {
         }
     };
 
-
-
     const renderHomeButton = () => (
         <motion.div
             className="fixed h-fit w-fit justify-center items-center pb-8 pt-5 pl-3 pr-3 z-95"
@@ -202,6 +184,7 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
+
                         setHomeStage('home');
                         setIsMenuOpen(false);
                         router.push('/');
@@ -219,8 +202,12 @@ const MenuToggle = () => {
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
+
                     <BsClipboard2DataFill className="size-30 text-white m-4" />
                     REALTIME CHECK
+                    <BsClipboard2DataFill className="size-30 text-white" />
+                    MEASUREMENT REALTIME
+
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -230,7 +217,11 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
+
                     <BsUpcScan className="size-30 text-white m-4" />
+
+                    <BsUpcScan className="size-30 text-white" />
+
                     SEARCH STANDARD
                 </div>
                 <div className="flex w-full h-full"></div>
@@ -305,15 +296,11 @@ const MenuToggle = () => {
         clearinputref();
     };
 
-
-
     return (
         <>
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
             {homeStage === "scan" && renderScanCard()}
-
-
 
             <div className="absolute bottom-5 left-5 text-white">
                 Position: {`X: ${position.x}, Y: ${position.y}`}
