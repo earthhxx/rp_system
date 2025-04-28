@@ -49,11 +49,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-<<<<<<< HEAD
   const [submitStage, setSubmitStage] = useState<"WAITING" |"ONCHECKING"| "CHECKED" | "waitingResult" | "resulted">("WAITING");
-=======
-  const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED" | "waitingResult" | "resulted">("waiting");
->>>>>>> 0aaa4d5affece5d84ddbd91565726ec07a356c25
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
@@ -940,11 +936,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-<<<<<<< HEAD
                 <div className="font-roboto text-4xl text-white w-full font-bold">{data120_2?.productName}</div>
-=======
-                <div className="font-roboto text-4xl text-white w-full font-bold">{data120_9.R_Model}</div>
->>>>>>> 0aaa4d5affece5d84ddbd91565726ec07a356c25
               </div>
             </div>
             {/* Box2 */}
