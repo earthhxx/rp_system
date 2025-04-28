@@ -1,13 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan, BsClipboard2DataFill } from "react-icons/bs";
 import { motion } from "framer-motion";
-import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname, } from "next/navigation";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { AiFillHome } from "react-icons/ai";
+import { VscSignIn } from "react-icons/vsc";
 
 interface ReflowStatus {
     ST_Line: string;
@@ -205,8 +204,7 @@ const MenuToggle = () => {
 
                     <BsClipboard2DataFill className="size-30 text-white m-4" />
                     REALTIME CHECK
-                    <BsClipboard2DataFill className="size-30 text-white" />
-                    MEASUREMENT REALTIME
+         
 
                 </div>
                 <div className="flex w-full h-full"></div>
@@ -217,17 +215,13 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
-
                     <BsUpcScan className="size-30 text-white m-4" />
-
-                    <BsUpcScan className="size-30 text-white" />
-
-                    SEARCH STANDARD
+                    STANDARD SEARCH
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
-                    {/* <GoSkipFill className="size-30 text-white" />
-                    CANCEL PRODUCT */}
+                    <VscSignIn className="size-30 text-white m-4" />
+                    SIGN IN
                 </div>
                 <div className="flex w-full h-full"></div>
             </div>

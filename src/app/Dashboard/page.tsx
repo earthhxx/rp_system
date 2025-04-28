@@ -6,39 +6,49 @@ type LineStatus = {
     id: number;
     model: string;
     workOrder: string;
-    status: 'null' | 'waiting' | 'CHECKED';
+    status: 'NULL' | 'WAITING' | 'ONCHECKING'|'CHECKED';
     lastMeasured: string;
     waitTime: number;
 };
 
 const animetion = {
-    waiting: "animate-spin-slow", 
-    CHECKED: "", 
-    null: "",
+    WAITING: "animate-spin-slow", 
+    ONCHECKING :'',
+    CHECKED: "animate-ping-slow", 
+    NULL: "",
 };
 
 
 const icons = {
-    CHECKED: "✅",
-    null: <div className="size-[55px]"></div>,
-    waiting: "⏳ ",
-};
+    CHECKED: (
+        <span className="flex items-center justify-center size-[56px]">
+          <span className="absolute flex justify-center items-center rounded-full  opacity-75 animate-ping z-30">✅</span>
+          <span className="z-10 text-[40px] ">✅</span>
+        </span>
+      ),
+    WAITING: "⏳",
+    NULL: <div className="size-[56px]"></div>,
+    ONCHECKING: "",
+  };
+  
 
 const backgrounds = {
     CHECKED: "bg-pass",
-    null: "bg-gray-300/40",
-    waiting: "bg-pending ",
+    NULL: "bg-gray-300/40",
+    WAITING: "bg-pending ",
+    ONCHECKING: "",
 };
 
 const colors = {
     CHECKED: "text-pass",
-    null: "",
-    waiting: "text-pending",
+    NULL: "",
+    WAITING: "text-pending",
+    ONCHECKING: "",
 };
 
 const ActiveLinesDashboard: React.FC = () => {
     const [linesState, setLinesState] = useState<LineStatus[]>([]);
-    const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'CHECKED'>('ALL');
+    const [filter, setFilter] = useState<'ALL' | 'WAITING' |'ONCHECKING'| 'CHECKED'>('ALL');
 
     useEffect(() => {
         const fetchLines = async () => {
@@ -59,7 +69,7 @@ const ActiveLinesDashboard: React.FC = () => {
         const interval = setInterval(() => {
             setLinesState((prevLines) =>
                 prevLines.map((line) => {
-                    if (line.status === "waiting") {
+                    if (line.status === "WAITING") {
                         line.waitTime += 1;
                     } else {
                         line.waitTime = 0;
@@ -77,13 +87,13 @@ const ActiveLinesDashboard: React.FC = () => {
     const randomStatus = () => {
         const r = Math.random();
         if (r < 0.7) return "CHECKED";
-        else if (r < 0.9) return "null";
-        else return "waiting";
+        else if (r < 0.9) return "NULL";
+        else return "WAITING";
     };
 
     const filteredLines = () => {
         if (filter === "WAITING") {
-            return linesState.filter((line) => line.status === "waiting");
+            return linesState.filter((line) => line.status === "WAITING");
         } else if (filter === "CHECKED") {
             return linesState.filter((line) => line.status === "CHECKED");
         } else {
@@ -98,14 +108,14 @@ const ActiveLinesDashboard: React.FC = () => {
                 className={`card ${backgrounds[line.status]} w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
             >
                 <div className="line-name font-bold text-xl  pb-1">{`${line.id}`}</div>
-                <div className={`status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
+                <div className={`flex justify-center status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
                 <div className="model text-[12px] pb-3 text-gray-600">{`${line.status}`}</div>
                 <div className="">MODEL </div>
 
                 <div className="model text-[16px] pb-2 ">{` ${line.model}`}</div>
-                <div className="waiting text-sm pt-2 text-red-600">
-                    {line.status === "waiting"
-                        ? `Waiting: ${Math.floor(line.waitTime / 60)} minutes`
+                <div className="WAITING text-sm pt-2 text-red-600">
+                    {line.status === "WAITING"
+                        ? `WAITING: ${Math.floor(line.waitTime / 60)} minutes`
                         : "-"}
                 </div>
                 <div className="last-measured text-sm text-gray-600 pb-1">
@@ -147,15 +157,15 @@ const ActiveLinesDashboard: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col justify-center items-center">
-            <h1 className="flex flex-none text-3xl sm:text-5xl font-bold font-kanit text-blue-800 mb-6">
+        <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
+            <h3 className="flex flex-none text-3xl  sm:text-5xl   text-blue-800 mb-8 mt-8">
                 PROFILE MEASUREMENT REALTIME
-            </h1>
+            </h3>
 
             {renderFilterBar()}
 
             <div className="p-6 m-1 w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 w-full h-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full">
                     {renderLines()}
                 </div>
             </div>

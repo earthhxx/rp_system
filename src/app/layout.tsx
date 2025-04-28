@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Menu from "./components/MenuToggle";
-import {Kanit} from "next/font/google";
+import { Kanit } from "next/font/google";
+
 
 const kanitFont = Kanit({
-    subsets:['thai'],
-    weight: ["400","700"],
-    variable:"--font-kanit",
-})
+  subsets: ['thai'],
+  weight: ["400", "700"],
+  variable: "--font-kanit",
+});
+
+
 
 export const metadata: Metadata = {
   title: "Reflow Profile System",
@@ -17,6 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+      <link
+          href="https://fonts.googleapis.com/css2?family=Cal+Sans:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
 
       </head>
       <body className={`${kanitFont.variable} font-sans`}>

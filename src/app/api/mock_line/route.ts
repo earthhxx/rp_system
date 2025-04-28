@@ -4,7 +4,7 @@ type LineStatus = {
     id: string;
     model: string;
     workOrder: string;
-    status: 'null' | 'waiting' | 'CHECKED';  // Updated to match the new statuses
+    status: 'NULL' | 'WAITING' | 'ONCHECKING'|'CHECKED';  // Updated to match the new statuses
     lastMeasured: string;
     waitTime: number;
   };
@@ -12,7 +12,7 @@ type LineStatus = {
 
 const mockWOs = ['WO-1001', 'WO-1002', 'WO-1003', 'WO-1004', 'WO-1005'];
 
-const statuses: ('null' | 'waiting' | 'CHECKED')[] = ['null', 'waiting', 'CHECKED'];
+const statuses: ('NULL' | 'WAITING' |  'ONCHECKING'|'CHECKED')[] = ['NULL', 'WAITING', 'ONCHECKING','CHECKED'];
 
 const getRandomStatus = () => {
   return statuses[Math.floor(Math.random() * statuses.length)];

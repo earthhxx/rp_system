@@ -82,3 +82,7 @@ body {
 .animate-spin-slow {
   animation: spin-slow 5s linear infinite; /* หมุนช้า ๆ */
 }
+
+h3 {
+  font-family: 'Cal Sans', sans-serif;
+}
