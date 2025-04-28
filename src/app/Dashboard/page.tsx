@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 
 // Type definitions
@@ -10,6 +11,7 @@ type LineStatus = {
     lastMeasured: string;
     waitTime: number;
 };
+
 
 const animetion = {
     WAITING: "animate-spin-slow", 
@@ -158,14 +160,14 @@ const ActiveLinesDashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-            <h3 className="flex flex-none text-3xl  sm:text-5xl   text-blue-800 mb-8 mt-8">
+            <h3 className="font-noto font-extrabold  flex flex-none text-7xl sm:text-2xl  text-blue-800 mb-8 mt-8 ">
                 PROFILE MEASUREMENT REALTIME
             </h3>
 
             {renderFilterBar()}
 
             <div className="p-6 m-1 w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full">
+                <div className={` font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full`}>
                     {renderLines()}
                 </div>
             </div>

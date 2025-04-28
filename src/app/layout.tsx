@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Menu from "./components/MenuToggle";
-import { Kanit } from "next/font/google";
-
+import { Kanit, Noto_Sans } from "next/font/google";
 
 const kanitFont = Kanit({
   subsets: ['thai'],
@@ -20,13 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-      <link
-          href="https://fonts.googleapis.com/css2?family=Cal+Sans:wght@400;600&display=swap"
-          rel="stylesheet"
-        />
-
+        
       </head>
-      <body className={`${kanitFont.variable} font-sans`}>
+      <body className={`${kanitFont.variable}`}>
         <Menu />
         <main>{children}</main>
       </body>
