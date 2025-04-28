@@ -65,6 +65,10 @@ body {
   background: linear-gradient(145deg, #fff3cd, #f7e1a7); /* สีสำหรับ pending */
 }
 
+.bg-adjusting {
+  background: linear-gradient(145deg, rgb(255, 229, 205), #f7e0a7); /* สีสำหรับ adjusting */
+}
+
 .text-pass {
   color: green; /* สีข้อความสำหรับ pass */
 }

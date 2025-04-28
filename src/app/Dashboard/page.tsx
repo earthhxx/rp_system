@@ -16,7 +16,7 @@ type LineStatus = {
 
 const animetion = {
     WAITING: "animate-spin-slow",
-    ONCHECKING: '',
+    ONCHECKING: 'animate-spin-slow',
     CHECKED: "animate-ping-slow",
     NULL: "",
 };
@@ -31,7 +31,7 @@ const icons = {
     ),
     WAITING: "⏳",
     NULL: <div className="size-[56px]"></div>,
-    ONCHECKING: "",
+    ONCHECKING: "⏳",
 };
 
 
@@ -39,14 +39,14 @@ const backgrounds = {
     CHECKED: "bg-pass",
     NULL: "bg-gray-300/40",
     WAITING: "bg-pending ",
-    ONCHECKING: "",
+    ONCHECKING: "bg-adjusting",
 };
 
 const colors = {
     CHECKED: "text-pass",
     NULL: "",
     WAITING: "text-pending",
-    ONCHECKING: "",
+    ONCHECKING: "text-adjusting",
 };
 
 const ActiveLinesDashboard: React.FC = () => {
@@ -90,6 +90,7 @@ const ActiveLinesDashboard: React.FC = () => {
     const randomStatus = () => {
         const r = Math.random();
         if (r < 0.7) return "CHECKED";
+        else if (r <0.8) return "ONCHECKING";
         else if (r < 0.9) return "NULL";
         else return "WAITING";
     };
@@ -99,6 +100,8 @@ const ActiveLinesDashboard: React.FC = () => {
             return linesState.filter((line) => line.status === "WAITING");
         } else if (filter === "CHECKED") {
             return linesState.filter((line) => line.status === "CHECKED");
+        } else if (filter === "ONCHECKING") {
+            return linesState.filter((line) => line.status === "ONCHECKING");
         } else {
             return linesState;
         }
@@ -144,6 +147,13 @@ const ActiveLinesDashboard: React.FC = () => {
                     onClick={() => setFilter('WAITING')}
                 >
                     WAITING
+                </button>
+                <button
+                    className={`px-6 py-2 rounded-full font-bold ${filter === "ONCHECKING" ? "bg-orange-300 text-yellow-900" : "bg-gray-200 text-gray-600"
+                        }`}
+                    onClick={() => setFilter('ONCHECKING')}
+                >
+                    ONCHECKING
                 </button>
                 <button
                     className={`px-4 py-2 rounded-full font-bold ${filter === "CHECKED" ? "bg-green-300 text-green-900" : "bg-gray-200 text-gray-600"
