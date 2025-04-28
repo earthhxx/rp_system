@@ -16,7 +16,7 @@ type LineStatus = {
 
 const animetion = {
     WAITING: "animate-spin-slow",
-    ONCHECKING: 'animate-spin-slow',
+    ONCHECKING: 'animate-bounce',
     CHECKED: "animate-ping-slow",
     NULL: "",
 };
@@ -31,7 +31,16 @@ const icons = {
     ),
     WAITING: "⏳",
     NULL: <div className="size-[56px]"></div>,
-    ONCHECKING: "⏳",
+    ONCHECKING: (
+        <span className="flex items-center justify-center size-[56px]">
+            <span className="z-10 text-[40px] "><Image className="flex "
+                src="/images/circuit-board.png"
+                width={100}
+                height={100}
+                alt="Picture of the author"
+            /></span>
+        </span>
+    ),
 };
 
 
@@ -90,7 +99,7 @@ const ActiveLinesDashboard: React.FC = () => {
     const randomStatus = () => {
         const r = Math.random();
         if (r < 0.7) return "CHECKED";
-        else if (r <0.8) return "ONCHECKING";
+        else if (r < 0.8) return "ONCHECKING";
         else if (r < 0.9) return "NULL";
         else return "WAITING";
     };
@@ -113,7 +122,7 @@ const ActiveLinesDashboard: React.FC = () => {
                 key={line.id}
                 className={`card ${backgrounds[line.status]} w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
             >
-                <div className="line-name font-bold text-xl  pb-1">{`${line.id}`}</div>
+                <div className="line-name font-bold text-2xl  pb-1">{`${line.id}`}</div>
                 <div className={`flex justify-center status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
                 <div className="model text-[12px] pb-3 text-gray-600">{`${line.status}`}</div>
                 <div className="">MODEL </div>
@@ -133,55 +142,52 @@ const ActiveLinesDashboard: React.FC = () => {
 
     const renderFilterBar = () => {
         return (
-            <div className="flex flex-row space-x-4 w-auto px-6 py-2 rounded-full justify-center shadow-2xl bg-sky-800/80 items-center z-70">
-                <button
-                    className={`px-10 py-2 rounded-full font-bold ${filter === "ALL" ? "bg-blue-300 text-sky-800" : "bg-gray-200 text-gray-600"
-                        }`}
-                    onClick={() => setFilter('ALL')}
-                >
-                    ALL
-                </button>
-                <button
-                    className={`px-6 py-2 rounded-full font-bold ${filter === "WAITING" ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
-                        }`}
-                    onClick={() => setFilter('WAITING')}
-                >
-                    WAITING
-                </button>
-                <button
-                    className={`px-6 py-2 rounded-full font-bold ${filter === "ONCHECKING" ? "bg-orange-300 text-yellow-900" : "bg-gray-200 text-gray-600"
-                        }`}
-                    onClick={() => setFilter('ONCHECKING')}
-                >
-                    ONCHECKING
-                </button>
-                <button
-                    className={`px-4 py-2 rounded-full font-bold ${filter === "CHECKED" ? "bg-green-300 text-green-900" : "bg-gray-200 text-gray-600"
-                        }`}
-                    onClick={() => setFilter('CHECKED')}
-                >
-                    CHECKED
-                </button>
+            <div className="w-full flex justify-center mb-4">
+                <div className="flex flex-row  flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
+                    {["ALL", "WAITING", "ONCHECKING", "CHECKED"].map((type) => (
+                        <button
+                            key={type}
+                            className={`flex w-1/4   px-1 sm:px-2 py-1 sm:py-2 pe-10 ps-10 text-[14px] rounded-full font-bold transition justify-center ${filter === type
+                                    ? {
+                                        "ALL": "bg-gray-300 text-gray-800",
+                                        "WAITING": "bg-[#f7e1a7] text-yellow-900",
+                                        "ONCHECKING": "bg-[#9ec5fe] text-blue-600",
+                                        "CHECKED": "bg-[#a0d3a9] text-green-900",
+                                    }[type]
+                                    : "bg-gray-200 text-gray-600"
+                                }`}
+                            onClick={() => setFilter(type as any)}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </div>
             </div>
+
+
         );
     };
 
+
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-            <div className="flex flex-none w-full justify-center items-center ">
-                <Image className="flex "
+            <div className="flex flex-row justify-center items-center me-2 ms-2 w-full ">
+                <Image className="flex flex-none"
                     src="/images/438764.png"
                     width={100}
                     height={100}
                     alt="Picture of the author"
                 />
-                <h3 className="flex flex-none font-noto font-extrabold  text-7xl sm:text-2xl  text-blue-800 mb-8 mt-8 ">
-                    PROFILE MEASUREMENT REALTIME
-                </h3>
+                <div className="flex flex-col justify-center items-center w-full sm:w-lg lg:w-xl">
+                    <h3 className="flex w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-[27px] xl:text-4xl ">
+                        PROFILE MEASUREMENT REALTIME
+                    </h3>
+                    {renderFilterBar()}
+                </div>
                 <div className="flex flex-none w-[100px]"></div>
             </div>
 
-            {renderFilterBar()}
+
 
             <div className="p-6 m-1 w-full">
                 <div className={` font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full`}>
