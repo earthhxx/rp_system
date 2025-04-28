@@ -1,22 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from 'next/image'
 
 // Type definitions
 type LineStatus = {
     id: number;
     model: string;
     workOrder: string;
-    status: 'NULL' | 'WAITING' | 'ONCHECKING'|'CHECKED';
+    status: 'NULL' | 'WAITING' | 'ONCHECKING' | 'CHECKED';
     lastMeasured: string;
     waitTime: number;
 };
 
 
 const animetion = {
-    WAITING: "animate-spin-slow", 
-    ONCHECKING :'',
-    CHECKED: "animate-ping-slow", 
+    WAITING: "animate-spin-slow",
+    ONCHECKING: '',
+    CHECKED: "animate-ping-slow",
     NULL: "",
 };
 
@@ -24,15 +25,15 @@ const animetion = {
 const icons = {
     CHECKED: (
         <span className="flex items-center justify-center size-[56px]">
-          <span className="absolute flex justify-center items-center rounded-full  opacity-75 animate-ping z-30">✅</span>
-          <span className="z-10 text-[40px] ">✅</span>
+            <span className="absolute flex justify-center items-center rounded-full  opacity-75 animate-ping z-30">✅</span>
+            <span className="z-10 text-[40px] ">✅</span>
         </span>
-      ),
+    ),
     WAITING: "⏳",
     NULL: <div className="size-[56px]"></div>,
     ONCHECKING: "",
-  };
-  
+};
+
 
 const backgrounds = {
     CHECKED: "bg-pass",
@@ -50,7 +51,7 @@ const colors = {
 
 const ActiveLinesDashboard: React.FC = () => {
     const [linesState, setLinesState] = useState<LineStatus[]>([]);
-    const [filter, setFilter] = useState<'ALL' | 'WAITING' |'ONCHECKING'| 'CHECKED'>('ALL');
+    const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED'>('ALL');
 
     useEffect(() => {
         const fetchLines = async () => {
@@ -131,25 +132,22 @@ const ActiveLinesDashboard: React.FC = () => {
         return (
             <div className="flex flex-row space-x-4 w-auto px-6 py-2 rounded-full justify-center shadow-2xl bg-sky-800/80 items-center z-70">
                 <button
-                    className={`px-10 py-2 rounded-full font-bold ${
-                        filter === "ALL" ? "bg-blue-300 text-sky-800" : "bg-gray-200 text-gray-600"
-                    }`}
+                    className={`px-10 py-2 rounded-full font-bold ${filter === "ALL" ? "bg-blue-300 text-sky-800" : "bg-gray-200 text-gray-600"
+                        }`}
                     onClick={() => setFilter('ALL')}
                 >
                     ALL
                 </button>
                 <button
-                    className={`px-6 py-2 rounded-full font-bold ${
-                        filter === "WAITING" ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
-                    }`}
+                    className={`px-6 py-2 rounded-full font-bold ${filter === "WAITING" ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
+                        }`}
                     onClick={() => setFilter('WAITING')}
                 >
                     WAITING
                 </button>
                 <button
-                    className={`px-4 py-2 rounded-full font-bold ${
-                        filter === "CHECKED" ? "bg-green-300 text-green-900" : "bg-gray-200 text-gray-600"
-                    }`}
+                    className={`px-4 py-2 rounded-full font-bold ${filter === "CHECKED" ? "bg-green-300 text-green-900" : "bg-gray-200 text-gray-600"
+                        }`}
                     onClick={() => setFilter('CHECKED')}
                 >
                     CHECKED
@@ -160,9 +158,18 @@ const ActiveLinesDashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-            <h3 className="font-noto font-extrabold  flex flex-none text-7xl sm:text-2xl  text-blue-800 mb-8 mt-8 ">
-                PROFILE MEASUREMENT REALTIME
-            </h3>
+            <div className="flex flex-none w-full justify-center items-center ">
+                <Image className="flex "
+                    src="/images/438764.png"
+                    width={100}
+                    height={100}
+                    alt="Picture of the author"
+                />
+                <h3 className="flex flex-none font-noto font-extrabold  text-7xl sm:text-2xl  text-blue-800 mb-8 mt-8 ">
+                    PROFILE MEASUREMENT REALTIME
+                </h3>
+                <div className="flex flex-none w-[100px]"></div>
+            </div>
 
             {renderFilterBar()}
 
