@@ -10,7 +10,7 @@ import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { BsUpcScan } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa6";
 
 
 type DataItem120_2 = {
@@ -49,17 +49,18 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-  const [submitStage, setSubmitStage] = useState<"waiting" | "CHECKED" |"waitingResult"|"resulted">("waiting");
+  const [submitStage, setSubmitStage] = useState<"WAITING" |"ONCHECKING"| "CHECKED" | "waitingResult" | "resulted">("WAITING");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
 
+  const [isPdfOpen, setPdfOpen] = useState(false);
 
 
-  const [cameras, setCameras] = useState<any[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
+
+
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const qrRegionId = "qr-reader";
+
 
   const [topper, setTopper] = useState(false);
 
@@ -108,7 +109,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Line: data120_2?.ProcessLine,
         ST_Model: data120_2?.productName,
         ST_Prod: ProductOrderNo,
-        ST_Status: "waiting"
+        ST_Status: "WAITING"
       })
 
     });
@@ -129,7 +130,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         ST_Prod: ProductOrderNo,
         ST_Status: "CHECKED"
       })
-
     });
 
     const result = await res.json();
@@ -389,6 +389,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       }
     };
 
+    //STAGE VALIDATION CHECK
     const fetchReflowStatus = async () => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
@@ -406,12 +407,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         const { ST_Status, ST_Prod } = statusItem;
 
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
-          setSubmitStage("waiting");
+          setSubmitStage("WAITING");
           submitLogToReflow120_9();
           updateReflowStatus();
 
-        } else if ((!ST_Status || ST_Status === "waiting") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
-          setSubmitStage("waiting");
+        } else if ((!ST_Status || ST_Status === "WAITING") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
+          setSubmitStage("WAITING");
           submitLogToReflow120_9();
           updateReflowStatus();
 
@@ -581,7 +582,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     console.log(employeeName)
     if (EmployeeNo === employeeUserName) {
 
-      if (submitStage === "waiting") {
+      if (submitStage === "WAITING") {
         setSubmitStage("CHECKED");
         submitLogToReflow120_9_CHECK();
         updateReflowStatusCHECKED();
@@ -628,7 +629,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [submitStage]);
 
   switch (submitStage) {
-    case "waiting":
+    case "WAITING":
 
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
@@ -892,7 +893,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     <div className="flex flex-none"></div>
                     <div
                       onClick={() => {
-                        setisCardOpenclosepro(false);
+                        setArrowDownButtoncard(false);
                         setisCardOpenclosepro(true);
                       }}
                       className="flex flex-col  justify-center items-center">
@@ -906,7 +907,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     <div className="flex flex-none"></div>
                     <div
                       onClick={() => {
-                        
+                        setArrowDownButtoncard(false);
+                        if (pdfUrl) {
+                          setPdfOpen(true);
+                        } else {
+                          alert('No PDF found.');
+                        }
                       }}
                       className="flex flex-col  justify-center items-center">
                       <div className="flex flex-none"></div>
@@ -930,7 +936,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                <div className="font-roboto text-4xl text-white w-full font-bold">{ProductOrderNo}</div>
+                <div className="font-roboto text-4xl text-white w-full font-bold">{data120_2?.productName}</div>
               </div>
             </div>
             {/* Box2 */}
@@ -1034,6 +1040,30 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               {buttonContent}
             </button>
           </div>
+        </div>
+      )}
+      {isPdfOpen && pdfUrl && (
+        <div className="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center">
+          {/* ปุ่มปิด */}
+          <button
+            onClick={() => {setPdfOpen(false);
+              setArrowDownButton(true);}
+            }
+            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-60"
+          >
+            ✕
+          </button>
+
+          {/* Viewer */}
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <div className="w-full h-full p-4">
+              <Viewer
+                fileUrl={pdfUrl}
+                defaultScale={SpecialZoomLevel.PageFit}
+                plugins={[zoomPluginInstance]}
+              />
+            </div>
+          </Worker>
         </div>
       )}
 

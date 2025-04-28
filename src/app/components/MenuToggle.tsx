@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname, } from "next/navigation";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
+import { AiFillHome } from "react-icons/ai";
+
 interface ReflowStatus {
     ST_Line: string;
     ST_Model: string;
@@ -200,19 +202,25 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-
+                        setHomeStage('home');
                         setIsMenuOpen(false);
+                        router.push('/');
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    {/* <GoCheckCircle className="size-30 text-white" />
-                    SUBMIT PRODUCT */}
+                    <AiFillHome className="size-30 text-white m-4" />
+                    HOME
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
-                    onClick={() => router.push('/Dashboard')}
+                    onClick={() => {
+                        console.log("test onclick dashboard");
+                        setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
+                        router.push('/Dashboard');
+
+                    }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <BsClipboard2DataFill className="size-30 text-white" />
-                    DASHBOARD
+                    <BsClipboard2DataFill className="size-30 text-white m-4" />
+                    REALTIME CHECK
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -222,8 +230,8 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
-                    <BsUpcScan className="size-30 text-white" />
-                    SCAN PRODUCT
+                    <BsUpcScan className="size-30 text-white m-4" />
+                    SEARCH STANDARD
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -271,6 +279,7 @@ const MenuToggle = () => {
                         <div
                             onClick={() => {
                                 handleNextPageStatus();
+                                clearinputref();
                             }}
 
                             className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"

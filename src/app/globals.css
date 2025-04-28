@@ -49,3 +49,36 @@ body {
 
 
 
+/* styles/global.css */
+.bg-pass {
+  background: linear-gradient(145deg, #d4edda, #a0d3a9); /* สีสำหรับ pass */
+}
+
+.bg-fail {
+  background: linear-gradient(145deg, #f8d7da, #f1a7b2); /* สีสำหรับ fail */
+}
+
+.bg-pending {
+  background: linear-gradient(145deg, #fff3cd, #f7e1a7); /* สีสำหรับ pending */
+}
+
+.text-pass {
+  color: green; /* สีข้อความสำหรับ pass */
+}
+
+.text-fail {
+  color: red; /* สีข้อความสำหรับ fail */
+}
+
+.text-pending {
+  color: orange; /* สีข้อความสำหรับ pending */
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 5s linear infinite; /* หมุนช้า ๆ */
+}

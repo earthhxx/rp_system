@@ -1,152 +1,166 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import clsx from 'clsx';
+"use client";
+import React, { useEffect, useState } from "react";
 
+// Type definitions
 type LineStatus = {
-    line: string;
+    id: number;
     model: string;
-    productOrderNo: string;
-    status: 'waiting' | 'checked' | 'null' | 'waitingResult' | 'resulted';
-    time: string;
+    workOrder: string;
+    status: 'null' | 'waiting' | 'CHECKED';
+    lastMeasured: string;
+    waitTime: number;
 };
 
-const STATUS_COLOR = {
-    waiting: 'bg-yellow-400 text-yellow-900',
-    checked: 'bg-blue-400 text-blue-900',
-    null: 'bg-gray-400 text-gray-900',
-    waitingResult: 'bg-orange-400 text-orange-900',
-    resulted: 'bg-green-400 text-green-900',
+const animetion = {
+    waiting: "animate-spin-slow", 
+    CHECKED: "", 
+    null: "",
 };
 
-const PRODUCTION_GROUPS: Record<string, string[]> = {
-    'Production 1': ['SMT-1', 'SMT-5', 'SMT-10', 'SMT-11', 'SMT-12', 'SMT-13', 'SMT-14', 'SMT-15'],
-    'Production 2': ['SMT-2', 'SMT-3', 'SMT-4', 'SMT-6', 'SMT-7', 'SMT-8', 'SMT-9'],
-    'Production 3': ['SMT-18'],
-    'Production 4': ['SMT-21'],
-    'Production 5': ['SMT-19', 'SMT-20'],
+
+const icons = {
+    CHECKED: "✅",
+    null: <div className="size-[55px]"></div>,
+    waiting: "⏳ ",
 };
 
-export default function ActiveLinesDashboard() {
-    const [lines, setLines] = useState<LineStatus[]>([]);
+const backgrounds = {
+    CHECKED: "bg-pass",
+    null: "bg-gray-300/40",
+    waiting: "bg-pending ",
+};
 
-    const fetchData = async () => {
-        try {
-            const res = await fetch('/api/mock-line-status');
-            const data = await res.json();
-            setLines(data);
-        } catch (err) {
-            console.error('Failed to fetch line status', err);
-        }
-    };
+const colors = {
+    CHECKED: "text-pass",
+    null: "",
+    waiting: "text-pending",
+};
+
+const ActiveLinesDashboard: React.FC = () => {
+    const [linesState, setLinesState] = useState<LineStatus[]>([]);
+    const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'CHECKED'>('ALL');
 
     useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 5000);
+        const fetchLines = async () => {
+            try {
+                const response = await fetch("/api/mock_line");
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch: ${response.statusText}`);
+                }
+                const data = await response.json();
+                setLinesState(data);
+            } catch (error) {
+                console.error("Error fetching lines:", error);
+            }
+        };
+
+        fetchLines();
+
+        const interval = setInterval(() => {
+            setLinesState((prevLines) =>
+                prevLines.map((line) => {
+                    if (line.status === "waiting") {
+                        line.waitTime += 1;
+                    } else {
+                        line.waitTime = 0;
+                    }
+                    line.status = randomStatus();
+                    line.lastMeasured = new Date().toLocaleTimeString();
+                    return line;
+                })
+            );
+        }, 60000); // ทุก 1 นาที
+
         return () => clearInterval(interval);
     }, []);
 
-    const groupLinesByProduction = () => {
-        return Object.entries(PRODUCTION_GROUPS).map(([groupName, lineList]) => {
-            const groupLines = lines.filter((line) => lineList.includes(line.line));
-            return { groupName, groupLines };
-        });
+    const randomStatus = () => {
+        const r = Math.random();
+        if (r < 0.7) return "CHECKED";
+        else if (r < 0.9) return "null";
+        else return "waiting";
     };
 
-    const allGroups = groupLinesByProduction();
-    const mainGroups = allGroups.filter(g => ['Production 1', 'Production 2'].includes(g.groupName));
-    const compactGroups = allGroups.filter(g => ['Production 3', 'Production 4'].includes(g.groupName));
-    const compactGroups2 = allGroups.filter(g => ['Production 5'].includes(g.groupName));
+    const filteredLines = () => {
+        if (filter === "WAITING") {
+            return linesState.filter((line) => line.status === "waiting");
+        } else if (filter === "CHECKED") {
+            return linesState.filter((line) => line.status === "CHECKED");
+        } else {
+            return linesState;
+        }
+    };
+
+    const renderLines = () => {
+        return filteredLines().map((line) => (
+            <div
+                key={line.id}
+                className={`card ${backgrounds[line.status]} w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
+            >
+                <div className="line-name font-bold text-xl  pb-1">{`${line.id}`}</div>
+                <div className={`status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
+                <div className="model text-[12px] pb-3 text-gray-600">{`${line.status}`}</div>
+                <div className="">MODEL </div>
+
+                <div className="model text-[16px] pb-2 ">{` ${line.model}`}</div>
+                <div className="waiting text-sm pt-2 text-red-600">
+                    {line.status === "waiting"
+                        ? `Waiting: ${Math.floor(line.waitTime / 60)} minutes`
+                        : "-"}
+                </div>
+                <div className="last-measured text-sm text-gray-600 pb-1">
+                    {`Start time : ${line.lastMeasured}`}
+                </div>
+            </div>
+        ));
+    };
+
+    const renderFilterBar = () => {
+        return (
+            <div className="flex flex-row space-x-4 w-auto px-6 py-2 rounded-full justify-center shadow-2xl bg-sky-800/80 items-center z-70">
+                <button
+                    className={`px-10 py-2 rounded-full font-bold ${
+                        filter === "ALL" ? "bg-blue-300 text-sky-800" : "bg-gray-200 text-gray-600"
+                    }`}
+                    onClick={() => setFilter('ALL')}
+                >
+                    ALL
+                </button>
+                <button
+                    className={`px-6 py-2 rounded-full font-bold ${
+                        filter === "WAITING" ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
+                    }`}
+                    onClick={() => setFilter('WAITING')}
+                >
+                    WAITING
+                </button>
+                <button
+                    className={`px-4 py-2 rounded-full font-bold ${
+                        filter === "CHECKED" ? "bg-green-300 text-green-900" : "bg-gray-200 text-gray-600"
+                    }`}
+                    onClick={() => setFilter('CHECKED')}
+                >
+                    CHECKED
+                </button>
+            </div>
+        );
+    };
 
     return (
-        <div className="min-h-screen w-full p-6 bg-gradient-to-br from-white to-blue-200 ">
-            <h1 className="text-6xl font-kanit font-bold mb-8 text-blue-800 text-center">REFLOW STATUS DASHBOARD</h1>
+        <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col justify-center items-center">
+            <h1 className="flex flex-none text-3xl sm:text-5xl font-bold font-kanit text-blue-800 mb-6">
+                PROFILE MEASUREMENT REALTIME
+            </h1>
 
-            <div className="space-y-12">
-                {/* Main full-width groups */}
-                {mainGroups.map(({ groupName, groupLines }) => (
-                    <div key={groupName}>
-                        <h2 className="text-2xl font-semibold mb-4 text-blue-700">{groupName}</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {groupLines.map((line, index) => (
-                                <LineCard key={index} line={line} />
-                            ))}
-                        </div>
-                    </div>
-                ))}
+            {renderFilterBar()}
 
-                {/* Compact grid for Production 3, 4 */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-center items-center">
-                    <div className=" grid grid-cols-2 gap-4">
-                        {compactGroups.map(({ groupName, groupLines }) => (
-                            <div key={groupName} className="flex flex-col">
-                                <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-                                <div className="flex flex-col gap-4">
-                                    {groupLines.map((line, index) => (
-                                        <LineCard key={index} line={line} />
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-
-                    </div>
-
-                    {compactGroups2.map(({ groupName, groupLines }) => (
-                        <div key={groupName} className="grid grid-cols-1">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-700">{groupName}</h2>
-
-
-                            <div className="grid grid-cols-2 gap-4">
-                                {groupLines.map((line, index) => (
-                                    <LineCard key={index} line={line} />
-                                ))}
-                            </div>
-
-
-
-                        </div>
-                    ))}
-
-
-
-
+            <div className="p-6 m-1 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 w-full h-full">
+                    {renderLines()}
                 </div>
             </div>
         </div>
     );
-}
+};
 
-
-function LineCard({ line }: { line: LineStatus }) {
-    return (
-        <div className="rounded-2xl shadow-md border border-blue-300  bg-white hover:shadow-lg transition-all">
-            <div>
-                <div className="flex">
-                    <div className='flex w-[35%] justify-center items-center bg-blue-50'> 
-                        <div className=" font-semibold text-lg text-blue-900 ">{line.line}</div>
-                    </div>
-                    <div className='flex flex-col w-full justify-center '>
-
-                        <div className="flex flex-col justify-center items-start w-full  text-sm mt-4 mb-4 text-gray-700">
-                            <p><strong>Model:</strong> {line.model}</p>
-                            <p><strong>Order No:</strong> {line.productOrderNo}</p>
-                            <p className="text-xs text-gray-500 mt-1">Updated: {line.time}</p>
-                        </div>
-                        <div className="flex ">
-                            <span
-                                className={clsx(
-                                    'w-full px-2 py-1 text-[18px] font-semibold font-kanit rounded-br-xl capitalize text-center',
-                                    STATUS_COLOR[line.status]
-                                )}
-                            >
-                                {line.status}
-                            </span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-    );
-}
+export default ActiveLinesDashboard;

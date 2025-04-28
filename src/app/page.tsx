@@ -1,41 +1,61 @@
 import Image from "next/image";
 
-
 const Home = () => {
-    return (
-        <div className="flex flex-col h-screen w-screen justify-center items-center bg-blue-800">
-            <div className="flex flex-row items-center">
-                <div className="font-kanit text-white flex w-full h-fit text-[70px] font-bold justify-center items-center"> HOW TO USE </div>
-                <div className="flex flex-col text-white">
-                    <div className="font-kanit flex w-full justify-start pt-4 pe-8">1. Tap or Click IM Electronic Logo</div>
-                    <div className="font-kanit flex w-full justify-start pt-4">2. The menu will open </div>
-                    <div className="font-kanit flex w-full justify-start pt-4">3. Tap or Click to choose use function</div>
-                    <div className="flex h-10"></div>
-                </div>
-            </div>
-            <div className="rounded-full bg-white h-2 w-220 m-4"></div>
-            <div className="flex flex-row items-center">
-                    <div className="font-kanit text-white flex w-full h-fit text-[98px] font-normal justify-center items-center"> วิธีใช้งาน </div>
-                    <div className="flex flex-col text-xl text-white mt-4">
-                        <div className={`font-kanit flex w-full justify-start pt-4`}>1. แตะ หรือ คลิ๊ก IM Electronic Logo</div>
-                        <div className="font-kanit flex w-full justify-start pt-4">2. เมนูจะเปิดขึ้นมากลางหน้าจอ  </div>
-                        <div className="font-kanit  flex w-full justify-start pt-4">3. แตะ หรือ คลิ๊ก เลือกฟังชั่นการทำงาน  </div>
-                        <div className="flex">
-                            {/* <Image
-                      src="/images/menu.png"
-                      alt="Menu Image"
-                      width={250}
-                      height={250}
-                      className="w-full h-full rounded-xl"
-                    /> */}
-                        </div>
-                    </div>
-                </div>
+  return (
+    <div className="flex flex-col min-h-screen w-screen justify-center items-center bg-blue-800 p-6">
+      {/* Title Section */}
+      <div className="text-white font-kanit text-5xl md:text-6xl font-bold mb-12 text-center">
+        HOW TO USE
+      </div>
 
+      {/* English Instructions */}
+      <div className="flex flex-col text-white w-full max-w-2xl space-y-4">
+        <InstructionStep number={1} text="Tap or Click IM Electronic Logo" />
+        <InstructionStep number={2} text="The menu will open" />
+        <InstructionStep number={3} text="Tap or Click to choose a function" />
+      </div>
 
+      {/* Divider */}
+      <div className="h-2 w-64 bg-white rounded-full my-12" />
 
-        </div>
-    );
+      {/* Thai Title */}
+      <div className="text-white font-kanit text-5xl md:text-6xl font-bold mb-12 text-center">
+        วิธีใช้งาน
+      </div>
+
+      {/* Thai Instructions */}
+      <div className="flex flex-col text-white w-full max-w-2xl text-xl space-y-4">
+        <InstructionStep number={1} text="แตะ หรือ คลิ๊ก IM Electronic Logo" />
+        <InstructionStep number={2} text="เมนูจะเปิดขึ้นมากลางหน้าจอ" />
+        <InstructionStep number={3} text="แตะ หรือ คลิ๊ก เลือกฟังก์ชันการทำงาน" />
+      </div>
+
+      {/* Optional Image (Uncomment if needed) */}
+      {/* 
+      <div className="mt-12">
+        <Image
+          src="/images/menu.png"
+          alt="Menu Image"
+          width={250}
+          height={250}
+          className="rounded-xl"
+        />
+      </div>
+      */}
+    </div>
+  );
 };
+
+interface InstructionStepProps {
+  number: number;
+  text: string;
+}
+
+const InstructionStep = ({ number, text }: InstructionStepProps) => (
+  <div className="flex items-start space-x-3">
+    <span className="font-kanit font-semibold">{number}.</span>
+    <span className="font-kanit">{text}</span>
+  </div>
+);
 
 export default Home;
