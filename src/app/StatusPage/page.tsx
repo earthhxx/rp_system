@@ -100,34 +100,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setPdfWarning2("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
-  useEffect(() => {
-    if (isPdfOpen === true) return;
 
-    const fetchPdfData2 = async () => {
-      try {
-        const res = await fetch(
-          `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2?.ProcessLine}&R_Model=${data120_2?.productName}&productOrderNo=${ProductOrderNo}`
-        );
-        const { data } = await res.json();
-
-        if (data?.R_PDF2) {
-          const decoded = atob(data.R_PDF2);
-          if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
-            handleShowPdf2(data.R_PDF2);
-          } else {
-            setPdfWarning2('PDF format ผิดพลาด');
-          }
-        } else {
-          setPdfWarning2('ไม่พบข้อมูล PDF');
-        }
-      } catch (err) {
-        console.error("โหลด PDF ล้มเหลว:", err);
-        setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
-      }
-    };
-
-    fetchPdfData2();
-  }, [isPdfOpen]);
 
 
   useEffect(() => {
@@ -144,7 +117,44 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
-
+  useEffect(() => {
+    if (
+      !isPdfOpen ||
+      !data120_2?.ProcessLine ||
+      !data120_2?.productName ||
+      !ProductOrderNo
+    ) {
+      console.log("⛔ ยังไม่พร้อม ไม่ fetch PDF");
+      return;
+    }
+  
+    const fetchPdfData2 = async () => {
+      try {
+        const res = await fetch(
+          `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
+        );
+        const { data } = await res.json();
+        console.log("✅ ได้ข้อมูล PDF:", data);
+  
+        if (data?.R_PDF2) {
+          const decoded = atob(data.R_PDF2);
+          if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
+            handleShowPdf2(data.R_PDF2);
+          } else {
+            setPdfWarning2('PDF format ผิดพลาด');
+          }
+        } else {
+          setPdfWarning2('ไม่พบข้อมูล PDF');
+        }
+      } catch (err) {
+        console.error("❌ โหลด PDF ล้มเหลว:", err);
+        setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
+      }
+    };
+  
+    fetchPdfData2();
+  }, [isPdfOpen, data120_2?.ProcessLine, data120_2?.productName, ProductOrderNo]);
+  
 
   const updateReflowStatus = async () => {
     const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
@@ -955,11 +965,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     <div
                       onClick={() => {
                         setArrowDownButtoncard(false);
-                        if (pdfUrl) {
-                          setPdfOpen(true);
-                        } else {
-                          alert('No PDF found.');
-                        }
+                        setPdfOpen(true);
+                        console.log('pass setpdfopen')
                       }}
                       className="flex flex-col  justify-center items-center">
                       <div className="flex flex-none"></div>
@@ -1089,7 +1096,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
         </div>
       )}
-      {isPdfOpen && pdfUrl2 && (
+      {isPdfOpen && (
         <div className="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center">
           <button
             onClick={() => {
@@ -1101,16 +1108,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             ✕
           </button>
 
-          {/* Viewer */}
-          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-            <div className="w-full h-full p-4">
-              <Viewer
-                fileUrl={pdfUrl2 as string}
-                defaultScale={SpecialZoomLevel.PageFit}
-                plugins={[zoomPluginInstance]}
-              />
-            </div>
-          </Worker>
+          {pdfUrl2 && (
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+              <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+                <div className="w-full h-full ">
+                  <Viewer
+                    fileUrl={pdfUrl2}
+                    defaultScale={SpecialZoomLevel.PageFit}
+                    plugins={[zoomPluginInstance]}
+                  />
+                </div>
+              </div>
+            </Worker>
+          )}
         </div>
       )}
 
