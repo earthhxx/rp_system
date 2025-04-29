@@ -655,6 +655,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
+      setisCardOpencancel(false);
       // log
       submitLogcancelToReflow120_9();
       // update null
@@ -676,6 +677,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
+      setisCardOpenclosepro(false);
       // log
       submitLogCloseprodToReflow120_9();
       // update null
@@ -981,11 +983,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpenONCHECKING]);
 
-
-
-
-
-
+  useEffect(() => {
+    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro) {
+      inputRef.current = null;
+    }
+  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
@@ -1081,7 +1083,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
         {arrowdownbuttoncard && (
           <>
-            <div  className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
+            <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
               <div ref={cardarrowRef} className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
                 <div className="flex flex-none h-10"></div>
                 <div className="flex flex-row justify-center items-center ">
@@ -1099,20 +1101,26 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     </div>
                     <div className="flex flex-none"></div>
                   </div>
-                  <div className="flex w-full h-full justify-center">
-                    <div className="flex flex-none"></div>
-                    <div
-                      onClick={() => {
-                        setArrowDownButtoncard(false);
-                        setisCardOpenclosepro(true);
-                      }}
-                      className="flex flex-col  justify-center items-center">
+                  {submitStage === "CHECKED" && (
+                    <div className="flex w-full h-full justify-center">
                       <div className="flex flex-none"></div>
-                      <GoCheckCircle className="size-30 text-white" />
-                      <div>SUBMIT PRODUCT</div>
+                      <div
+                        onClick={() => {
+                          setArrowDownButtoncard(false);
+                          setisCardOpenclosepro(true);
+                        }}
+                        className="flex flex-col  justify-center items-center">
+                        <div className="flex flex-none"></div>
+                        <GoCheckCircle className="size-30 text-white" />
+                        <div>SUBMIT PRODUCT</div>
+                      </div>
+                      <div className="flex flex-none "></div>
                     </div>
-                    <div className="flex flex-none "></div>
-                  </div>
+
+                  )
+
+                  }
+
                   <div className="flex w-full h-full justify-center">
                     <div className="flex flex-none"></div>
                     <div
