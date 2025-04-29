@@ -526,8 +526,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
         } else if ((!ST_Status || ST_Status === "WAITING") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("WAITING");
-          submitLogToReflow120_9();
-          updateReflowStatus();
 
         } else if (ST_Status === "ONCHECKING" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("ONCHECKING");
