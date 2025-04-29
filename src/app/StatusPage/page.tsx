@@ -529,15 +529,20 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           submitLogToReflow120_9();
           updateReflowStatus();
 
+        } else if (ST_Status === "ONCHECKING" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
+          setSubmitStage("ONCHECKING");
+
         } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
           setSubmitStage("CHECKED");
 
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
+          //router out
         }
 
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
+        //router out
       }
     };
 
@@ -700,7 +705,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         submitLogToReflow120_9_CHECK();
         updateReflowStatusCHECKED();
         setShowBar(false);
-        setIsCardOpen(false);
+        setisCardOpenONCHECKING(false);
         clearinputref();
         console.log("CHECKED");
         console.log("Scanned ID:", EmployeeNo);
@@ -729,7 +734,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setSubmitStage("ONCHECKING");
         submitLogToReflow120_9_ONCHECKING();
         updateReflowStatusONCHECKEDING();
-        setShowBar(false);
         setIsCardOpen(false);
         clearinputref();
         console.log("ONCHECKING");
