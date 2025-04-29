@@ -818,8 +818,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       break;
     case "ONCHECKING":
 
-      buttonClass = "bg-yellow-400 text-black";
-      buttonClassL = "bg-yellow-400/50";
+      buttonClass = "bg-[#9ec5fe] text-black";
+      buttonClassL = "bg-[#cfe2ff]";
       buttonClick = () => setisCardOpenONCHECKING(true);
       buttonContent = (
         <>
