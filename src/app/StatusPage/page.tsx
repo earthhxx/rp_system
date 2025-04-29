@@ -55,7 +55,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-  const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" | "waitingResult" | "resulted">("WAITING");
+  const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" >("WAITING");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
@@ -80,11 +80,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [isCardOpenclosepro, setisCardOpenclosepro] = useState(false);
   const cardRefClosepro = useRef<HTMLInputElement>(null);
 
+  const [isCardOpenONCHECKING ,setisCardOpenONCHECKING] = useState(false);
+  const cardRefONCHECKING = useRef<HTMLInputElement>(null);
+
   const zoomPluginInstance = zoomPlugin();
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
-  const [data120_9_result, setData120_9_Result] = useState<DataItem120_9_Result | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
@@ -122,6 +124,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
   const fetchPdfData2 = async () => {
+    
     try {
       if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
         console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
@@ -192,6 +195,24 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     console.log(result);
   };
 
+  const updateReflowStatusONCHECKEDING = async () => {
+    const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ST_Line: data120_2?.ProcessLine,
+        ST_Model: data120_2?.productName,
+        ST_Prod: ProductOrderNo,
+        ST_Status: "ONCHECKING"
+      })
+    });
+
+    const result = await res.json();
+    console.log(result);
+  };
+
   const updateReflowStatusCancel = async () => {
     const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status_cancel', {
       method: 'POST',
@@ -223,7 +244,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     const result = await res.json();
     console.log(result);
   };
+  //ONCHECKING
+  //submit log state to check
+  const submitLogToReflow120_9_ONCHECKING = async () => {
+    if (!data120_2 || !submitStage) {
+      console.warn("Missing required fields to submit log");
+      return;
+    }
 
+    try {
+      const payload = {
+        R_Line: data120_2.ProcessLine,
+        R_Model: data120_2.productName,
+        productOrderNo: ProductOrderNo,
+        ST_Status: "ONCHECKEDING",
+        Log_User: EmployeeNo
+      };
+
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        console.error("Log submit failed:", result.message);
+      } else {
+        console.log("Log submitted successfully");
+      }
+
+    } catch (error) {
+      console.error("Error submitting log:", error);
+    }
+  };
 
   //submit log state to waiting
   const submitLogToReflow120_9 = async () => {
@@ -638,7 +695,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     console.log(employeeName)
     if (EmployeeNo === employeeUserName) {
 
-      if (submitStage === "WAITING") {
+      if (submitStage === "ONCHECKING") {
         setSubmitStage("CHECKED");
         submitLogToReflow120_9_CHECK();
         updateReflowStatusCHECKED();
@@ -646,6 +703,36 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setIsCardOpen(false);
         clearinputref();
         console.log("CHECKED");
+        console.log("Scanned ID:", EmployeeNo);
+      }
+      else {
+        console.log(submitStage);
+        // window.location.reload();
+      }
+
+    }
+    else {
+      alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+      console.log("employeeName != EmployeeNo")
+    }
+  };
+  const handleNextPageStatusONCHECKEDING = () => {
+    const value = inputRef.current?.value.trim();
+    if (!value) {
+      alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+      return;
+    }
+    console.log(employeeName)
+    if (EmployeeNo === employeeUserName) {
+
+      if (submitStage === "WAITING") {
+        setSubmitStage("ONCHECKING");
+        submitLogToReflow120_9_ONCHECKING();
+        updateReflowStatusONCHECKEDING();
+        setShowBar(false);
+        setIsCardOpen(false);
+        clearinputref();
+        console.log("ONCHECKING");
         console.log("Scanned ID:", EmployeeNo);
       }
       else {
@@ -662,8 +749,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   let buttonClass = "";
   let buttonClassL = "";
   let buttonContent = null;
+  let buttonClick = () => {};
+
+
 
   useEffect(() => {
+    
     if (submitStage === "CHECKED") {
       // setTopper(false); // ซ่อน topper เมื่อ submitStage เป็น CHECKED
       const timer = setTimeout(() => {
@@ -689,6 +780,44 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
+      buttonClick = () => setIsCardOpen(true);
+      buttonContent = (
+        <>
+          <div className="flex flex-col justify-center items-center w-86">
+            <div className="flex flex-col justify-center items-center">
+              <div className="font-roboto font-bold text-[25px] mb-6">Waiting for Measurement</div>
+              <svg
+                className="size-24 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+                />
+              </svg>
+              <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์เด้อคับ..</div>
+            </div>
+            <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
+          </div>
+        </>
+      );
+      break;
+      case "ONCHECKING":
+
+      buttonClass = "bg-yellow-400 text-black";
+      buttonClassL = "bg-yellow-400/50";
+      buttonClick = () => setisCardOpenONCHECKING(true);
       buttonContent = (
         <>
           <div className="flex flex-col justify-center items-center w-86">
@@ -832,6 +961,33 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpenclosepro]);
 
+  useEffect(() => {
+    const handleClickOutsideONCHECKING = (event: MouseEvent) => {
+      if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
+        setisCardOpenONCHECKING(false);
+        clearCamera();
+      }
+    };
+    if (isCardOpenONCHECKING) {
+      document.addEventListener("mousedown", handleClickOutsideONCHECKING);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideONCHECKING);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideONCHECKING);
+    };
+  }, [isCardOpenONCHECKING]);
+  
+  const handleStageClick = () => {
+    if (submitStage === "WAITING") {
+      setSubmitStage("ONCHECKING");
+    } else if (submitStage === "ONCHECKING") {
+      setSubmitStage("CHECKED");
+    }
+  };
+  
+  
+
 
 
   return (
@@ -872,6 +1028,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
         )
       }
+      
 
       {
         isCardOpenclosepro && (
@@ -996,7 +1153,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             {/* Box2 */}
             <div className="flex h-full items-center justify-center">
               <button
-                onClick={() => setIsCardOpen(true)}
+                // onClick={() => setIsCardOpen(true)}
                 type="button"
                 className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
               >
@@ -1081,13 +1238,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               </div>
             </div>
           ) : (
-            <div className="text-white">🔇 showBar ถูกปิด</div>
+            <div className="text-white"> </div>
           )}
 
           {/* box2 */}
           <div className="flex h-full w-80 items-center justify-center">
             <button
-              onClick={() => { setIsCardOpen(true); }}
+              onClick={() => { buttonClick }}
               type="button"
               className={`flex w-full h-full justify-center items-center ps-8 pe-8 shadow transition-all duration-300 ${buttonClass}`}
             >
@@ -1152,7 +1309,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
+                    handleNextPageStatusONCHECKEDING();
+                  }}
+                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  SUBMIT
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+      {
+        isCardOpenONCHECKING && (
+          <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+            <div ref={cardRefONCHECKING} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+              <div className="flex justify-center items-center w-full text-white">onchecking Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+              <input
+                ref={inputRef}
+                type="text"
+                value={EmployeeNo}
+                onChange={(e) => setEmployeeNo(e.target.value)}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="รหัสพนักงาน"
+              />
+              <div className="flex w-full h-full items-center">
+
+                <span
+                  onClick={startScan}
+                  className="flex w-1/2 h-32 justify-center">
+                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                </span>
+                <div
+                  onClick={() => {
                     handleNextPageStatusCHECKED();
+                    
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT

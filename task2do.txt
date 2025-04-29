@@ -1,10 +1,10 @@
-stage ONCHECKING ++
+stage ONCHECKING ++ /
 
-UI STAGE ONCHECKING " FIXED ORANGE !PROP! PEN CLIPBOARD ANIMETION ETC  "
+UI STAGE ONCHECKING " FIXED ORANGE !PROP! PEN CLIPBOARD ANIMETION ETC  "  
 
 
-api updatestatus ONCHECKING
-api log ONCHECKING PAYLOAD ++s
-//STAGE VALIDATION CHECK
+api updatestatus ONCHECKING /
+api log ONCHECKING PAYLOAD ++s /
+//STAGE VALIDATION CHECK 
 handlenextpagestatusONCHECKING !!"this is fuction for submit button for stage ("","","","") " !! NOT SAME In it is many function so make it clear.
 
