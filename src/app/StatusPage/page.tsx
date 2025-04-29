@@ -848,7 +848,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               </svg>
               <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..กำลังวัดโปรไฟล์..</div>
             </div>
-            <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
+            <div className="w-full text-[20px] text-white backdrop-blur-md rounded-xl"></div>
           </div>
         </>
       );
@@ -966,7 +966,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   useEffect(() => {
     const handleClickOutsideONCHECKING = (event: MouseEvent) => {
-      if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
+      if (cardRefONCHECKING.current && !cardRefONCHECKING.current.contains(event.target as Node)) {
         setisCardOpenONCHECKING(false);
         clearCamera();
       }
@@ -981,13 +981,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     };
   }, [isCardOpenONCHECKING]);
 
-  const handleStageClick = () => {
-    if (submitStage === "WAITING") {
-      setSubmitStage("ONCHECKING");
-    } else if (submitStage === "ONCHECKING") {
-      setSubmitStage("CHECKED");
-    }
-  };
+
 
 
 
@@ -1087,8 +1081,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
         {arrowdownbuttoncard && (
           <>
-            <div ref={cardarrowRef} className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
-              <div className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
+            <div  className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
+              <div ref={cardarrowRef} className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
                 <div className="flex flex-none h-10"></div>
                 <div className="flex flex-row justify-center items-center ">
                   <div className="flex w-full h-full justify-center">
@@ -1326,7 +1320,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         isCardOpenONCHECKING && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
             <div ref={cardRefONCHECKING} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-              <div className="flex justify-center items-center w-full text-white">onchecking Please enter your Employee ID :</div>
+              <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
               <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
