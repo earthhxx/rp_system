@@ -32,6 +32,9 @@ type DataItem120_9_Status = {
   ST_Status: string;
 };
 
+type DataItem120_9_Result = {
+  R_PDF2: string;
+};
 
 
 //api if !datalocal check status = ??? else back to layout
@@ -81,6 +84,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
   const [isLoading120_2, setIsLoading120_2] = useState(true);
   const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
+  const [data120_9_result, setData120_9_Result] = useState<DataItem120_9_Result | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
@@ -101,20 +105,24 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
     const fetchPdfData2 = async () => {
       try {
-        const res = await fetch(`/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2?.ProcessLine}&R_Model=${data120_2?.productName}`); // แก้ URL ให้ตรง
+        const res = await fetch(
+          `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2?.ProcessLine}&R_Model=${data120_2?.productName}&productOrderNo=${ProductOrderNo}`
+        );
         const { data } = await res.json();
 
-        if (data?.R_PDF) {
-          const decoded = atob(data.R_PDF);
-          if (decoded.startsWith('%PDF-')) {
-            handleShowPdf2(data.R_PDF);
+        if (data?.R_PDF2) {
+          const decoded = atob(data.R_PDF2);
+          if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
+            handleShowPdf2(data.R_PDF2);
           } else {
             setPdfWarning2('PDF format ผิดพลาด');
-            console.log(pdfWarning2);
           }
+        } else {
+          setPdfWarning2('ไม่พบข้อมูล PDF');
         }
       } catch (err) {
         console.error("โหลด PDF ล้มเหลว:", err);
+        setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
       }
     };
 
@@ -1097,7 +1105,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <div className="w-full h-full p-4">
               <Viewer
-                fileUrl={pdfUrl2 as string} 
+                fileUrl={pdfUrl2 as string}
                 defaultScale={SpecialZoomLevel.PageFit}
                 plugins={[zoomPluginInstance]}
               />

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
-
+//https://localhost:3003/api/120-9/checkreflow/load-pdf-data2?R_Line=SMT-5&R_Model=NPVV067AA11MBO&productOrderNo=202504080022
 // Correct type for database record
 type Data = {
   success: boolean;
@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const model = searchParams.get('R_Model');
     const line = searchParams.get('R_Line');
+    const productOrderNo = searchParams.get('productOrderNo');
 
-    if (!model || !line) {
+    if (!model || !line || !productOrderNo) {
       return NextResponse.json(
         { success: false, message: 'Missing R_Model or R_Line query parameter' },
         { status: 400 }
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Fetching PDF for:', { model, line });
+      console.log('Fetching PDF for:', { model, line,productOrderNo });
     }
 
     const pool = await getDashboardConnection();
@@ -31,10 +32,11 @@ export async function GET(req: NextRequest) {
     const result = await pool.request()
       .input('R_Model', sql.NVarChar, model)
       .input('R_Line', sql.NVarChar, line)
+      .input('productOrderNo',sql.NVarChar,productOrderNo)
       .query(`
-        SELECT TOP 1 R_PDF
+        SELECT TOP 1 PDF_Loc
         FROM REFLOW_Result
-        WHERE Result_Line = @R_Line AND Result_Model = @R_Model
+        WHERE Result_Line = @R_Line AND Result_Model = @R_Model AND Result_ProOrder = @productOrderNo
         ORDER BY CreateDate DESC
       `);
 
@@ -48,17 +50,17 @@ export async function GET(req: NextRequest) {
     const row = result.recordset[0];
 
     let base64PDF: string | null = null;
-    if (row.R_PDF) {
-      if (Buffer.isBuffer(row.R_PDF)) {
-        base64PDF = row.R_PDF.toString('base64');
-      } else if (typeof row.R_PDF === 'string') {
-        base64PDF = row.R_PDF; // กรณีเก็บเป็น base64 string แล้ว
+    if (row.PDF_Loc) {
+      if (Buffer.isBuffer(row.PDF_Loc)) {
+        base64PDF = row.PDF_Loc.toString('base64');
+      } else if (typeof row.PDF_Loc === 'string') {
+        base64PDF = row.PDF_Loc; // กรณีเก็บเป็น base64 string แล้ว
       }
     }
 
     return NextResponse.json({
       success: true,
-      data: { R_PDF: base64PDF },
+      data: { R_PDF2: base64PDF },
     });
 
   } catch (error) {
