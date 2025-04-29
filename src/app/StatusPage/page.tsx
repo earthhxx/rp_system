@@ -32,15 +32,20 @@ type DataItem120_9_Status = {
   ST_Status: string;
 };
 
+type DataItem120ReultPdf_9 = {
+
+};
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = ({ base64 }: { base64: string }) => {
+  const [pdfUrl2, setPdfUrl2] = useState<string | null>(null);
   const router = useRouter();
   const goToHome = () => {
     router.push('/');
   };
 
   const [pdfWarning, setPdfWarning] = useState("");
+  const [pdfWarning2, setPdfWarning2] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
   const searchParams = useSearchParams();
   const ProductOrderNo = searchParams.get('productOrderNo');
@@ -49,7 +54,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-  const [submitStage, setSubmitStage] = useState<"WAITING" |"ONCHECKING"| "CHECKED" | "waitingResult" | "resulted">("WAITING");
+  const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" | "waitingResult" | "resulted">("WAITING");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
@@ -82,6 +87,41 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
   const [employeeUserName, setEmployeeUserName] = useState("");
+
+  const handleShowPdf2 = (base64: string) => {
+    try {
+      const dataUri = `data:application/pdf;base64,${base64}`;
+      setPdfUrl2(dataUri);
+      console.log("✅ Data URI set for PDF", dataUri);
+    } catch (err) {
+      console.error("❌ Failed to convert base64 to data URI:", err);
+      setPdfWarning2("เกิดข้อผิดพลาดขณะแปลง PDF");
+    }
+  };
+  useEffect(() => {
+    if (isPdfOpen === true) return;
+
+    const fetchPdfData2 = async () => {
+      try {
+        const res = await fetch(`/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2?.ProcessLine}&R_Model=${data120_2?.productName}`); // แก้ URL ให้ตรง
+        const { data } = await res.json();
+
+        if (data?.R_PDF) {
+          const decoded = atob(data.R_PDF);
+          if (decoded.startsWith('%PDF-')) {
+            handleShowPdf2(data.R_PDF);
+          } else {
+            setPdfWarning2('PDF format ผิดพลาด');
+          }
+        }
+      } catch (err) {
+        console.error("โหลด PDF ล้มเหลว:", err);
+      }
+    };
+
+    fetchPdfData2();
+  }, [isPdfOpen]);
+
 
   useEffect(() => {
     const fetchEmployeeName = async () => {
@@ -1042,13 +1082,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
         </div>
       )}
-      {isPdfOpen && pdfUrl && (
+      {isPdfOpen && pdfUrl2 && (
         <div className="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center">
-          {/* ปุ่มปิด */}
           <button
-            onClick={() => {setPdfOpen(false);
-              setArrowDownButton(true);}
-            }
+            onClick={() => {
+              setPdfOpen(false);
+              setArrowDownButton(true);
+            }}
             className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-60"
           >
             ✕
@@ -1058,7 +1098,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <div className="w-full h-full p-4">
               <Viewer
-                fileUrl={pdfUrl}
+                fileUrl={pdfUrl2 as string} 
                 defaultScale={SpecialZoomLevel.PageFit}
                 plugins={[zoomPluginInstance]}
               />
@@ -1066,6 +1106,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </Worker>
         </div>
       )}
+
 
 
       {/* CARD */}

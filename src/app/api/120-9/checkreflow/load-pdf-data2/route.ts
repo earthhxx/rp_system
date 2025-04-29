@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-
 import { getDashboardConnection } from '@/lib/connection';
-
 import sql from 'mssql';
 
-// Define type for record from database
-interface ReflowRecord {
-  R_Model: string;
-  R_Line: string;
-  R_PDF: string | null;
-}
+// Correct type for database record
+type Data = {
+  success: boolean;
+  data?: { R_PDF: string | null };
+  message?: string;
+};
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +15,6 @@ export async function GET(req: NextRequest) {
     const model = searchParams.get('R_Model');
     const line = searchParams.get('R_Line');
 
-    // Validate input
     if (!model || !line) {
       return NextResponse.json(
         { success: false, message: 'Missing R_Model or R_Line query parameter' },
@@ -25,43 +22,44 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Log input in development mode only
     if (process.env.NODE_ENV === 'development') {
       console.log('Fetching PDF for:', { model, line });
     }
 
-    // Connect to SQL Server
     const pool = await getDashboardConnection();
 
-    // Query the database
     const result = await pool.request()
       .input('R_Model', sql.NVarChar, model)
       .input('R_Line', sql.NVarChar, line)
       .query(`
-        SELECT R_Model, R_Line, R_PDF 
-        FROM REFLOW_TEMP_STANDARD 
-        WHERE R_Line = @R_Line AND R_Model = @R_Model
+        SELECT TOP 1 R_PDF
+        FROM REFLOW_Result
+        WHERE Result_Line = @R_Line AND Result_Model = @R_Model
+        ORDER BY CreateDate DESC
       `);
 
-    const rows = result.recordset as ReflowRecord[];
-
-    if (rows.length === 0) {
+    if (result.recordset.length === 0) {
       return NextResponse.json(
         { success: false, message: 'PDF not found for specified model and line' },
         { status: 404 }
       );
     }
 
-    // Convert R_PDF to base64
-    const processedRows = rows.map(item => ({
-      ...item,
-      R_PDF: item.R_PDF && Buffer.isBuffer(item.R_PDF)
-        ? item.R_PDF.toString('base64')
-        : null,
-    }));
+    const row = result.recordset[0];
 
-    // Return only first record (if needed)
-    return NextResponse.json({ success: true, data: processedRows[0] });
+    let base64PDF: string | null = null;
+    if (row.R_PDF) {
+      if (Buffer.isBuffer(row.R_PDF)) {
+        base64PDF = row.R_PDF.toString('base64');
+      } else if (typeof row.R_PDF === 'string') {
+        base64PDF = row.R_PDF; // กรณีเก็บเป็น base64 string แล้ว
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: { R_PDF: base64PDF },
+    });
 
   } catch (error) {
     console.error('DB Query Error:', error);

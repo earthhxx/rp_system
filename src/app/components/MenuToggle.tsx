@@ -175,7 +175,7 @@ const MenuToggle = () => {
     );
 
     const renderMenu = () => (
-        <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+        <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
             <div
                 ref={menuRef}
                 className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
@@ -233,7 +233,7 @@ const MenuToggle = () => {
 
         return (
 
-            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+            <div className="fixed inset-0 flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
 
                 <div
                     ref={cardRef}
