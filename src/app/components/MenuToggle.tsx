@@ -233,7 +233,7 @@ const MenuToggle = () => {
 
         return (
 
-            <div className="fixed inset-0 flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+            <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
 
                 <div
                     ref={cardRef}

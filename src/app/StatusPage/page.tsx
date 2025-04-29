@@ -32,9 +32,7 @@ type DataItem120_9_Status = {
   ST_Status: string;
 };
 
-type DataItem120ReultPdf_9 = {
 
-};
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = ({ base64 }: { base64: string }) => {
@@ -112,6 +110,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             handleShowPdf2(data.R_PDF);
           } else {
             setPdfWarning2('PDF format ผิดพลาด');
+            console.log(pdfWarning2);
           }
         }
       } catch (err) {
