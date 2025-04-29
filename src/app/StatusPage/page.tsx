@@ -641,6 +641,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   };
 
+  useEffect(() => {
+    console.log('inputRef.current:', inputRef.current);
+  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
+  
   const clearinputref = () => {
     // เคลียร์ inputRef และ state
     if (inputRef.current) {
@@ -655,11 +659,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
-      setisCardOpencancel(false);
+      
       // log
       submitLogcancelToReflow120_9();
       // update null
       updateReflowStatusCancel();
+      clearinputref();
+      setisCardOpencancel(false);
       // navigate
       goToHome();
     }
@@ -677,11 +683,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
-      setisCardOpenclosepro(false);
+      
       // log
       submitLogCloseprodToReflow120_9();
       // update null
       updateReflowStatusClosepro();
+      clearinputref();
+      setisCardOpenclosepro(false);
       // navigate
       goToHome();
     }
@@ -706,12 +714,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         submitLogToReflow120_9_CHECK();
         updateReflowStatusCHECKED();
         setShowBar(false);
-        setisCardOpenONCHECKING(false);
         clearinputref();
+        setisCardOpenONCHECKING(false);
+        
         console.log("CHECKED");
         console.log("Scanned ID:", EmployeeNo);
       }
       else {
+        clearinputref();
         console.log(submitStage);
         // window.location.reload();
       }
@@ -735,12 +745,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setSubmitStage("ONCHECKING");
         submitLogToReflow120_9_ONCHECKING();
         updateReflowStatusONCHECKEDING();
-        setIsCardOpen(false);
         clearinputref();
+        setIsCardOpen(false);
+        
         console.log("ONCHECKING");
         console.log("Scanned ID:", EmployeeNo);
       }
       else {
+        clearinputref();
         window.location.reload();
       }
 
@@ -894,8 +906,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setIsCardOpen(false);
         clearCamera();
+        clearinputref();
+        setIsCardOpen(false);
+        
+        
       }
     };
 
@@ -933,8 +948,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     const handleClickOutsidecardcancel = (event: MouseEvent) => {
       if (cardRefcancel.current && !cardRefcancel.current.contains(event.target as Node)) {
-        setisCardOpencancel(false);
+        clearinputref();
         clearCamera();
+        setisCardOpencancel(false);
+        
         setArrowDownButton(true);
       }
     };
@@ -951,8 +968,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     const handleClickOutsideCloseprocard = (event: MouseEvent) => {
       if (cardRefClosepro.current && !cardRefClosepro.current.contains(event.target as Node)) {
-        setisCardOpenclosepro(false);
         clearCamera();
+        clearinputref();
+        setisCardOpenclosepro(false);
+        
         setArrowDownButton(true);
       }
     };
@@ -969,8 +988,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     const handleClickOutsideONCHECKING = (event: MouseEvent) => {
       if (cardRefONCHECKING.current && !cardRefONCHECKING.current.contains(event.target as Node)) {
-        setisCardOpenONCHECKING(false);
         clearCamera();
+        clearinputref();
+        setisCardOpenONCHECKING(false);
+        
       }
     };
     if (isCardOpenONCHECKING) {
@@ -1017,7 +1038,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 <div
                   onClick={() => {
                     handleNextPageStatuscancel();
-
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
