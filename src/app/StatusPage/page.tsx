@@ -55,7 +55,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
-  const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" >("WAITING");
+  const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
@@ -80,7 +80,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [isCardOpenclosepro, setisCardOpenclosepro] = useState(false);
   const cardRefClosepro = useRef<HTMLInputElement>(null);
 
-  const [isCardOpenONCHECKING ,setisCardOpenONCHECKING] = useState(false);
+  const [isCardOpenONCHECKING, setisCardOpenONCHECKING] = useState(false);
   const cardRefONCHECKING = useRef<HTMLInputElement>(null);
 
   const zoomPluginInstance = zoomPlugin();
@@ -124,20 +124,20 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
   const fetchPdfData2 = async () => {
-    
+
     try {
       if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
         console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
         setPdfWarning2("ข้อมูลไม่พร้อม โหลด PDF ไม่ได้");
         return;
       }
-  
+
       const res = await fetch(
         `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
       );
       const { data } = await res.json();
       console.log("✅ ได้ข้อมูล PDF:", data);
-  
+
       if (data?.R_PDF2) {
         const decoded = atob(data.R_PDF2);
         if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
@@ -155,8 +155,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
     }
   };
-  
-  
+
+
 
   const updateReflowStatus = async () => {
     const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
@@ -534,13 +534,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           setSubmitStage("CHECKED");
 
         } else {
+
           console.warn("สถานะไม่รู้จัก:", ST_Status);
-          //router out
+          alert(`สถานะไม่รู้จัก: ${ST_Status}`);
         }
 
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
-        //router out
+        alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
       }
     };
 
@@ -751,12 +752,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   let buttonClass = "";
   let buttonClassL = "";
   let buttonContent = null;
-  let buttonClick = () => {};
+  let buttonClick = () => { };
 
 
 
   useEffect(() => {
-    
+
     if (submitStage === "CHECKED") {
       // setTopper(false); // ซ่อน topper เมื่อ submitStage เป็น CHECKED
       const timer = setTimeout(() => {
@@ -815,7 +816,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         </>
       );
       break;
-      case "ONCHECKING":
+    case "ONCHECKING":
 
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
@@ -979,7 +980,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       document.removeEventListener("mousedown", handleClickOutsideONCHECKING);
     };
   }, [isCardOpenONCHECKING]);
-  
+
   const handleStageClick = () => {
     if (submitStage === "WAITING") {
       setSubmitStage("ONCHECKING");
@@ -987,8 +988,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setSubmitStage("CHECKED");
     }
   };
-  
-  
+
+
 
 
 
@@ -1030,7 +1031,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           </div>
         )
       }
-      
+
 
       {
         isCardOpenclosepro && (
@@ -1347,7 +1348,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 <div
                   onClick={() => {
                     handleNextPageStatusCHECKED();
-                    
+
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
