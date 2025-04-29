@@ -100,6 +100,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setPdfWarning2("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
+  const handleOpenPdf = async () => {
+    setPdfOpen(true);
+    await fetchPdfData2();
+  };
 
 
 
@@ -117,43 +121,38 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
-  useEffect(() => {
-    if (
-      !isPdfOpen ||
-      !data120_2?.ProcessLine ||
-      !data120_2?.productName ||
-      !ProductOrderNo
-    ) {
-      console.log("⛔ ยังไม่พร้อม ไม่ fetch PDF");
-      return;
-    }
-  
-    const fetchPdfData2 = async () => {
-      try {
-        const res = await fetch(
-          `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
-        );
-        const { data } = await res.json();
-        console.log("✅ ได้ข้อมูล PDF:", data);
-  
-        if (data?.R_PDF2) {
-          const decoded = atob(data.R_PDF2);
-          if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
-            handleShowPdf2(data.R_PDF2);
-          } else {
-            setPdfWarning2('PDF format ผิดพลาด');
-          }
-        } else {
-          setPdfWarning2('ไม่พบข้อมูล PDF');
-        }
-      } catch (err) {
-        console.error("❌ โหลด PDF ล้มเหลว:", err);
-        setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
+  const fetchPdfData2 = async () => {
+    try {
+      if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
+        console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
+        setPdfWarning2("ข้อมูลไม่พร้อม โหลด PDF ไม่ได้");
+        return;
       }
-    };
   
-    fetchPdfData2();
-  }, [isPdfOpen, data120_2?.ProcessLine, data120_2?.productName, ProductOrderNo]);
+      const res = await fetch(
+        `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
+      );
+      const { data } = await res.json();
+      console.log("✅ ได้ข้อมูล PDF:", data);
+  
+      if (data?.R_PDF2) {
+        const decoded = atob(data.R_PDF2);
+        if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
+          handleShowPdf2(data.R_PDF2);
+        } else {
+          console.warn("⚠️ PDF format ผิดพลาด");
+          setPdfWarning2('PDF format ผิดพลาด');
+        }
+      } else {
+        console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
+        setPdfWarning2('ไม่พบข้อมูล PDF');
+      }
+    } catch (err) {
+      console.error("❌ โหลด PDF ล้มเหลว:", err);
+      setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
+    }
+  };
+  
   
 
   const updateReflowStatus = async () => {
@@ -966,6 +965,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       onClick={() => {
                         setArrowDownButtoncard(false);
                         setPdfOpen(true);
+                        handleOpenPdf();
                         console.log('pass setpdfopen')
                       }}
                       className="flex flex-col  justify-center items-center">
