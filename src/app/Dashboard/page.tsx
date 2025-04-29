@@ -171,15 +171,15 @@ const ActiveLinesDashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-            <div className="flex flex-row justify-center items-center me-2 ms-2 w-full ">
+            <div className="flex flex-row justify-center items-center me-2 ms-2 w-fit ">
                 <Image className="flex flex-none"
                     src="/images/438764.png"
                     width={100}
                     height={100}
                     alt="Picture of the author"
                 />
-                <div className="flex flex-col justify-center items-center w-full sm:w-lg lg:w-xl">
-                    <h3 className="flex w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-[27px] xl:text-4xl ">
+                <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
+                    <h3 className="flex w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-2xl md:text-2xl xl:text-4xl ">
                         PROFILE MEASUREMENT REALTIME
                     </h3>
                     {renderFilterBar()}
