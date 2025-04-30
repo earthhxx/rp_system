@@ -668,7 +668,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       // update null
       updateReflowStatusCancel();
       setisCardOpencancel(false);
-      
+      setisLoading(false);
       // navigate
       goToHome();
     }
@@ -692,7 +692,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       // update null
       updateReflowStatusClosepro();
       setisCardOpenclosepro(false);
-      
+      setisLoading(false);
       // navigate
       goToHome();
     }
@@ -1027,7 +1027,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
-      {isLoading && renderLoading()}
+      {(isLoading || isLoading120_9 ) && renderLoading() }
       {
         isCardOpencancel && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
@@ -1232,9 +1232,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         </div>
       )}
 
-      {isLoading120_9 ? (
+      {isLoading120_9  ? (
         <div className="flex justify-center items-center text-2xl text-blue-600">
           Loading...
+          
         </div>
       ) : !data120_9 ? (
         <div className="flex justify-center items-center text-2xl text-red-600">
