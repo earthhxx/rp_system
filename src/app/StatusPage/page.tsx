@@ -12,7 +12,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
 import { FaFilePdf } from "react-icons/fa6";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
+import { FaHandPointDown } from "react-icons/fa";
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -510,47 +510,49 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-
+    
         if (!success || !data || data.length === 0) {
           console.warn("โหลดสถานะล้มเหลว:", message);
           return;
         }
-
+    
         const statusItem: DataItem120_9_Status = data[0];
-        setStatusData120_9(statusItem); // <- เก็บค่าเข้า state
-
-        // ตรวจสอบเพื่อเปลี่ยนสถานะ
+        setStatusData120_9(statusItem);
+    
         const { ST_Status, ST_Prod } = statusItem;
-
+    
+        const isProdMatch = ST_Prod === ProductOrderNo;
+    
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
           submitLogToReflow120_9();
           updateReflowStatus();
-
-        } else if ((!ST_Status || ST_Status === "WAITING") && (!ST_Prod || ST_Prod === ProductOrderNo)) {
+          fetchPdfData();
+    
+        } else if (ST_Status === "WAITING" && isProdMatch) {
           setSubmitStage("WAITING");
-
-        } else if (ST_Status === "ONCHECKING" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
+          fetchPdfData();
+    
+        } else if (ST_Status === "ONCHECKING" && isProdMatch) {
           setSubmitStage("ONCHECKING");
-
-        } else if (ST_Status === "CHECKED" && (!ST_Prod || ST_Prod === ProductOrderNo)) {
+          fetchPdfData();
+    
+        } else if (ST_Status === "CHECKED" && isProdMatch) {
           setSubmitStage("CHECKED");
-
+          fetchPdfData();
+    
         } else {
-
           console.warn("สถานะไม่รู้จัก:", ST_Status);
           alert(`สถานะไม่รู้จัก: ${ST_Status}`);
         }
-
+    
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
         alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
       }
     };
-
-    fetchPdfData();
+    
     fetchReflowStatus();
-
   }, [data120_2]);
 
 
@@ -1022,11 +1024,16 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               </div>
           </div>
       );
-
+  const pointing =()=>(
+    <div className="fixed top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce"/> </div>
+  );
   const [isLoading,setisLoading] = useState(false);
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
+      {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
+      
+
       {(isLoading || isLoading120_9 ) && renderLoading() }
       {
         isCardOpencancel && (
@@ -1247,7 +1254,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       ) : (
         // แสดงผลหลัก
         <div
-          className={`fixed z-40 top-80 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
+          className={`fixed z-40 top-110 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
         >
           {showBar ? (
             <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">

@@ -10,7 +10,6 @@ validation check to user popup this line already has prod running
 next-i18next ปรับภาษาไทย
 
 UI telling user where to check pass process
-
 UI position profile status
 
 color status
