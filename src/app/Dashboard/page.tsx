@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from 'next/image'
+import Image from 'next/image';
 
 // Type definitions
 type LineStatus = {
@@ -13,14 +13,12 @@ type LineStatus = {
     waitTime: number;
 };
 
-
 const animetion = {
     WAITING: "animate-spin-slow",
     ONCHECKING: 'animate-bounce',
     CHECKED: "animate-ping-slow",
     NULL: "",
 };
-
 
 const icons = {
     CHECKED: (
@@ -42,7 +40,6 @@ const icons = {
         </span>
     ),
 };
-
 
 const backgrounds = {
     CHECKED: "bg-pass",
@@ -68,29 +65,31 @@ const ActiveLinesDashboard: React.FC = () => {
                 const response = await fetch("/api/120-9/dashboard/select_status");
                 if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
                 const raw = await response.json();
-    
-                const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => ({
-                    id: index + 1,
-                    model: item.ST_Model || "",
-                    workOrder: item.ST_Prod || "",
-                    status: (item.ST_Status || "NULL") as LineStatus["status"],
-                    lastMeasured: item.ST_Datetime || "-",
-                    waitTime: 0,
-                }));
-    
+
+                const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
+                    const stDatetime = item.ST_Datetime;
+                    const waitTime = Math.floor((Date.now() - new Date(stDatetime).getTime()) / 60000);
+
+                    return {
+                        id: index + 1,
+                        model: item.ST_Model || "",
+                        workOrder: item.ST_Prod || "",
+                        status: (item.ST_Status || "NULL") as LineStatus["status"],
+                        lastMeasured: stDatetime || "-",
+                        waitTime: waitTime,
+                    };
+                });
+
                 setLinesState(mappedData);
             } catch (error) {
                 console.error("Error fetching lines:", error);
             }
         };
-    
-        fetchLines(); // initial load
-    
-        const interval = setInterval(fetchLines, 5000); // fetch every 5 seconds
-    
-        return () => clearInterval(interval); // clear on unmount
+
+        fetchLines();
+        const interval = setInterval(fetchLines, 5000);
+        return () => clearInterval(interval);
     }, []);
-    
 
     const filteredLines = () => {
         if (filter === "WAITING") {
@@ -114,15 +113,14 @@ const ActiveLinesDashboard: React.FC = () => {
                 <div className={`flex justify-center status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
                 <div className="model text-[12px] pb-3 text-gray-600">{`${line.status}`}</div>
                 <div className="">MODEL </div>
-
                 <div className="model text-[16px] pb-2 ">{` ${line.model}`}</div>
                 <div className="WAITING text-sm pt-2 text-red-600">
                     {line.status === "WAITING"
-                        ? `WAITING: ${Math.floor(line.waitTime / 60)} minutes`
+                        ? `WAITING: ${line.waitTime} minutes`
                         : "-"}
                 </div>
                 <div className="last-measured text-sm text-gray-600 pb-1">
-                    {`Start time : ${line.lastMeasured}`}
+                    {`Start time: ${line.lastMeasured.replace("T", " ").substring(0, 19)}`}
                 </div>
             </div>
         ));
@@ -136,13 +134,13 @@ const ActiveLinesDashboard: React.FC = () => {
                         <button
                             key={type}
                             className={`flex w-1/4   px-1 sm:px-2 py-1 sm:py-2 pe-10 ps-10 text-[14px] rounded-full font-bold transition justify-center ${filter === type
-                                    ? {
-                                        "ALL": "bg-gray-300 text-gray-800",
-                                        "WAITING": "bg-[#f7e1a7] text-yellow-900",
-                                        "ONCHECKING": "bg-[#9ec5fe] text-blue-600",
-                                        "CHECKED": "bg-[#a0d3a9] text-green-900",
-                                    }[type]
-                                    : "bg-gray-200 text-gray-600"
+                                ? {
+                                    "ALL": "bg-gray-300 text-gray-800",
+                                    "WAITING": "bg-[#f7e1a7] text-yellow-900",
+                                    "ONCHECKING": "bg-[#9ec5fe] text-blue-600",
+                                    "CHECKED": "bg-[#a0d3a9] text-green-900",
+                                }[type]
+                                : "bg-gray-200 text-gray-600"
                                 }`}
                             onClick={() => setFilter(type as any)}
                         >
@@ -151,11 +149,8 @@ const ActiveLinesDashboard: React.FC = () => {
                     ))}
                 </div>
             </div>
-
-
         );
     };
-
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
@@ -174,8 +169,6 @@ const ActiveLinesDashboard: React.FC = () => {
                 </div>
                 <div className="flex flex-none w-[100px]"></div>
             </div>
-
-
 
             <div className="p-6 m-1 w-full">
                 <div className={` font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full`}>
