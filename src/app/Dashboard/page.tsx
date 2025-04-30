@@ -68,17 +68,23 @@ const ActiveLinesDashboard: React.FC = () => {
 
                 const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
                     const stDatetime = item.ST_Datetime;
-                    const waitMinutes = Math.floor((Date.now() - new Date(stDatetime).getTime()) / 60000);
-                    const waitTimeStr = waitMinutes.toString();
-                    const waitTime = waitTimeStr.substring(1, 5); // เอาตัวที่ 1 ถึง 4
+                    console.log(stDatetime);
+                    // แปลงจาก UTC+7 ไปเป็น UTC
+                    const dateInUTC = new Date(new Date(stDatetime).getTime() - 7 * 60 * 60 * 1000);
+                    const waitMinutes = Math.max(
+                        0,
+                        Math.floor((Date.now() - dateInUTC.getTime()) / 60000)
+                    );
+                    
+
 
                     return {
                         id: index + 1,
                         model: item.ST_Model || "",
                         workOrder: item.ST_Prod || "",
                         status: (item.ST_Status || "NULL") as LineStatus["status"],
-                        lastMeasured: stDatetime || "-",
-                        waitTime: waitTime,
+                        lastMeasured: item.ST_Datetime || "-",
+                        waitTime: waitMinutes,
                     };
                 });
 
