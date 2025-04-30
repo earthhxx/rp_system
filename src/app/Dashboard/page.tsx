@@ -65,44 +65,32 @@ const ActiveLinesDashboard: React.FC = () => {
     useEffect(() => {
         const fetchLines = async () => {
             try {
-                const response = await fetch("/api/mock_line");
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch: ${response.statusText}`);
-                }
-                const data = await response.json();
-                setLinesState(data);
+                const response = await fetch("/api/120-9/dashboard/select_status");
+                if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+                const raw = await response.json();
+    
+                const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => ({
+                    id: index + 1,
+                    model: item.ST_Model || "",
+                    workOrder: item.ST_Prod || "",
+                    status: (item.ST_Status || "NULL") as LineStatus["status"],
+                    lastMeasured: item.ST_Datetime || "-",
+                    waitTime: 0,
+                }));
+    
+                setLinesState(mappedData);
             } catch (error) {
                 console.error("Error fetching lines:", error);
             }
         };
-
-        fetchLines();
-
-        const interval = setInterval(() => {
-            setLinesState((prevLines) =>
-                prevLines.map((line) => {
-                    if (line.status === "WAITING") {
-                        line.waitTime += 1;
-                    } else {
-                        line.waitTime = 0;
-                    }
-                    line.status = randomStatus();
-                    line.lastMeasured = new Date().toLocaleTimeString();
-                    return line;
-                })
-            );
-        }, 60000); // ทุก 1 นาที
-
-        return () => clearInterval(interval);
+    
+        fetchLines(); // initial load
+    
+        const interval = setInterval(fetchLines, 5000); // fetch every 5 seconds
+    
+        return () => clearInterval(interval); // clear on unmount
     }, []);
-
-    const randomStatus = () => {
-        const r = Math.random();
-        if (r < 0.7) return "CHECKED";
-        else if (r < 0.8) return "ONCHECKING";
-        else if (r < 0.9) return "NULL";
-        else return "WAITING";
-    };
+    
 
     const filteredLines = () => {
         if (filter === "WAITING") {

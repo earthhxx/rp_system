@@ -1,4 +1,4 @@
-//https://localhost:3003/api/120-9/dashboard/select_status?R_Line=SMT-5
+//https://localhost:3003/api/120-9/dashboard/select_status
 //test url 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -17,24 +17,12 @@ interface ReflowRecordStatus {
 
 export async function GET(req: NextRequest) {
     try {
-        const { searchParams } = req.nextUrl;
-        const line = searchParams.get('R_Line');
-
-        // Validate input
-        if (!line) {
-            return NextResponse.json(
-                { success: false, message: 'Missing R_Line query parameter' },
-                { status: 400 }
-            );
-        }
-
-
+        
         // Connect to SQL Server
         const pool = await getDashboardConnection();
 
         // Query the database
         const result = await pool.request()
-            .input('ST_Line', sql.NVarChar, line)
             .query(`
           SELECT * FROM REFLOW_Status 
         `);
