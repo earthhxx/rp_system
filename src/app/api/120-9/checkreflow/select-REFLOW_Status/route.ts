@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     if (rows.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'PDF not found for specified model and line' },
+        { success: false, message: 'Runningline not found for specified model and line' },
         { status: 404 }
       );
     }
