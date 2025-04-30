@@ -68,7 +68,9 @@ const ActiveLinesDashboard: React.FC = () => {
 
                 const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
                     const stDatetime = item.ST_Datetime;
-                    const waitTime = Math.floor((Date.now() - new Date(stDatetime).getTime()) / 60000);
+                    const waitMinutes = Math.floor((Date.now() - new Date(stDatetime).getTime()) / 60000);
+                    const waitTimeStr = waitMinutes.toString();
+                    const waitTime = waitTimeStr.substring(1, 5); // เอาตัวที่ 1 ถึง 4
 
                     return {
                         id: index + 1,
