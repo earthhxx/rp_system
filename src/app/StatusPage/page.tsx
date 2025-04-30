@@ -11,6 +11,7 @@ import { BsUpcScan } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
 import { FaFilePdf } from "react-icons/fa6";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
 type DataItem120_2 = {
@@ -73,6 +74,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [arrowdownbuttoncard, setArrowDownButtoncard] = useState(false);
   const [arrowdownbutton, setArrowDownButton] = useState(true);
   const cardarrowRef = useRef<HTMLDivElement>(null);
+
+
 
   const [isCardOpencancel, setisCardOpencancel] = useState(false);
   const cardRefcancel = useRef<HTMLInputElement>(null);
@@ -664,8 +667,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       submitLogcancelToReflow120_9();
       // update null
       updateReflowStatusCancel();
-      clearinputref();
       setisCardOpencancel(false);
+      setisLoading(true);
       // navigate
       goToHome();
     }
@@ -688,8 +691,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       submitLogCloseprodToReflow120_9();
       // update null
       updateReflowStatusClosepro();
-      clearinputref();
       setisCardOpenclosepro(false);
+      setisLoading(true);
       // navigate
       goToHome();
     }
@@ -714,7 +717,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         submitLogToReflow120_9_CHECK();
         updateReflowStatusCHECKED();
         setShowBar(false);
-        clearinputref();
         setisCardOpenONCHECKING(false);
         
         console.log("CHECKED");
@@ -745,7 +747,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setSubmitStage("ONCHECKING");
         submitLogToReflow120_9_ONCHECKING();
         updateReflowStatusONCHECKEDING();
-        clearinputref();
+    
         setIsCardOpen(false);
         
         console.log("ONCHECKING");
@@ -972,6 +974,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         clearinputref();
         setisCardOpenclosepro(false);
         
+        
         setArrowDownButton(true);
       }
     };
@@ -1010,8 +1013,21 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
+  const renderLoading = () => (
+          <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
+              <div
+                  className="flex  justify-center-safe "
+              >
+                <AiOutlineLoading3Quarters className="size-[200px] animate-spin"/>
+              </div>
+          </div>
+      );
+
+  const [isLoading,setisLoading] = useState(false);
+
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
+      {isLoading && renderLoading()}
       {
         isCardOpencancel && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
@@ -1023,7 +1039,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <input
                 ref={inputRef}
                 type="text"
-                value={EmployeeNo}
                 onChange={(e) => setEmployeeNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
@@ -1060,7 +1075,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <input
                 ref={inputRef}
                 type="text"
-                value={EmployeeNo}
                 onChange={(e) => setEmployeeNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
@@ -1103,7 +1117,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
         {arrowdownbuttoncard && (
           <>
-            <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-60">
+            <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-49">
               <div ref={cardarrowRef} className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
                 <div className="flex flex-none h-10"></div>
                 <div className="flex flex-row justify-center items-center ">
@@ -1285,7 +1299,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               setPdfOpen(false);
               setArrowDownButton(true);
             }}
-            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-60"
+            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg "
           >
             ✕
           </button>
@@ -1320,7 +1334,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <input
                 ref={inputRef}
                 type="text"
-                value={EmployeeNo}
                 onChange={(e) => setEmployeeNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
@@ -1355,7 +1368,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               <input
                 ref={inputRef}
                 type="text"
-                value={EmployeeNo}
                 onChange={(e) => setEmployeeNo(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
