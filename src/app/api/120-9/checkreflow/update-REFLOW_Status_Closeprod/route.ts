@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
         UPDATE REFLOW_Status
         SET ST_Model = NULL,
             ST_Prod = NULL,
-            ST_Status = NULL
+            ST_Status = NULL,
+            ST_Datetime = NULL
         WHERE ST_Line = @ST_Line
       `);
 

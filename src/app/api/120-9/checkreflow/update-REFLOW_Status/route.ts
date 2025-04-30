@@ -32,22 +32,23 @@ export async function POST(req: NextRequest) {
       .input('ST_Prod', sql.NVarChar, ST_Prod || '')
       .input('ST_Status', sql.NVarChar, ST_Status || '')
       .query(`
-        UPDATE REFLOW_Status
-        SET ST_Model = @ST_Model,
-            ST_Prod = @ST_Prod,
-            ST_Status = @ST_Status
-        WHERE ST_Line = @ST_Line
+          UPDATE REFLOW_Status
+          SET ST_Model = @ST_Model,
+              ST_Prod = @ST_Prod,
+              ST_Status = @ST_Status,
+              ST_Datetime = GETDATE()
+          WHERE ST_Line = @ST_Line;
 
-  SELECT ST_Status 
-  FROM REFLOW_Status 
-  WHERE ST_Line = @ST_Line;
+          SELECT ST_Status 
+          FROM REFLOW_Status 
+          WHERE ST_Line = @ST_Line;
       `);
-      const newStatus = result.recordset?.[0]?.ST_Status;
-      return NextResponse.json({
-        success: true,
-        data: { newStatus },
-        message: `Status updated successfully: ${newStatus}`
-      });
+    const newStatus = result.recordset?.[0]?.ST_Status;
+    return NextResponse.json({
+      success: true,
+      data: { newStatus },
+      message: `Status updated successfully: ${newStatus}`
+    });
 
 
   } catch (error) {

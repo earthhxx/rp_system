@@ -662,13 +662,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
-      
+      setisLoading(true);
       // log
       submitLogcancelToReflow120_9();
       // update null
       updateReflowStatusCancel();
       setisCardOpencancel(false);
-      setisLoading(true);
+      
       // navigate
       goToHome();
     }
@@ -686,13 +686,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       return;
     }
     if (EmployeeNo === employeeUserName) {
-      
+      setisLoading(true);
       // log
       submitLogCloseprodToReflow120_9();
       // update null
       updateReflowStatusClosepro();
       setisCardOpenclosepro(false);
-      setisLoading(true);
+      
       // navigate
       goToHome();
     }
