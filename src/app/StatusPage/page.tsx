@@ -528,7 +528,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
         alert(
           `ไม่พบข้อมูล STANDARD PDF`
-          
         )
       } finally {
         setIsLoading120_9(false);
