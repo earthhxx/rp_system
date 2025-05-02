@@ -87,7 +87,6 @@ const ActiveLinesDashboard: React.FC = () => {
                         waitTime: waitMinutes,
                     };
                 });
-
                 setLinesState(mappedData);
             } catch (error) {
                 console.error("Error fetching lines:", error);
@@ -107,7 +106,7 @@ const ActiveLinesDashboard: React.FC = () => {
         } else if (filter === "ONCHECKING") {
             return linesState.filter((line) => line.status === "ONCHECKING");
         } else {
-            return linesState;
+            return linesState.filter((line)=>line.status !== "NULL");
         }
     };
 
