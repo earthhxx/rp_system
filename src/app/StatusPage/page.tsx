@@ -1063,9 +1063,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING ) {
       inputRef.current = null;
-      setEmployeeNo("");
+      setEmployeeName("");
     }
-  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
+  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro , isCardOpenONCHECKING]);
 
   const renderLoading = () => (
     <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
