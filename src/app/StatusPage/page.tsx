@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, HTMLInputAutoCompleteAttribute } from "react";
+import React, { useState, useRef, useEffect} from "react";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
@@ -1061,8 +1061,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [isCardOpenONCHECKING]);
 
   useEffect(() => {
-    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro) {
+    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING ) {
       inputRef.current = null;
+      setEmployeeNo("");
     }
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
@@ -1160,7 +1161,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
       <div>
         {arrowdownbutton && (
-          <div className="fixed mt-4 mr-4 z-65 flex w-full justify-end">
+          <div className="fixed mt-16 mr-4 z-49 flex w-full justify-end right-10">
             <div
               onClick={() => {
                 setArrowDownButtoncard(true);
@@ -1168,7 +1169,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               }}
               className="flex flex-none ">
               <MdKeyboardArrowDown
-                className="size-10 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
+                className="size-12 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
             </div>
           </div>
         )}
@@ -1358,7 +1359,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               setPdfOpen(false);
               setArrowDownButton(true);
             }}
-            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg "
+            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-49"
           >
             ✕
           </button>
