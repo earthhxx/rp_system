@@ -37,6 +37,16 @@ type DataItem120_9_Result = {
   R_PDF2: string;
 };
 
+function setJsonToLocalStorage<T>(key: string, value: T) {
+  localStorage.setItem(key, JSON.stringify(value));
+  window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value } }));
+}
+
+function getJsonFromLocalStorage<T>(key: string): T | null {
+  const value = localStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
+}
+
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = ({ base64 }: { base64: string }) => {
@@ -45,6 +55,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const goToHome = () => {
     router.push('/');
   };
+
+  const [confirmmodel,setconfirmmodel] = useState(false);
 
   const [pdfWarning, setPdfWarning] = useState("");
   const [pdfWarning2, setPdfWarning2] = useState("");
@@ -60,11 +72,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   const [showChecked, setShowChecked] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
-
   const [isPdfOpen, setPdfOpen] = useState(false);
-
-
-
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
@@ -110,6 +118,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     await fetchPdfData2();
   };
 
+  //LOAD Moldel from local
+  useEffect(() => {
+    if (data120_2) {
+      const getmodel: string | null = getJsonFromLocalStorage('modellocal');
+  
+      if (getmodel === data120_2.productName) {
+        setconfirmmodel(true);
+      } else {
+        console.log('Model is not match');
+        setconfirmmodel(false); // เผื่อเคส model ไม่ตรง
+      }
+    }
+  }, [data120_2]);
 
 
   useEffect(() => {
@@ -734,6 +755,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
+        setJsonToLocalStorage('modellcal',(data120_2?.productName));
 
         console.log("CHECKED");
         console.log("Scanned ID:", EmployeeNo);
@@ -743,7 +765,6 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         console.log(submitStage);
         // window.location.reload();
       }
-
     }
     else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
