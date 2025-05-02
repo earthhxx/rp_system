@@ -44,26 +44,42 @@ const MenuToggle = () => {
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
+        const handler = () => {
+            // เช่น reset state หรือ redirect
+            console.log("productOrderNo ถูกลบแล้ว");
+            // อัปเดต state เพื่อให้ component รู้ว่ามีการลบ
+            setProductOrderNo("");
+        };
+
+        window.addEventListener("productOrderNo:removed", handler);
+
+        return () => {
+            window.removeEventListener("productOrderNo:removed", handler);
+        };
+    }, []);
+
+
+    useEffect(() => {
         //เช็ค event ถ้ามีค่า === prod or ค่าใหม่
         const handleStorageChange = (event: StorageEvent) => {
             if (event.key === "productOrderNo") {
                 setProductOrderNo(event.newValue || "");
             }
         };
-    
+
         window.addEventListener("storage", handleStorageChange);
-    
+
         // โหลดค่าจาก localStorage
         const stored = getJsonFromLocalStorage<string>("productOrderNo");
         if (stored && typeof stored === "string") {
             setProductOrderNo(stored);
         }
-    
+
         return () => {
             window.removeEventListener("storage", handleStorageChange);
         };
     }, []);
-    
+
 
     const handleSaveAndNavigate = () => {
         setJsonToLocalStorage("productOrderNo", productOrderNo);
@@ -83,7 +99,7 @@ const MenuToggle = () => {
         }
     }, []);
 
- 
+
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -206,7 +222,7 @@ const MenuToggle = () => {
 
                         setHomeStage('home');
                         setIsMenuOpen(false);
-                
+
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <AiFillHome className="size-30 text-white m-4" />

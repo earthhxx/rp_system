@@ -657,56 +657,68 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   };
 
-  const handleNextPageStatuscancel = () => {
+  const handleNextPageStatuscancel = async () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
+  
     if (EmployeeNo === employeeUserName) {
-      setisLoading(true);
-      // log
-      submitLogcancelToReflow120_9();
-      // update null
-      updateReflowStatusCancel();
-      setisCardOpencancel(false);
-      setisLoading(false);
-      localStorage.removeItem("producOrderNo");
-      // navigate
-      goToHome();
-    }
-    else {
+      try {
+        setisLoading(true);
+        await submitLogcancelToReflow120_9();
+        await updateReflowStatusCancel();
+        setisCardOpencancel(false);
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+  
+        goToHome(); // นำทางกลับหน้า home
+      } catch (err) {
+        console.error("Error during cancel process:", err);
+      } finally {
+        setisLoading(false);
+      }
+    } else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo")
+      console.log("employeeName != EmployeeNo");
     }
+  
     clearinputref();
   };
-
-  const handleNextPageStatuscloseprod = () => {
+  
+  const handleNextPageStatuscloseprod = async () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
+  
     if (EmployeeNo === employeeUserName) {
-      setisLoading(true);
-      // log
-      submitLogCloseprodToReflow120_9();
-      // update null
-      updateReflowStatusClosepro();
-      setisCardOpenclosepro(false);
-      setisLoading(false);
-      localStorage.removeItem("producOrderNo");
-      // navigate
-      goToHome();
-    }
-    else {
+      try {
+        setisLoading(true);
+  
+        await submitLogCloseprodToReflow120_9();
+        await updateReflowStatusClosepro();
+  
+        setisCardOpenclosepro(false);
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+  
+        goToHome();
+      } catch (err) {
+        console.error("Error during closeprod process:", err);
+      } finally {
+        setisLoading(false);
+      }
+    } else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo")
+      console.log("employeeName != EmployeeNo");
     }
-
+  
     clearinputref();
   };
+  
   const handleNextPageStatusCHECKED = () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
