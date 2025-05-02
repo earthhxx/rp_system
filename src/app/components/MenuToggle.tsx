@@ -15,6 +15,22 @@ interface ReflowStatus {
     ST_Status: string;
 }
 
+// Util สำหรับจัดการ localStorage
+function setJsonToLocalStorage<T>(key: string, value: T) {
+    localStorage.setItem(key, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value } }));
+}
+
+function getJsonFromLocalStorage<T>(key: string): T | null {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+}
+
+function removeItemFromLocalStorage(key: string) {
+    localStorage.removeItem(key);
+    window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value: null } }));
+}
+
 const MenuToggle = () => {
     const router = useRouter();
     const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
@@ -25,8 +41,36 @@ const MenuToggle = () => {
     const [productOrderNo, setProductOrderNo] = useState("");
     const cardRef = useRef<HTMLDivElement>(null);
     const scannerRef = useRef<Html5Qrcode | null>(null);
-    const qrRegionId = "qr-reader";
     const inputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+        //เช็ค event ถ้ามีค่า === prod or ค่าใหม่
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === "productOrderNo") {
+                setProductOrderNo(event.newValue || "");
+            }
+        };
+    
+        window.addEventListener("storage", handleStorageChange);
+    
+        // โหลดค่าจาก localStorage
+        const stored = getJsonFromLocalStorage<string>("productOrderNo");
+        if (stored && typeof stored === "string") {
+            setProductOrderNo(stored);
+        }
+    
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+    
+
+    const handleSaveAndNavigate = () => {
+        setJsonToLocalStorage("productOrderNo", productOrderNo);
+        router.push(`/StatusPage?productOrderNo=${encodeURIComponent(productOrderNo)}`);
+        clearinputref();
+    };
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -38,6 +82,8 @@ const MenuToggle = () => {
             });
         }
     }, []);
+
+ 
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -72,56 +118,30 @@ const MenuToggle = () => {
 
         try {
             const devices = await Html5Qrcode.getCameras();
+            if (!devices || devices.length === 0) return;
 
-            if (!devices || devices.length === 0) {
-                console.error("ไม่พบกล้องบนอุปกรณ์");
-                return;
-            }
+            const backCam = devices.find(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment"));
+            const deviceId = backCam ? backCam.id : devices[0].id;
 
-            // หากล้องที่ชื่อดูเหมือนกล้องหลัง
-            const backCam = devices.find((d) =>
-                d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment")
-            );
-
-            const selectedDeviceId = backCam ? backCam.id : devices[0].id;
-
-            await html5QrCode.start(
-                { deviceId: { exact: selectedDeviceId } },
-                {
-                    fps: 10,
-                    qrbox: (vw, vh) => {
-                        const size = Math.min(vw, vh) * 0.8;
-                        return { width: size, height: size };
-                    },
-                },
+            await html5QrCode.start({ deviceId: { exact: deviceId } }, { fps: 10, qrbox: 300 },
                 (decodedText) => {
                     setProductOrderNo(decodedText);
                     if (inputRef.current) inputRef.current.value = decodedText;
-
                     html5QrCode.stop().then(() => html5QrCode.clear());
+                    scannerRef.current = null;
                 },
-                (err) => console.warn("QR Scan Error:", err)
+                (err) => console.warn("Scan error:", err)
             );
-
-            setTimeout(() => {
-                const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
-                if (video) {
-                    video.style.width = "400px";
-                    video.style.height = "400px";
-                    video.style.borderRadius = "12px";
-                    video.style.objectFit = "cover";
-                }
-            }, 300);
         } catch (err) {
-            console.error("Camera initialization error:", err);
+            console.error("Camera initialization failed:", err);
         }
     };
+
     const clearinputref = () => {
-        // เคลียร์ inputRef และ state
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
+        if (inputRef.current) inputRef.current.value = "";
     };
+
+
 
     const clearCamera = () => {
         if (scannerRef.current) {
@@ -186,7 +206,7 @@ const MenuToggle = () => {
 
                         setHomeStage('home');
                         setIsMenuOpen(false);
-                        router.push('/');
+                
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <AiFillHome className="size-30 text-white m-4" />
@@ -204,14 +224,19 @@ const MenuToggle = () => {
 
                     <BsClipboard2DataFill className="size-30 text-white m-4" />
                     REALTIME CHECK
-         
+
 
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-                        setHomeStage("scan");
-                        setIsMenuOpen(false);
+                        if (productOrderNo || productOrderNo !== '') {
+                            router.push(`/StatusPage?productOrderNo=${productOrderNo}`);
+                        }
+                        else {
+                            setHomeStage("scan");
+                            setIsMenuOpen(false);
+                        }
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
@@ -284,9 +309,8 @@ const MenuToggle = () => {
             return;
         }
         setHomeStage("home");
-        const query = encodeURIComponent(productOrderNo); // ป้องกันปัญหา URL พิเศษ
-        router.push(`/StatusPage?productOrderNo=${query}`);
-        clearinputref();
+        handleSaveAndNavigate();
+
     };
 
     return (

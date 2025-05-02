@@ -671,6 +671,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       updateReflowStatusCancel();
       setisCardOpencancel(false);
       setisLoading(false);
+      localStorage.removeItem("producOrderNo");
       // navigate
       goToHome();
     }
@@ -695,6 +696,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       updateReflowStatusClosepro();
       setisCardOpenclosepro(false);
       setisLoading(false);
+      localStorage.removeItem("producOrderNo");
       // navigate
       goToHome();
     }
