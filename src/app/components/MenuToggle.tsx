@@ -248,6 +248,8 @@ const MenuToggle = () => {
                     onClick={() => {
                         if (productOrderNo || productOrderNo !== '') {
                             router.push(`/StatusPage?productOrderNo=${productOrderNo}`);
+                            setHomeStage("scan");
+                            setIsMenuOpen(false);
                         }
                         else {
                             setHomeStage("scan");

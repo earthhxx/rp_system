@@ -510,48 +510,48 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-    
+
         if (!success || !data || data.length === 0) {
           console.warn("โหลดสถานะล้มเหลว:", message);
           return;
         }
-    
+
         const statusItem: DataItem120_9_Status = data[0];
         setStatusData120_9(statusItem);
-    
+
         const { ST_Status, ST_Prod } = statusItem;
-    
+
         const isProdMatch = ST_Prod === ProductOrderNo;
-    
+
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
           submitLogToReflow120_9();
           updateReflowStatus();
           fetchPdfData();
-    
+
         } else if (ST_Status === "WAITING" && isProdMatch) {
           setSubmitStage("WAITING");
           fetchPdfData();
-    
+
         } else if (ST_Status === "ONCHECKING" && isProdMatch) {
           setSubmitStage("ONCHECKING");
           fetchPdfData();
-    
+
         } else if (ST_Status === "CHECKED" && isProdMatch) {
           setSubmitStage("CHECKED");
           fetchPdfData();
-    
+
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
           alert(`สถานะไม่รู้จัก: ${ST_Status}`);
         }
-    
+
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
         alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
       }
     };
-    
+
     fetchReflowStatus();
   }, [data120_2]);
 
@@ -649,7 +649,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     console.log('inputRef.current:', inputRef.current);
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
-  
+
   const clearinputref = () => {
     // เคลียร์ inputRef และ state
     if (inputRef.current) {
@@ -663,7 +663,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
-  
+
     if (EmployeeNo === employeeUserName) {
       try {
         setisLoading(true);
@@ -672,7 +672,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setisCardOpencancel(false);
         localStorage.removeItem("productOrderNo");
         window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-  
+
         goToHome(); // นำทางกลับหน้า home
       } catch (err) {
         console.error("Error during cancel process:", err);
@@ -683,28 +683,28 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
       console.log("employeeName != EmployeeNo");
     }
-  
+
     clearinputref();
   };
-  
+
   const handleNextPageStatuscloseprod = async () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
-  
+
     if (EmployeeNo === employeeUserName) {
       try {
         setisLoading(true);
-  
+
         await submitLogCloseprodToReflow120_9();
         await updateReflowStatusClosepro();
-  
+
         setisCardOpenclosepro(false);
         localStorage.removeItem("productOrderNo");
         window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-  
+
         goToHome();
       } catch (err) {
         console.error("Error during closeprod process:", err);
@@ -715,10 +715,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
       console.log("employeeName != EmployeeNo");
     }
-  
+
     clearinputref();
   };
-  
+
   const handleNextPageStatusCHECKED = () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
@@ -734,7 +734,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
-        
+
         console.log("CHECKED");
         console.log("Scanned ID:", EmployeeNo);
       }
@@ -763,9 +763,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setSubmitStage("ONCHECKING");
         submitLogToReflow120_9_ONCHECKING();
         updateReflowStatusONCHECKEDING();
-    
+
         setIsCardOpen(false);
-        
+
         console.log("ONCHECKING");
         console.log("Scanned ID:", EmployeeNo);
       }
@@ -927,8 +927,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         clearCamera();
         clearinputref();
         setIsCardOpen(false);
-        
-        
+
+
       }
     };
 
@@ -969,7 +969,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         clearinputref();
         clearCamera();
         setisCardOpencancel(false);
-        
+
         setArrowDownButton(true);
       }
     };
@@ -989,8 +989,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         clearCamera();
         clearinputref();
         setisCardOpenclosepro(false);
-        
-        
+
+
         setArrowDownButton(true);
       }
     };
@@ -1010,7 +1010,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         clearCamera();
         clearinputref();
         setisCardOpenONCHECKING(false);
-        
+
       }
     };
     if (isCardOpenONCHECKING) {
@@ -1030,25 +1030,25 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
   const renderLoading = () => (
-          <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
-              <div
-                  className="flex  justify-center-safe "
-              >
-                <AiOutlineLoading3Quarters className="size-[200px] animate-spin"/>
-              </div>
-          </div>
-      );
-  const pointing =()=>(
-    <div className="fixed top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce"/> </div>
+    <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
+      <div
+        className="flex  justify-center-safe "
+      >
+        <AiOutlineLoading3Quarters className="size-[200px] animate-spin" />
+      </div>
+    </div>
   );
-  const [isLoading,setisLoading] = useState(false);
+  const pointing = () => (
+    <div className="fixed top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
+  );
+  const [isLoading, setisLoading] = useState(false);
 
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
-      
 
-      {(isLoading || isLoading120_9 ) && renderLoading() }
+
+      {(isLoading || isLoading120_9) && renderLoading()}
       {
         isCardOpencancel && (
           <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
@@ -1157,41 +1157,41 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     <div className="flex flex-none"></div>
                   </div>
                   {submitStage === "CHECKED" && (
-                    <div className="flex w-full h-full justify-center">
-                      <div className="flex flex-none"></div>
-                      <div
-                        onClick={() => {
-                          setArrowDownButtoncard(false);
-                          setisCardOpenclosepro(true);
-                        }}
-                        className="flex flex-col  justify-center items-center">
+                    <>
+                      <div className="flex w-full h-full justify-center">
                         <div className="flex flex-none"></div>
-                        <GoCheckCircle className="size-30 text-white" />
-                        <div>SUBMIT PRODUCT</div>
+                        <div
+                          onClick={() => {
+                            setArrowDownButtoncard(false);
+                            setisCardOpenclosepro(true);
+                          }}
+                          className="flex flex-col  justify-center items-center">
+                          <div className="flex flex-none"></div>
+                          <GoCheckCircle className="size-30 text-white" />
+                          <div>SUBMIT PRODUCT</div>
+                        </div>
+                        <div className="flex flex-none "></div>
                       </div>
-                      <div className="flex flex-none "></div>
-                    </div>
+                      <div className="flex w-full h-full justify-center">
+                        <div className="flex flex-none"></div>
+                        <div
+                          onClick={() => {
+                            setArrowDownButtoncard(false);
+                            setPdfOpen(true);
+                            handleOpenPdf();
+                            console.log('pass setpdfopen')
+                          }}
+                          className="flex flex-col  justify-center items-center">
+                          <div className="flex flex-none"></div>
+                          <FaFilePdf className="size-30 text-white" />
+                          <div>RESULT</div>
+                        </div>
+                        <div className="flex flex-none "></div>
+                      </div>
+                    </>
+                  )}
 
-                  )
 
-                  }
-
-                  <div className="flex w-full h-full justify-center">
-                    <div className="flex flex-none"></div>
-                    <div
-                      onClick={() => {
-                        setArrowDownButtoncard(false);
-                        setPdfOpen(true);
-                        handleOpenPdf();
-                        console.log('pass setpdfopen')
-                      }}
-                      className="flex flex-col  justify-center items-center">
-                      <div className="flex flex-none"></div>
-                      <FaFilePdf className="size-30 text-white" />
-                      <div>RESULT</div>
-                    </div>
-                    <div className="flex flex-none "></div>
-                  </div>
                 </div>
                 <div className="flex-none h-10"></div>
               </div>
@@ -1253,10 +1253,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         </div>
       )}
 
-      {isLoading120_9  ? (
+      {isLoading120_9 ? (
         <div className="flex justify-center items-center text-2xl text-blue-600">
           Loading...
-          
+
         </div>
       ) : !data120_9 ? (
         <div className="flex justify-center items-center text-2xl text-red-600">
