@@ -79,7 +79,7 @@ const ActiveLinesDashboard: React.FC = () => {
 
 
                     return {
-                        id: index + 1,
+                        id: item.ST_Line,
                         model: item.ST_Model || "",
                         workOrder: item.ST_Prod || "",
                         status: (item.ST_Status || "NULL") as LineStatus["status"],
