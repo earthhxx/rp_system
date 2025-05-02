@@ -57,6 +57,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   };
 
   const [confirmmodel,setconfirmmodel] = useState(false);
+  const [passmodelbutton,setpassmodelbutton] = useState(false);
 
   const [pdfWarning, setPdfWarning] = useState("");
   const [pdfWarning2, setPdfWarning2] = useState("");
@@ -755,7 +756,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
-        setJsonToLocalStorage('modellcal',(data120_2?.productName));
+        setJsonToLocalStorage('modellocal',(data120_2?.productName));
 
         console.log("CHECKED");
         console.log("Scanned ID:", EmployeeNo);
@@ -1390,7 +1391,17 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    handleNextPageStatusONCHECKEDING();
+                    if(passmodelbutton === true) {
+                      if(confirmmodel === true){
+                        handleNextPageStatusCHECKED();
+                      }
+                      else {
+                        alert('Model is not match')
+                      }
+                    }
+                    else {
+                      handleNextPageStatusONCHECKEDING();
+                    }
                   }}
                   className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
                   SUBMIT
