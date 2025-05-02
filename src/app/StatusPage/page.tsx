@@ -56,8 +56,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     router.push('/');
   };
 
-  const [confirmmodel,setconfirmmodel] = useState(false);
-  const [passmodelbutton,setpassmodelbutton] = useState(false);
+  const togglepassmodelbutton = () => {
+    setpassmodelbutton(prev => !prev); // สลับสถานะ
+  };
+
+  const [confirmmodel, setconfirmmodel] = useState(false);
+  const [passmodelbutton, setpassmodelbutton] = useState(false);
 
   const [pdfWarning, setPdfWarning] = useState("");
   const [pdfWarning2, setPdfWarning2] = useState("");
@@ -123,7 +127,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (data120_2) {
       const getmodel: string | null = getJsonFromLocalStorage('modellocal');
-  
+
       if (getmodel === data120_2.productName) {
         setconfirmmodel(true);
       } else {
@@ -756,9 +760,20 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
-        setJsonToLocalStorage('modellocal',(data120_2?.productName));
+        setJsonToLocalStorage('modellocal', (data120_2?.productName));
 
         console.log("CHECKED");
+        console.log("Scanned ID:", EmployeeNo);
+      }
+      else if (submitStage === "WAITING") {
+        setSubmitStage("CHECKED");
+        submitLogToReflow120_9_CHECK();
+        updateReflowStatusCHECKED();
+        setShowBar(false);
+        setisCardOpenONCHECKING(false);
+        setJsonToLocalStorage('modellocal', (data120_2?.productName));
+
+        console.log("CHECKED PASS FROM WAITING");
         console.log("Scanned ID:", EmployeeNo);
       }
       else {
@@ -1382,6 +1397,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
               />
+              <button
+                onClick={togglepassmodelbutton}
+                className={`px-4 py-2 rounded ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                  }`}
+              >
+                {passmodelbutton ? 'continued' : 'continued'}
+              </button>
               <div className="flex w-full h-full items-center">
 
                 <span
@@ -1391,9 +1413,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    if(passmodelbutton === true) {
-                      if(confirmmodel === true){
+                    if (passmodelbutton === true) {
+                      if (confirmmodel === true) {
                         handleNextPageStatusCHECKED();
+                        console.log('true');
                       }
                       else {
                         alert('Model is not match')

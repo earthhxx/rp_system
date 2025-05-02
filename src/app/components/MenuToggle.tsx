@@ -247,8 +247,10 @@ const MenuToggle = () => {
                 <div
                     onClick={() => {
                         if (productOrderNo || productOrderNo !== '') {
-                            router.push(`/StatusPage?productOrderNo=${productOrderNo}`);
+                            setHomeStage("home");
                             setIsMenuOpen(false);
+                            router.push(`/StatusPage?productOrderNo=${productOrderNo}`);
+                    
                         }
                         else {
                             setHomeStage("scan");
