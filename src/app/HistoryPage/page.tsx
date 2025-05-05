@@ -117,7 +117,7 @@ export default function HistoryPage() {
   const renderLines = () => {
     return (
       <div className="overflow-x-auto w-full p-4 rounded-2xl ">
-        <table className="w-full rounded-2xl bg-gray-50 text-sm sm:text-[10px] font-kanit ">
+        <table className="w-full rounded-2xl bg-gray-50 text-sm sm:text-[20px] font-kanit ">
           <thead className="bg-blue-700 text-white">
             <tr>
               <th className="px-4 py-2 text-left rounded-tl-2xl">ID</th>
