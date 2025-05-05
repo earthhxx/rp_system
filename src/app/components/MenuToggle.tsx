@@ -268,7 +268,14 @@ const MenuToggle = () => {
                     <div>STANDARD SEARCH</div>
                     <div className="font-kanit text-xl">ค้นหา ข้อกำหนด</div>
                 </div>
-                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                <div
+                 onClick={() => {
+                        console.log("test onclick HistoryPage");
+                        setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
+                        router.push('/HistoryPage');
+
+                    }} 
+                className="flex flex-col justify-center items-center w-full h-full text-white">
                     <MdHistory  className="size-25 text-white m-4" />
                     <div>HISTORY SEARCH</div>
                     <div className="font-kanit text-xl">ค้นหาประวัติ</div>
