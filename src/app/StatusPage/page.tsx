@@ -469,22 +469,31 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
   // Fetching Data 120-2
   useEffect(() => {
-    if (ProductOrderNo) {
+    const fetchData = async () => {
+      if (!ProductOrderNo) return;
+  
       setIsLoading120_2(true); // ⏳ เริ่มโหลด
-      fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Fetched Data from 120-2:", data);
-          setData120_2(data.data);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch 120-2:", error);
-        })
-        .finally(() => {
-          setIsLoading120_2(false); // ✅ โหลดเสร็จแล้ว
-        });
-    }
+      try {
+        const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
+        const data = await res.json();
+        console.log("Fetched Data from 120-2:", data);
+        alert(`ไม่พบข้อมูล STANDARD PDF`);
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+        router.push('/'); // นำทางกลับหน้า home
+  
+        setData120_2(data.data);
+      } catch (error) {
+        console.error("Failed to fetch 120-2:", error);
+        alert(`ไม่พบข้อมูล STANDARD PDF`);
+      } finally {
+        setIsLoading120_2(false); // ✅ โหลดเสร็จแล้ว
+      }
+    };
+  
+    fetchData();
   }, [ProductOrderNo]);
+  
 
   useEffect(() => {
     if (!data120_2) return;
@@ -521,6 +530,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         } catch (e) {
           console.error("Base64 decode error:", e);
           setPdfWarning("ข้อมูล PDF ไม่สามารถแปลงได้");
+          alert(
+            `ไม่พบข้อมูล STANDARD PDF`
+          );
         }
 
       } catch (error) {
@@ -528,7 +540,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
         alert(
           `ไม่พบข้อมูล STANDARD PDF`
-        )
+        );
       } finally {
         setIsLoading120_9(false);
       }
