@@ -136,8 +136,8 @@ const ActiveLinesDashboard: React.FC = () => {
     const renderFilterBar = () => {
         return (
             <div className="w-full flex justify-center mb-4">
-                <div className="flex flex-row  flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
-                    {["ALL", "WAITING", "ONCHECKING", "CHECKED"].map((type) => (
+                <div className="whitespace-pre-line flex flex-row  flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
+                    {["ALL\n (ทั้งหมด)", "WAITING\n (รอวัด)", "ONCHECKING\n (กำลังวัด)", "CHECKED\n (เช็คแล้ว)"].map((type) => (
                         <button
                             key={type}
                             className={`flex w-1/4   px-1 sm:px-2 py-1 sm:py-2 pe-10 ps-10 text-[14px] rounded-full font-bold transition justify-center ${filter === type
@@ -169,8 +169,13 @@ const ActiveLinesDashboard: React.FC = () => {
                     alt="Picture of the author"
                 />
                 <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
-                    <h3 className="flex w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-2xl md:text-2xl xl:text-4xl ">
+                    <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-2xl md:text-2xl xl:text-4xl ">
+                        <div>
                         PROFILE MEASUREMENT REALTIME
+                        </div>
+                        <div className="font-kanit text-blue-800/90">
+                        โปรไฟล์การวัดผลแบบเรียลไทม์
+                        </div>
                     </h3>
                     {renderFilterBar()}
                 </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
@@ -471,29 +471,37 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!ProductOrderNo) return;
-  
+
       setIsLoading120_2(true); // ⏳ เริ่มโหลด
       try {
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
-        alert(`ไม่พบข้อมูล STANDARD PDF`);
-        localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-        router.push('/'); // นำทางกลับหน้า home
-  
+        // ตรวจสอบว่า data ไม่มีข้อมูลหรือมี error ภายใน payload
+        if (!data || !data.data || data.success === false || data.error) {
+          alert("ข้อมูลไม่ถูกต้องหรือว่างเปล่า");
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+          router.push('/'); // นำทางกลับหน้า home
+
+        }
+
+
         setData120_2(data.data);
       } catch (error) {
         console.error("Failed to fetch 120-2:", error);
-        alert(`ไม่พบข้อมูล STANDARD PDF`);
+        alert(`api ผิดพลาด`);
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+        router.push('/'); // นำทางกลับหน้า home
       } finally {
         setIsLoading120_2(false); // ✅ โหลดเสร็จแล้ว
       }
     };
-  
+
     fetchData();
   }, [ProductOrderNo]);
-  
+
 
   useEffect(() => {
     if (!data120_2) return;
@@ -1076,11 +1084,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [isCardOpenONCHECKING]);
 
   useEffect(() => {
-    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING ) {
+    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING) {
       inputRef.current = null;
       setEmployeeName("");
     }
-  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro , isCardOpenONCHECKING]);
+  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro, isCardOpenONCHECKING]);
 
   const renderLoading = () => (
     <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
