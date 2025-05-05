@@ -62,6 +62,7 @@ const ActiveLinesDashboard: React.FC = () => {
     useEffect(() => {
         const fetchLines = async () => {
             try {
+                
                 const response = await fetch("/api/120-9/dashboard/select_status");
                 if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
                 const raw = await response.json();

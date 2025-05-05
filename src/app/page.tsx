@@ -2,7 +2,6 @@ import Image from "next/image";
 
 const Home = () => {
   return (
-
     
     <div className="flex flex-col min-h-screen w-screen justify-center items-center bg-blue-800 p-6">
       {/* Title Section */}
