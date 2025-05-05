@@ -107,7 +107,7 @@ const ActiveLinesDashboard: React.FC = () => {
         } else if (filter === "ONCHECKING") {
             return linesState.filter((line) => line.status === "ONCHECKING");
         } else {
-            return linesState.filter((line) => line.status !== "NULL");
+            return linesState.filter((line) => line.status);
         }
     };
 
@@ -124,7 +124,7 @@ const ActiveLinesDashboard: React.FC = () => {
                         <div>WAITING (รอวัด)</div>
                     )}
                     {line.status === "ONCHECKING" && (
-                        <div>ON CHECKING (กำลังวัด)</div>
+                        <div>ONCHECKING (กำลังวัด)</div>
                     )}
                     {line.status === "CHECKED" && (
                         <div>CHECKED (เช็คแล้ว)</div>

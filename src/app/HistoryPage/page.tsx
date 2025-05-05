@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from 'react';
 
+type StatusType = 'WAITING' | 'ONCHECKING' | 'CHECKED' | 'NULL';
+
 interface HistoryRecord {
-  id: number;
   line: string;
   model: string;
-  productOrderNo: string;
-  status: 'NULL' | 'WAITING' | 'ONCHECKING' | 'CHECKED';
-  user: string | null;
-  datetime: string;
+  status: StatusType;
+  Datetime: string;
+  Log_Status?: string; // Add Log_Status as an optional property
+  Log_Model?: string; // Add Log_Model as an optional property
+  Log_Line?: string; // Add Log_Line as an optional property
+  id?: string; // Add Log_id as an optional property
 }
+
 
 const animetion = {
   WAITING: 'animate-spin-slow',
@@ -21,16 +25,16 @@ const animetion = {
 
 const icons = {
   CHECKED: (
-    <span className="flex items-center justify-center size-[56px]">
+    <span className="flex items-center justify-center ">
       <span className="absolute flex justify-center items-center rounded-full opacity-75 animate-ping z-30">✅</span>
-      <span className="z-10 text-[40px] ">✅</span>
+      <span className="z-10 text-[20px] ">✅</span>
     </span>
   ),
   WAITING: "⏳",
-  NULL: <div className="size-[56px]"></div>,
+  NULL: "⏳",
   ONCHECKING: (
-    <span className="flex items-center justify-center size-[56px]">
-      <span className="z-10 text-[40px]">
+    <span className="flex items-center justify-center">
+      <span className="z-10 text-[20px] size-[26px]">
         <img className="flex" src="/images/circuit-board.png" width={100} height={100} alt="Circuit board" />
       </span>
     </span>
@@ -38,23 +42,23 @@ const icons = {
 };
 
 const backgrounds = {
-  CHECKED: "bg-pass",
-  NULL: "bg-gray-300/40",
-  WAITING: "bg-pending ",
-  ONCHECKING: "bg-adjusting",
+  CHECKED: " bg-pass ",
+  NULL: " bg-gray-300/40 ",
+  WAITING: " bg-pending ",
+  ONCHECKING: " bg-adjusting ",
 };
 
 const colors = {
   CHECKED: "text-pass",
-  NULL: "",
+  NULL: "text-gray-500",
   WAITING: "text-pending",
-  ONCHECKING: "text-adjusting",
+  ONCHECKING: "text-adjusting ",
 };
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(14);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +69,20 @@ export default function HistoryPage() {
         const res = await fetch(`/api/120-9/History?page=${page}&pageSize=${pageSize}`);
         const json = await res.json();
         if (json.success) {
-          setHistory(json.data);
+          // Clean status here
+          const cleanedData = json.data.map((item: HistoryRecord) => ({
+            ...item,
+            status:
+              item.Log_Status === 'ONCHECKING'
+                ? 'ONCHECKING'
+                : item.Log_Status ?? 'NULL',
+            model: item.Log_Model,
+            id: item.id,
+            line: item.Log_Line,
+            Datetime: item.Datetime,
+          }));
+
+          setHistory(cleanedData);
           setTotalPages(json.totalPages);
         }
       } catch (error) {
@@ -83,33 +100,52 @@ export default function HistoryPage() {
   };
 
   const renderLines = () => {
-    return filteredLines().map((line) => (
-      <div
-        key={line.id}
-        className={`card ${backgrounds[line.status]} w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
-      >
-        <div className="line-name font-bold text-2xl pb-1">{`${line.id}`}</div>
-        <div className={`flex justify-center status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
-        <div className="model text-[12px] pb-3 text-gray-600">
-          {line.status === "WAITING" && (
-            <div>WAITING (รอวัด)</div>
-          )}
-          {line.status === "ONCHECKING" && (
-            <div>ON CHECKING (กำลังวัด)</div>
-          )}
-          {line.status === "CHECKED" && (
-            <div>CHECKED (เช็คแล้ว)</div>
-          )}
-        </div>
-        <div>MODEL (โมเดล) </div>
-        <div className="model text-[16px] pb-2">{`${line.model}`}</div>
-        <div className="last-measured text-sm text-gray-600 pb-1">
-          {/* ตรวจสอบว่า datetime ไม่เป็น undefined หรือ null */}
-          {line.datetime ? `Start time (เวลา เริ่ม):\n ${line.datetime.replace("T", " ").substring(0, 19)}` : 'Start time: Not available'}
-        </div>
+    return (
+      <div className="overflow-x-auto w-full p-4 rounded-2xl ">
+        <table className="w-full rounded-2xl bg-gray-50 text-sm font-kanit ">
+          <thead className="bg-blue-700 text-white">
+            <tr>
+              <th className="px-4 py-2 text-left rounded-tl-2xl">ID</th>
+              <th className="px-4 py-2 text-left">Line</th>
+              <th className="px-4 py-2 text-left">Status</th>
+              <th className="px-4 py-2 text-left">Model</th>
+              <th className="px-4 py-2 text-left rounded-tr-2xl ">Time</th>
+            </tr>
+          </thead>
+          <tbody className='rounded-2xl'>
+            {filteredLines().map((line) => (
+              <tr
+                key={`${line.id}-${line.Datetime}`}
+                className={`${backgrounds[line.status]} transition duration-300 hover:bg-yellow-100`}
+              >
+                <td className="border px-4 py-2 ">{line.id}</td>
+                <td className="border px-4 py-2">{line.line}</td>
+                <td className="border px-4 py-2 flex flex-row items-center gap-2">
+                  <span className={`${colors[line.status]} text-xl ${animetion[line.status]}`}>
+                    {icons[line.status]}
+                  </span>
+                  <span>
+                    {line.status === "WAITING" && "WAITING (รอวัด)"}
+                    {line.status === "ONCHECKING" && "ONCHECKING (กำลังวัด)"}
+                    {line.status === "CHECKED" && "CHECKED (เช็คแล้ว)"}
+                  </span>
+                </td>
+                <td className="border px-4 py-2">{line.model}</td>
+                <td className="border px-4 py-2">
+                  {line.Datetime
+                    ? line.Datetime.replace("T", " ").substring(0, 19)
+                    : "N/A"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    ));
+    );
   };
+
+
+
 
   const paginate = (pageNum: number) => {
     if (pageNum >= 1 && pageNum <= totalPages) {
@@ -176,10 +212,11 @@ export default function HistoryPage() {
         <div className="text-center text-gray-500">Loading...</div>
       ) : (
         <>
-          <div className="p-6 m-1 w-full">
-            <div className="font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full">
+          <div className="p-6 m-1 w-full rounded-2xl drop-shadow-2xl backdrop-blur-3xl ">
+            <div className="font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-1 gap-5 gap-y-10 w-full h-full rounded-2xl drop-shadow-2xl p-4">
               {renderLines()}
             </div>
+
           </div>
           {renderPagination()}
         </>

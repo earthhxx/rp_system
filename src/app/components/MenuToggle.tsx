@@ -249,7 +249,6 @@ const MenuToggle = () => {
 
 
                 </div>
-                <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
                         if (productOrderNo || productOrderNo !== '') {
@@ -269,6 +268,11 @@ const MenuToggle = () => {
                     <div>STANDARD SEARCH</div>
                     <div className="font-kanit text-xl">ค้นหา ข้อกำหนด</div>
                 </div>
+                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                    <MdHistory  className="size-25 text-white m-4" />
+                    <div>HISTORY SEARCH</div>
+                    <div className="font-kanit text-xl">ค้นหาประวัติ</div>
+                </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
                     <VscSignIn className="size-25 text-white m-4" />
@@ -276,9 +280,7 @@ const MenuToggle = () => {
                     <div className="font-kanit text-xl">ล็อคอิน</div>
                 </div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <MdHistory  className="size-25 text-white m-4" />
-                    <div>HISTORY SEARCH</div>
-                    <div className="font-kanit text-xl">ค้นหาประวัติ</div>
+                   
                 </div>
             </div>
         </div>

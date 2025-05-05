@@ -224,7 +224,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     console.log(result);
   };
 
-  const updateReflowStatusONCHECKEDING = async () => {
+  const updateReflowStatusONCHECKING = async () => {
     const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
       method: 'POST',
       headers: {
@@ -286,7 +286,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Line: data120_2.ProcessLine,
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
-        ST_Status: "ONCHECKEDING",
+        ST_Status: "ONCHECKING",
         Log_User: EmployeeNo
       };
 
@@ -783,6 +783,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
+        setIsCardOpen(false);
         setJsonToLocalStorage('modellocal', (data120_2?.productName));
 
         console.log("CHECKED");
@@ -810,7 +811,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.log("employeeName != EmployeeNo")
     }
   };
-  const handleNextPageStatusONCHECKEDING = () => {
+  const handleNextPageStatusONCHECKING = () => {
     const value = inputRef.current?.value.trim();
     if (!value) {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
@@ -822,7 +823,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       if (submitStage === "WAITING") {
         setSubmitStage("ONCHECKING");
         submitLogToReflow120_9_ONCHECKING();
-        updateReflowStatusONCHECKEDING();
+        updateReflowStatusONCHECKING();
 
         setIsCardOpen(false);
 
@@ -901,7 +902,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
                 />
               </svg>
-              <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์เด้อคับ..</div>
+              <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์..</div>
             </div>
             <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
           </div>
@@ -1116,7 +1117,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRefcancel} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
@@ -1136,8 +1137,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   onClick={() => {
                     handleNextPageStatuscancel();
                   }}
-                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  <div>
                   SUBMIT
+                  </div>
+                  <div>
+                    ส่งข้อมูล
+                  </div>
                 </div>
               </div>
             </div>
@@ -1152,7 +1158,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRefClosepro} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
@@ -1172,8 +1178,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   onClick={() => {
                     handleNextPageStatuscloseprod();
                   }}
-                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  <div>
                   SUBMIT
+                  </div>
+                  <div>
+                    ส่งข้อมูล
+                  </div>
                 </div>
               </div>
             </div>
@@ -1210,10 +1221,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                         setArrowDownButtoncard(false);
                         setisCardOpencancel(true);
                       }}
-                      className="flex flex-col justify-center items-center">
+                      className="flex flex-col justify-center items-center font-kanit text-white">
                       <div className="flex flex-none"></div>
-                      <GoSkipFill className="size-30 text-white" />
+                      <GoSkipFill className="size-30 text-white " />
                       <div>CANCEL PRODUCT</div>
+                      <div>ยกเลิก โปรไฟล์</div>
                     </div>
                     <div className="flex flex-none"></div>
                   </div>
@@ -1226,10 +1238,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                             setArrowDownButtoncard(false);
                             setisCardOpenclosepro(true);
                           }}
-                          className="flex flex-col  justify-center items-center">
+                          className="flex flex-col  justify-center items-center font-kanit text-white">
                           <div className="flex flex-none"></div>
                           <GoCheckCircle className="size-30 text-white" />
                           <div>SUBMIT PRODUCT</div>
+                          <div>สำเร็จการวัดโปรไฟล์</div>
                         </div>
                         <div className="flex flex-none "></div>
                       </div>
@@ -1242,10 +1255,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                             handleOpenPdf();
                             console.log('pass setpdfopen')
                           }}
-                          className="flex flex-col  justify-center items-center">
+                          className="flex flex-col  justify-center items-center font-kanit text-white ">
                           <div className="flex flex-none"></div>
-                          <FaFilePdf className="size-30 text-white" />
+                          <FaFilePdf className="size-28 text-white" />
                           <div>RESULT</div>
+                          <div>ผลการวัดโปรไฟล์</div>
                         </div>
                         <div className="flex flex-none "></div>
                       </div>
@@ -1412,7 +1426,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
@@ -1426,7 +1440,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 className={`px-4 py-2 rounded ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                   }`}
               >
-                {passmodelbutton ? 'continued' : 'continued'}
+                {passmodelbutton ? 'วัดโปรไฟล์ต่อเนื่อง' : 'วัดโปรไฟล์ใหม่'}
               </button>
               <div className="flex w-full h-full items-center">
 
@@ -1447,11 +1461,16 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       }
                     }
                     else {
-                      handleNextPageStatusONCHECKEDING();
+                      handleNextPageStatusONCHECKING();
                     }
                   }}
-                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  <div>
                   SUBMIT
+                  </div>
+                  <div>
+                    ส่งข้อมูล
+                  </div>
                 </div>
               </div>
             </div>
@@ -1464,7 +1483,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             <div ref={cardRefONCHECKING} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
               <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
               <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-              <div className="flex justify-center items-center w-full text-white">CHECK YOUR ID = {employeeName || "ไม่มีข้อมูล"} </div>
+              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
               <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
               <input
                 ref={inputRef}
@@ -1485,8 +1504,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                     handleNextPageStatusCHECKED();
 
                   }}
-                  className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  <div>
                   SUBMIT
+                  </div>
+                  <div>
+                    ส่งข้อมูล
+                  </div>
                 </div>
               </div>
             </div>
