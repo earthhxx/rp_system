@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-type StatusType = 'WAITING' | 'ONCHECKING' | 'CHECKED' | 'NULL';
+type StatusType = 'WAITING' | 'ONCHECKING' | 'CHECKED' | 'NULL' | 'close' | 'cancel';
 
 interface HistoryRecord {
   line: string;
@@ -17,10 +17,12 @@ interface HistoryRecord {
 
 
 const animetion = {
-  WAITING: 'animate-spin-slow',
-  ONCHECKING: 'animate-bounce',
+  WAITING: 'text-center animate-spin-slow',
+  ONCHECKING: ' animate-bounce',
   CHECKED: 'animate-ping-slow',
-  NULL: '',
+  NULL: ' text-center',
+  close: ' text-center',
+  cancel: ' text-center',
 };
 
 const icons = {
@@ -31,7 +33,9 @@ const icons = {
     </span>
   ),
   WAITING: "⏳",
-  NULL: "⏳",
+  NULL: <div className='flex items-center justify-center text-[20px]'>null</div>,
+  close: <div className='flex items-center justify-center text-[20px]'>null</div>,
+  cancel: <div className='flex items-center justify-center text-[20px]'>null</div>,
   ONCHECKING: (
     <span className="flex items-center justify-center">
       <span className="z-10 text-[20px] size-[26px]">
@@ -43,7 +47,9 @@ const icons = {
 
 const backgrounds = {
   CHECKED: " bg-pass ",
-  NULL: " bg-gray-300/40 ",
+  NULL: " bg-gray-300 ",
+  close: " bg-gray-300 ",
+  cancel: " bg-gray-300 ",
   WAITING: " bg-pending ",
   ONCHECKING: " bg-adjusting ",
 };
@@ -51,8 +57,10 @@ const backgrounds = {
 const colors = {
   CHECKED: "text-pass",
   NULL: "text-gray-500",
+  close: "text-gray-500",
+  cancel: "text-gray-500",
   WAITING: "text-pending",
-  ONCHECKING: "text-adjusting ",
+  ONCHECKING: " text-adjusting ",
 };
 
 export default function HistoryPage() {
@@ -70,17 +78,24 @@ export default function HistoryPage() {
         const json = await res.json();
         if (json.success) {
           // Clean status here
-          const cleanedData = json.data.map((item: HistoryRecord) => ({
-            ...item,
-            status:
-              item.Log_Status === 'ONCHECKING'
+          const cleanedData = json.data.map((item: any) => {
+            console.log('Raw item from API:', item); // เช็คตรงนี้ดูว่ามี Log_Status ไหม
+
+            const rawStatus = item.Log_Status;
+            const finalStatus =
+              rawStatus === 'ONCHECKING'
                 ? 'ONCHECKING'
-                : item.Log_Status ?? 'NULL',
-            model: item.Log_Model,
-            id: item.id,
-            line: item.Log_Line,
-            Datetime: item.Datetime,
-          }));
+                : rawStatus ?? 'NULL';
+
+            return {
+              id: item.id ?? '',
+              model: item.Log_Model ?? 'Unknown',
+              line: item.Log_Line ?? 'Unknown',
+              Datetime: item.Datetime ?? '',
+              status: finalStatus,
+            };
+          });
+          console.log('Cleaned data:', cleanedData); // เช็คตรงนี้ดูว่ามี Log_Status ไหม          
 
           setHistory(cleanedData);
           setTotalPages(json.totalPages);
@@ -102,7 +117,7 @@ export default function HistoryPage() {
   const renderLines = () => {
     return (
       <div className="overflow-x-auto w-full p-4 rounded-2xl ">
-        <table className="w-full rounded-2xl bg-gray-50 text-sm font-kanit ">
+        <table className="w-full rounded-2xl bg-gray-50 text-sm sm:text-[10px] font-kanit ">
           <thead className="bg-blue-700 text-white">
             <tr>
               <th className="px-4 py-2 text-left rounded-tl-2xl">ID</th>
@@ -120,7 +135,7 @@ export default function HistoryPage() {
               >
                 <td className="border px-4 py-2 ">{line.id}</td>
                 <td className="border px-4 py-2">{line.line}</td>
-                <td className="border px-4 py-2 flex flex-row items-center gap-2">
+                <td className="border px-4 py-2 grid grid-cols-2 items-center justify-center gap-2">
                   <span className={`${colors[line.status]} text-xl ${animetion[line.status]}`}>
                     {icons[line.status]}
                   </span>
@@ -128,6 +143,9 @@ export default function HistoryPage() {
                     {line.status === "WAITING" && "WAITING (รอวัด)"}
                     {line.status === "ONCHECKING" && "ONCHECKING (กำลังวัด)"}
                     {line.status === "CHECKED" && "CHECKED (เช็คแล้ว)"}
+                    {line.status === "NULL" && "NULL (ไม่มีข้อมูล)"}
+                    {line.status === "close" && "CLOSED (ปิดไลน์)"}
+                    {line.status === "cancel" && "CANCELED (ยกเลิกการผลิต)"}
                   </span>
                 </td>
                 <td className="border px-4 py-2">{line.model}</td>
