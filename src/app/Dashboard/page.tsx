@@ -75,7 +75,7 @@ const ActiveLinesDashboard: React.FC = () => {
                         0,
                         Math.floor((Date.now() - dateInUTC.getTime()) / 60000)
                     );
-                    
+
 
 
                     return {
@@ -106,7 +106,7 @@ const ActiveLinesDashboard: React.FC = () => {
         } else if (filter === "ONCHECKING") {
             return linesState.filter((line) => line.status === "ONCHECKING");
         } else {
-            return linesState.filter((line)=>line.status !== "NULL");
+            return linesState.filter((line) => line.status !== "NULL");
         }
     };
 
@@ -114,12 +114,22 @@ const ActiveLinesDashboard: React.FC = () => {
         return filteredLines().map((line) => (
             <div
                 key={line.id}
-                className={`card ${backgrounds[line.status]} w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
+                className={`card ${backgrounds[line.status]} whitespace-pre-line w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
             >
                 <div className="line-name font-bold text-2xl  pb-1">{`${line.id}`}</div>
                 <div className={`flex justify-center status text-[36px] ${colors[line.status]} ${animetion[line.status]}`}>{icons[line.status]}</div>
-                <div className="model text-[12px] pb-3 text-gray-600">{`${line.status}`}</div>
-                <div className="">MODEL </div>
+                <div className="model text-[12px] pb-3 text-gray-600">
+                    {line.status === "WAITING" && (
+                        <div>WAITING (รอวัด)</div>
+                    )}
+                    {line.status === "ONCHECKING" && (
+                        <div>ON CHECKING (กำลังวัด)</div>
+                    )}
+                    {line.status === "CHECKED" && (
+                        <div>CHECKED (เช็คแล้ว)</div>
+                    )}
+                </div>
+                <div className="">MODEL (โมเดล) </div>
                 <div className="model text-[16px] pb-2 ">{` ${line.model}`}</div>
                 <div className="WAITING text-sm pt-2 text-red-600">
                     {line.status === "WAITING"
@@ -127,7 +137,7 @@ const ActiveLinesDashboard: React.FC = () => {
                         : "-"}
                 </div>
                 <div className="last-measured text-sm text-gray-600 pb-1">
-                    {`Start time: ${line.lastMeasured.replace("T", " ").substring(0, 19)}`}
+                    {`Start time (เวลา เริ่ม):\n ${line.lastMeasured.replace("T", " ").substring(0, 19)}`}
                 </div>
             </div>
         ));
@@ -171,10 +181,10 @@ const ActiveLinesDashboard: React.FC = () => {
                 <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
                     <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-2xl md:text-2xl xl:text-4xl ">
                         <div>
-                        PROFILE MEASUREMENT REALTIME
+                            PROFILE MEASUREMENT REALTIME
                         </div>
                         <div className="font-kanit text-blue-800/90">
-                        โปรไฟล์การวัดผลแบบเรียลไทม์
+                            โปรไฟล์การวัดผลแบบเรียลไทม์
                         </div>
                     </h3>
                     {renderFilterBar()}
