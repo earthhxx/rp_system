@@ -145,30 +145,40 @@ const ActiveLinesDashboard: React.FC = () => {
     };
 
     const renderFilterBar = () => {
+        const filterOptions: { label: string; value: 'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED' }[] = [
+            { value: 'ALL', label: 'ALL\n (ทั้งหมด)' },
+            { value: 'WAITING', label: 'WAITING\n (รอวัด)' },
+            { value: 'ONCHECKING', label: 'ONCHECKING\n (กำลังวัด)' },
+            { value: 'CHECKED', label: 'CHECKED\n (เช็คแล้ว)' },
+        ];
+    
+        const activeClass = {
+            ALL: "bg-gray-300 text-gray-800",
+            WAITING: "bg-[#f7e1a7] text-yellow-900",
+            ONCHECKING: "bg-[#9ec5fe] text-blue-600",
+            CHECKED: "bg-[#a0d3a9] text-green-900",
+        };
+    
         return (
             <div className="w-full flex justify-center mb-4">
-                <div className="whitespace-pre-line flex flex-row  flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
-                    {["ALL\n (ทั้งหมด)", "WAITING\n (รอวัด)", "ONCHECKING\n (กำลังวัด)", "CHECKED\n (เช็คแล้ว)"].map((type) => (
+                <div className="whitespace-pre-line flex flex-row flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
+                    {filterOptions.map(({ label, value }) => (
                         <button
-                            key={type}
-                            className={`flex w-1/4   px-1 sm:px-2 py-1 sm:py-2 pe-10 ps-10 text-[14px] rounded-full font-bold transition justify-center ${filter === type
-                                ? {
-                                    "ALL": "bg-gray-300 text-gray-800",
-                                    "WAITING": "bg-[#f7e1a7] text-yellow-900",
-                                    "ONCHECKING": "bg-[#9ec5fe] text-blue-600",
-                                    "CHECKED": "bg-[#a0d3a9] text-green-900",
-                                }[type]
+                            key={value}
+                            className={`flex w-1/4 px-1 sm:px-2 py-1 sm:py-2 pe-10 ps-10 text-[14px] rounded-full font-bold transition justify-center ${filter === value
+                                ? activeClass[value]
                                 : "bg-gray-200 text-gray-600"
                                 }`}
-                            onClick={() => setFilter(type as any)}
+                            onClick={() => setFilter(value)}
                         >
-                            {type}
+                            {label}
                         </button>
                     ))}
                 </div>
             </div>
         );
     };
+    
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
