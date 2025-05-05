@@ -224,6 +224,7 @@ const MenuToggle = () => {
 
                         setHomeStage('home');
                         setIsMenuOpen(false);
+                        router.push('/');
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
