@@ -7,6 +7,8 @@ import { useRouter, usePathname, } from "next/navigation";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { AiFillHome } from "react-icons/ai";
 import { VscSignIn } from "react-icons/vsc";
+import { MdHistory } from "react-icons/md";
+
 
 interface ReflowStatus {
     ST_Line: string;
@@ -214,7 +216,7 @@ const MenuToggle = () => {
         <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
             <div
                 ref={menuRef}
-                className="grid grid-cols-3 gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6"
+                className="grid grid-cols-3 gap-4 size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-4"
             >
                 <div className="flex w-full h-full"></div>
                 <div
@@ -225,8 +227,10 @@ const MenuToggle = () => {
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <AiFillHome className="size-30 text-white m-4" />
-                    HOME
+                    <AiFillHome className="size-25 text-white m-4" />
+                    
+                    <div>HOME</div>
+                    <div className="font-kanit text-xl">หน้าหลัก</div>
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -238,8 +242,9 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
 
-                    <BsClipboard2DataFill className="size-30 text-white m-4" />
-                    REALTIME CHECK
+                    <BsClipboard2DataFill className="size-25 text-white m-4" />
+                    <div>REALTIME CHECK</div>
+                    <div className="font-kanit text-xl">เช็คสถานะ โปรไฟล์</div>
 
 
                 </div>
@@ -259,15 +264,21 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
-                    <BsUpcScan className="size-30 text-white m-4" />
-                    STANDARD SEARCH
+                    <BsUpcScan className="size-25 text-white m-4" />
+                    <div>STANDARD SEARCH</div>
+                    <div className="font-kanit text-xl">ค้นหา ข้อกำหนด</div>
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <VscSignIn className="size-30 text-white m-4" />
-                    SIGN IN
+                    <VscSignIn className="size-25 text-white m-4" />
+                    <div>SIGN IN</div>
+                    <div className="font-kanit text-xl">ล็อคอิน</div>
                 </div>
-                <div className="flex w-full h-full"></div>
+                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                    <MdHistory  className="size-25 text-white m-4" />
+                    <div>HISTORY SEARCH</div>
+                    <div className="font-kanit text-xl">ค้นหาประวัติ</div>
+                </div>
             </div>
         </div>
     );
