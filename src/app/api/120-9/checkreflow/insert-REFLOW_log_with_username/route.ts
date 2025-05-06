@@ -38,10 +38,10 @@ export async function POST(req: NextRequest) {
       .input('Log_Status', sql.NVarChar, ST_Status)
       .input('Log_User', sql.NVarChar, Log_User)
       .input('Log_UserID', sql.NVarChar, Log_UserID)
-      .input('Datetime', sql.DateTime, new Date())
+
       .query(`
         INSERT INTO REFLOW_Log (Log_Line, Log_Model, Log_ProOrder, Log_Status, Log_User, Log_UserID, Datetime)
-        VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status, @Log_User, @Log_UserID, @Datetime)
+        VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status, @Log_User, @Log_UserID, GETDATE())
       `);
 
     return NextResponse.json({ success: true, message: 'Log inserted successfully' });
