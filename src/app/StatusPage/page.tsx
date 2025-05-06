@@ -574,115 +574,103 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (!data120_2) return;
 
-    const fetchPdfData = async () => {
+    const fetchPdfData = async (): Promise<boolean> => {
       setIsLoading120_9(true);
       setPdfWarning('');
       setPdfUrl(null);
-
+    
       try {
         const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
         const { data, success, message } = await res.json();
-
-        if (!success || !data) {
-          setPdfWarning(message || 'ไม่พบข้อมูลจาก API load-pdf-data');
-          return;
-        }
-
-        setData120_9(data);
-
-        // ตรวจสอบและแสดง PDF
-        if (!data.R_PDF) {
-          setPdfWarning("ไม่พบข้อมูล R_PDF ในฐานข้อมูล");
-          return;
-        }
-
-        try {
-          const decoded = atob(data.R_PDF);
-          if (decoded.startsWith("%PDF-")) {
-            handleShowPdf(data.R_PDF);
-          } else {
-            setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
-            localStorage.removeItem("productOrderNo");
-            window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-            router.push('/'); // นำทางกลับหน้า home
-          }
-        } catch (e) {
-          console.error("Base64 decode error:", e);
-          setPdfWarning("ข้อมูล PDF ไม่สามารถแปลงได้");
-          alert(
-            `ไม่พบข้อมูล STANDARD PDF`
-          );
+    
+        if (!success || !data || !data.R_PDF || data.R_PDF === "null") {
+          setPdfWarning(message || 'ไม่พบข้อมูลจาก API');
+          alert("ไม่พบข้อมูล STANDARD PDF");
           localStorage.removeItem("productOrderNo");
-          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-          router.push('/'); // นำทางกลับหน้า home
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
+          return false;
         }
-
-      } catch (error) {
-        console.error("โหลด PDF ล้มเหลว:", error);
+    
+        const decoded = atob(data.R_PDF);
+        if (!decoded.startsWith("%PDF-")) {
+          setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
+          alert("ไม่พบข้อมูล STANDARD PDF");
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
+          return false;
+        }
+    
+        handleShowPdf(data.R_PDF);
+        setData120_9(data);
+        return true;
+    
+      } catch (err) {
+        console.error("โหลด PDF ล้มเหลว:", err);
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
-        alert(
-          `ไม่พบข้อมูล STANDARD PDF`
-        );
+        alert("ไม่พบข้อมูล STANDARD PDF");
         localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-        router.push('/'); // นำทางกลับหน้า home
+        window.dispatchEvent(new Event("productOrderNo:removed"));
+        router.push('/');
+        return false;
       } finally {
         setIsLoading120_9(false);
       }
     };
+    
 
     //STAGE VALIDATION CHECK
     const fetchReflowStatus = async () => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-
+    
         if (!success || !data || data.length === 0) {
-          console.warn("โหลดสถานะล้มเหลว:", message);
+          alert("ไม่พบข้อมูล REFLOW Status");
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
           return;
         }
-
+    
         const statusItem: DataItem120_9_Status = data[0];
         setStatusData120_9(statusItem);
-
+    
         const { ST_Status, ST_Prod } = statusItem;
-
         const isProdMatch = ST_Prod === ProductOrderNo;
-
+    
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
-          submitLogToReflow120_9();
-          updateReflowStatus();
-          fetchPdfData();
-
+          const pdfSuccess = await fetchPdfData();
+          if (pdfSuccess) {
+            submitLogToReflow120_9();
+            updateReflowStatus();
+          }
         } else if (ST_Status === "WAITING" && isProdMatch) {
           setSubmitStage("WAITING");
-          fetchPdfData();
-
+          await fetchPdfData();
         } else if (ST_Status === "ONCHECKING" && isProdMatch) {
           setSubmitStage("ONCHECKING");
-          fetchPdfData();
-
+          await fetchPdfData();
         } else if (ST_Status === "CHECKED" && isProdMatch) {
           setSubmitStage("CHECKED");
-          fetchPdfData();
-
+          await fetchPdfData();
         } else {
-          console.warn("สถานะไม่รู้จัก:", ST_Status);
-          alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง \nอาจเป็นเพราะมีการสแกนเลขนี้ไปแล้ว`);
+          alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง`);
           localStorage.removeItem("productOrderNo");
-          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-          router.push('/'); // นำทางกลับหน้า home
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
         }
-
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
         alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
         localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-        router.push('/'); // นำทางกลับหน้า home
+        window.dispatchEvent(new Event("productOrderNo:removed"));
+        router.push('/');
       }
     };
+    
 
     fetchReflowStatus();
   }, [data120_2]);
