@@ -578,11 +578,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       setIsLoading120_9(true);
       setPdfWarning('');
       setPdfUrl(null);
-    
+
       try {
         const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
         const { data, success, message } = await res.json();
-    
+
         if (!success || !data || !data.R_PDF || data.R_PDF === "null") {
           setPdfWarning(message || 'ไม่พบข้อมูลจาก API');
           alert("ไม่พบข้อมูล STANDARD PDF");
@@ -591,7 +591,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           router.push('/');
           return false;
         }
-    
+
         const decoded = atob(data.R_PDF);
         if (!decoded.startsWith("%PDF-")) {
           setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
@@ -601,11 +601,11 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           router.push('/');
           return false;
         }
-    
+
         handleShowPdf(data.R_PDF);
         setData120_9(data);
         return true;
-    
+
       } catch (err) {
         console.error("โหลด PDF ล้มเหลว:", err);
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
@@ -618,14 +618,14 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setIsLoading120_9(false);
       }
     };
-    
+
 
     //STAGE VALIDATION CHECK
     const fetchReflowStatus = async () => {
       try {
         const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
-    
+
         if (!success || !data || data.length === 0) {
           alert("ไม่พบข้อมูล REFLOW Status");
           localStorage.removeItem("productOrderNo");
@@ -633,13 +633,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           router.push('/');
           return;
         }
-    
+
         const statusItem: DataItem120_9_Status = data[0];
         setStatusData120_9(statusItem);
-    
+
         const { ST_Status, ST_Prod } = statusItem;
         const isProdMatch = ST_Prod === ProductOrderNo;
-    
+
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
           const pdfSuccess = await fetchPdfData();
@@ -670,7 +670,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         router.push('/');
       }
     };
-    
+
 
     fetchReflowStatus();
   }, [data120_2]);
@@ -1514,14 +1514,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 placeholder="รหัสพนักงาน"
               />
               <div className="flex flex-row w-full justify-center items-center">
-                <div className="flex justify-center items-center w-[40%] text-white">SAME MODEL('รันงานต่อเนื่อง')</div>
+                <div className="flex flex-col w-[50%]">
+                  <div className="flex justify-center items-center w-[40%] text-white">รันงานต่อเนื่องหรือไม่</div>
+                </div>
                 <div className="flex flex-none w-[%]"></div>
                 <button
                   onClick={togglepassmodelbutton}
                   className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                     }`}
                 >
-                  {passmodelbutton ? 'YES' : 'NO'}
+                  <pre>
+                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่ใช่'}
+                  </pre>
+
                 </button>
 
               </div>
