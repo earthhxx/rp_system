@@ -650,7 +650,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
-          alert(`สถานะไม่รู้จัก: ${ST_Status}`);
+          alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง \nอาจเป็นเพราะมีการสแกนเลขนี้ไปแล้ว`);
           localStorage.removeItem("productOrderNo");
           window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
           router.push('/'); // นำทางกลับหน้า home
