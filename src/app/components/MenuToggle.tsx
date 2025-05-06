@@ -273,7 +273,6 @@ const MenuToggle = () => {
                         console.log("test onclick HistoryPage");
                         setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
                         router.push('http://192.168.120.9:3004/HistoryRefiow');
-                        router.push('http://192.168.120.9:3004/RegisterResultReflow')
 
                     }} 
                 className="flex flex-col justify-center items-center w-full h-full text-white">
