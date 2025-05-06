@@ -347,6 +347,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.error("Error submitting log:", error);
     }
   };
+
+
   //submit log state to check
   const submitLogToReflow120_9_CHECK = async () => {
     if (!data120_2 || !submitStage) {
@@ -383,6 +385,44 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.error("Error submitting log:", error);
     }
   };
+
+    //submit log state to check
+    const submitLogToReflow120_9_continuous = async () => {
+      if (!data120_2 || !submitStage) {
+        console.warn("Missing required fields to submit log");
+        return;
+      }
+  
+      try {
+        const payload = {
+          R_Line: data120_2.ProcessLine,
+          R_Model: data120_2.productName,
+          productOrderNo: ProductOrderNo,
+          ST_Status: "CONTINUOUS",
+          Log_User: EmployeeNo
+        };
+  
+        const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+  
+        const result = await res.json();
+  
+        if (!res.ok || !result.success) {
+          console.error("Log submit failed:", result.message);
+        } else {
+          console.log("Log submitted successfully");
+        }
+  
+      } catch (error) {
+        console.error("Error submitting log:", error);
+      }
+    };
+
   // //submit log state to cancel
   const submitLogcancelToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
@@ -791,7 +831,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       }
       else if (submitStage === "WAITING") {
         setSubmitStage("CHECKED");
-        submitLogToReflow120_9_CHECK();
+        submitLogToReflow120_9_continuous();//change to continue status
         updateReflowStatusCHECKED();
         setShowBar(false);
         setisCardOpenONCHECKING(false);
@@ -811,6 +851,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       console.log("employeeName != EmployeeNo")
     }
   };
+
+
+
+
   const handleNextPageStatusONCHECKING = () => {
     const value = inputRef.current?.value.trim();
     if (!value) {

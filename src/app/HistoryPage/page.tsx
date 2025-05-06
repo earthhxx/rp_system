@@ -33,9 +33,9 @@ const icons = {
     </div>
   ),
   WAITING: "⏳",
-  NULL: <div className='flex items-center justify-center text-[20px]'>null</div>,
-  close: <div className='flex items-center justify-center text-[20px]'>null</div>,
-  cancel: <div className='flex items-center justify-center text-[20px]'>null</div>,
+  NULL: <div className='flex flex-none h-full items-center justify-center text-[20px]'>null</div>,
+  close: "⏳",
+  cancel: <div className='flex flex-none h-full items-center justify-center text-[20px]'>null</div>,
   ONCHECKING: (
     <span className="flex items-center justify-center">
       <span className="z-10 text-[20px] size-[26px]">
@@ -136,7 +136,7 @@ export default function HistoryPage() {
                 <td className="border px-4 py-2 ">{line.id}</td>
                 <td className="border px-4 py-2">{line.line}</td>
                 <td className="border px-4 py-2 flex flex-row items-center justify-center gap-2">
-                  <div className={`${colors[line.status]} ${animetion[line.status]}`}>
+                  <div className={`${colors[line.status]} ${animetion[line.status]} `}>
                     {icons[line.status]}
                   </div>
                   <span>
