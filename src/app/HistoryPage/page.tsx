@@ -66,7 +66,7 @@ const colors = {
 export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(14);
+  const [pageSize] = useState(16);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
@@ -116,8 +116,8 @@ export default function HistoryPage() {
 
   const renderLines = () => {
     return (
-      <div className="overflow-auto p-4 rounded-2xl ">
-        <table className="w-full rounded-2xl bg-gray-50 text-[10px] lg:text-[18px] font-kanit font-normal ">
+      <div className="flex overflow-auto rounded-2xl items-center justify-center ">
+        <table className="w-full h-full rounded-2xl bg-gray-50 text-[10px] lg:text-[18px] font-kanit font-normal ">
           <thead className="bg-blue-700 text-white">
             <tr>
               <th className="px-4 py-2 text-left rounded-tl-2xl">ID</th>
@@ -230,7 +230,7 @@ export default function HistoryPage() {
         <div className="text-center text-gray-500">Loading...</div>
       ) : (
         <>
-          <div className="p-6 m-1 w-full h-[70%] rounded-2xl drop-shadow-2xl backdrop-blur-3xl ">
+          <div className=" w-full h-[80%] rounded-2xl drop-shadow-2xl backdrop-blur-3xl items-center">
             <div className="font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-1 gap-5 gap-y-10 w-full h-full rounded-2xl drop-shadow-2xl p-4">
               {renderLines()}
             </div>
