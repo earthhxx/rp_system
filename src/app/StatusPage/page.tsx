@@ -1202,17 +1202,21 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 placeholder="รหัสพนักงาน"
               />
               <div className="flex w-full h-full items-center">
-
-                <span
-                  onClick={startScan}
-                  className="flex w-1/2 h-32 justify-center">
-                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                </span>
+              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <span
+                    onClick={startScan}
+                    className="flex w-1/2 h-32 justify-center">
+                    <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                  </span>
+                  <div>SCAN</div>
+                  <div>สแกน</div>
+                </div>
                 <div
                   onClick={() => {
                     handleNextPageStatuscancel();
                   }}
-                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <GoCheckCircle className="size-30 " />
                   <div>
                     SUBMIT
                   </div>
@@ -1244,16 +1248,21 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span
-                  onClick={startScan}
-                  className="flex w-1/2 h-32 justify-center">
-                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                </span>
+              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <span
+                    onClick={startScan}
+                    className="flex w-1/2 h-32 justify-center">
+                    <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                  </span>
+                  <div>SCAN</div>
+                  <div>สแกน</div>
+                </div>
                 <div
                   onClick={() => {
                     handleNextPageStatuscloseprod();
                   }}
-                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <GoCheckCircle className="size-30 " />
                   <div>
                     SUBMIT
                   </div>
@@ -1533,12 +1542,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               </div>
 
               <div className="flex w-full h-full items-center">
-
-                <span
-                  onClick={startScan}
-                  className="flex w-1/2 h-32 justify-center">
-                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                </span>
+                <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <span
+                    onClick={startScan}
+                    className="flex w-1/2 h-32 justify-center">
+                    <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                  </span>
+                  <div>SCAN</div>
+                  <div>สแกน</div>
+                </div>
                 <div
                   onClick={() => {
                     if (passmodelbutton === true) {
@@ -1558,7 +1570,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                     }
                   }}
-                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <GoCheckCircle className="size-30 " />
                   <div>
                     SUBMIT
                   </div>
@@ -1588,11 +1601,15 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-                <span
-                  onClick={startScan}
-                  className="flex w-1/2 h-32 justify-center">
-                  <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                </span>
+              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <span
+                    onClick={startScan}
+                    className="flex w-1/2 h-32 justify-center">
+                    <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                  </span>
+                  <div>SCAN</div>
+                  <div>สแกน</div>
+                </div>
                 <div
                   onClick={() => {
                     if (DataInArrayEmployee.includes(EmployeeNo)) {
@@ -1602,7 +1619,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                       alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                     }
                   }}
-                  className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
+                  className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                  <GoCheckCircle className="size-30 " />
                   <div>
                     SUBMIT
                   </div>
