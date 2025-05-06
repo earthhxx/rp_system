@@ -834,7 +834,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         submitLogToReflow120_9_continuous();//change to continue status
         updateReflowStatusCHECKED();
         setShowBar(false);
-        setisCardOpenONCHECKING(false);
+        setIsCardOpen(false);
         setJsonToLocalStorage('modellocal', (data120_2?.productName));
 
         console.log("CHECKED PASS FROM WAITING");
