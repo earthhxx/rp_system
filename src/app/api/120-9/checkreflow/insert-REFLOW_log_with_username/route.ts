@@ -11,16 +11,17 @@ interface ReflowLogRequest {
   productOrderNo: string;
   ST_Status: string;
   Log_User: string;
+  Log_UserID: string;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ReflowLogRequest;
 
-    const { R_Line, R_Model, productOrderNo, ST_Status,Log_User} = body;
+    const { R_Line, R_Model, productOrderNo, ST_Status,Log_User,Log_UserID} = body;
 
     // Validate input
-    if (!R_Line || !R_Model || !productOrderNo || !ST_Status|| !Log_User) {
+    if (!R_Line || !R_Model || !productOrderNo || !ST_Status|| !Log_User || !Log_UserID) {
       return NextResponse.json(
         { success: false, message: 'Missing required fields in request body' },
         { status: 400 }
@@ -36,10 +37,11 @@ export async function POST(req: NextRequest) {
       .input('Log_ProOrder', sql.NVarChar, productOrderNo)
       .input('Log_Status', sql.NVarChar, ST_Status)
       .input('Log_User', sql.NVarChar, Log_User)
+      .input('Log_UserID', sql.NVarChar, Log_UserID)
       .input('Datetime', sql.DateTime, new Date())
       .query(`
-        INSERT INTO REFLOW_Log (Log_Line, Log_Model, Log_ProOrder, Log_Status,Log_User, Datetime)
-        VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status, @Log_User, @Datetime)
+        INSERT INTO REFLOW_Log (Log_Line, Log_Model, Log_ProOrder, Log_Status, Log_User, Log_UserID, Datetime)
+        VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status, @Log_User, @Log_UserID, @Datetime)
       `);
 
     return NextResponse.json({ success: true, message: 'Log inserted successfully' });

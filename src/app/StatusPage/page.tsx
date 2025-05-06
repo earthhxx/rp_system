@@ -287,8 +287,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: "ONCHECKING",
-        Log_User: EmployeeNo,
-        Log_UserID:employeeName ,
+        Log_User: employeeName,
+        Log_UserID: EmployeeNo,
       };
 
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -363,8 +363,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: "CHECKED",
-        Log_User: EmployeeNo,
-        Log_UserID:employeeName ,
+        Log_User: employeeName,
+        Log_UserID: EmployeeNo,
       };
 
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -388,43 +388,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
     }
   };
 
-    //submit log state to check
-    const submitLogToReflow120_9_continuous = async () => {
-      if (!data120_2 || !submitStage) {
-        console.warn("Missing required fields to submit log");
-        return;
+  //submit log state to check
+  const submitLogToReflow120_9_continuous = async () => {
+    if (!data120_2 || !submitStage) {
+      console.warn("Missing required fields to submit log");
+      return;
+    }
+
+    try {
+      const payload = {
+        R_Line: data120_2.ProcessLine,
+        R_Model: data120_2.productName,
+        productOrderNo: ProductOrderNo,
+        ST_Status: "CONTINUOUS",
+        Log_User: employeeName,
+        Log_UserID: EmployeeNo,
+      };
+
+      const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        console.error("Log submit failed:", result.message);
+      } else {
+        console.log("Log submitted successfully");
       }
-  
-      try {
-        const payload = {
-          R_Line: data120_2.ProcessLine,
-          R_Model: data120_2.productName,
-          productOrderNo: ProductOrderNo,
-          ST_Status: "CONTINUOUS",
-          Log_User: EmployeeNo,
-          Log_UserID:employeeName ,
-        };
-  
-        const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-  
-        const result = await res.json();
-  
-        if (!res.ok || !result.success) {
-          console.error("Log submit failed:", result.message);
-        } else {
-          console.log("Log submitted successfully");
-        }
-  
-      } catch (error) {
-        console.error("Error submitting log:", error);
-      }
-    };
+
+    } catch (error) {
+      console.error("Error submitting log:", error);
+    }
+  };
 
   // //submit log state to cancel
   const submitLogcancelToReflow120_9 = async () => {
@@ -439,8 +439,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: 'Cancel',
-        Log_User: EmployeeNo,
-        Log_UserID:employeeName,
+        Log_User: employeeName,
+        Log_UserID:EmployeeNo ,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
@@ -476,8 +476,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: 'close',
-        Log_User: EmployeeNo,
-        Log_UserID:employeeName ,
+        Log_User: employeeName,
+        Log_UserID:EmployeeNo ,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
@@ -579,6 +579,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             handleShowPdf(data.R_PDF);
           } else {
             setPdfWarning("ไม่พบไฟล์ PDF หรือข้อมูลไม่ถูกต้อง");
+            localStorage.removeItem("productOrderNo");
+            window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+            router.push('/'); // นำทางกลับหน้า home
           }
         } catch (e) {
           console.error("Base64 decode error:", e);
@@ -586,6 +589,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           alert(
             `ไม่พบข้อมูล STANDARD PDF`
           );
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+          router.push('/'); // นำทางกลับหน้า home
         }
 
       } catch (error) {
@@ -594,6 +600,9 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         alert(
           `ไม่พบข้อมูล STANDARD PDF`
         );
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+        router.push('/'); // นำทางกลับหน้า home
       } finally {
         setIsLoading120_9(false);
       }
@@ -638,11 +647,17 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         } else {
           console.warn("สถานะไม่รู้จัก:", ST_Status);
           alert(`สถานะไม่รู้จัก: ${ST_Status}`);
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+          router.push('/'); // นำทางกลับหน้า home
         }
 
       } catch (err) {
         console.error("โหลด REFLOW Status ล้มเหลว:", err);
         alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+        router.push('/'); // นำทางกลับหน้า home
       }
     };
 
@@ -1188,7 +1203,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
                   <div>
-                  SUBMIT
+                    SUBMIT
                   </div>
                   <div>
                     ส่งข้อมูล
@@ -1229,7 +1244,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
                   <div>
-                  SUBMIT
+                    SUBMIT
                   </div>
                   <div>
                     ส่งข้อมูล
@@ -1515,7 +1530,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
                   <div>
-                  SUBMIT
+                    SUBMIT
                   </div>
                   <div>
                     ส่งข้อมูล
@@ -1555,7 +1570,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
                   <div>
-                  SUBMIT
+                    SUBMIT
                   </div>
                   <div>
                     ส่งข้อมูล
