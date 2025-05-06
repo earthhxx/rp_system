@@ -50,6 +50,9 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = ({ base64 }: { base64: string }) => {
+
+  const DataInArrayEmployee = ["0506", "E002", "E003", "E004", "E005"];
+
   const [pdfUrl2, setPdfUrl2] = useState<string | null>(null);
   const router = useRouter();
   const goToHome = () => {
@@ -440,7 +443,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         productOrderNo: ProductOrderNo,
         ST_Status: 'Cancel',
         Log_User: employeeName,
-        Log_UserID:EmployeeNo ,
+        Log_UserID: EmployeeNo,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
@@ -477,7 +480,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         productOrderNo: ProductOrderNo,
         ST_Status: 'close',
         Log_User: employeeName,
-        Log_UserID:EmployeeNo ,
+        Log_UserID: EmployeeNo,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
@@ -518,23 +521,23 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   useEffect(() => {
     if (hasFetched) return;
     hasFetched = true;
-  
+
     const fetchData = async () => {
       if (!ProductOrderNo) return;
       setIsLoading120_2(true);
-  
+
       try {
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
-  
+
         if (!data || !data.data || data.success === false || data.error) {
           alert("ข้อมูลไม่ถูกต้องหรือว่างเปล่า");
           localStorage.removeItem("productOrderNo");
           window.dispatchEvent(new Event("productOrderNo:removed"));
           router.push('/');
         }
-  
+
         setData120_2(data.data);
       } catch (error) {
         console.error("Failed to fetch 120-2:", error);
@@ -546,10 +549,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         setIsLoading120_2(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+
 
 
   useEffect(() => {
@@ -1503,14 +1506,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
               />
-              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR MODEL ('ตรวจสอบข้อมูลของคุณ') = {data120_2?.productName || "ไม่มีข้อมูล"} </div>
-              <button
-                onClick={togglepassmodelbutton}
-                className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
-                  }`}
-              >
-                {passmodelbutton ? 'YES' : 'NO'}
-              </button>
+              <div className="flex flex-row w-full justify-center items-center">
+                <div className="flex justify-center items-center w-[40%] text-white">SAME MODEL('รันงานต่อเนื่อง')</div>
+                <div className="flex flex-none w-[5%]"></div>
+                <button
+                  onClick={togglepassmodelbutton}
+                  className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                    }`}
+                >
+                  {passmodelbutton ? 'YES' : 'NO'}
+                </button>
+
+              </div>
+
               <div className="flex w-full h-full items-center">
 
                 <span
@@ -1521,7 +1529,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 <div
                   onClick={() => {
                     if (passmodelbutton === true) {
-                      if (confirmmodel === true ) {
+                      if (confirmmodel === true) {
                         handleNextPageStatusCHECKED();
                         console.log('true');
                       }
@@ -1529,12 +1537,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                         alert('Model is not match')
                       }
                     }
-                    // else if (passmodelbutton === false && EmployeeNo === DataInArrayEmployee ) {
-                    //   handleNextPageStatusONCHECKING();
-                    //   console.log('false');
-                    // }
-                    else {
+                    else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
                       handleNextPageStatusONCHECKING();
+                      console.log('false and EmployeeNo is match to Arrey');
+                    }
+                    else {
+                      alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                     }
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
@@ -1574,8 +1582,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 </span>
                 <div
                   onClick={() => {
-                    handleNextPageStatusCHECKED();
-
+                    if (DataInArrayEmployee.includes(EmployeeNo)) {
+                      handleNextPageStatusCHECKED();
+                    }
+                    else {
+                      alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                    }
                   }}
                   className="flex flex-col text-xl font-bold justify-center items-center font-kanit w-1/2 size-32 bg-green-600 rounded-full">
                   <div>
