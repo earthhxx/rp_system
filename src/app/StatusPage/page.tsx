@@ -159,8 +159,12 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
 
     try {
       if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
+        alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF")
         console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
         setPdfWarning2("ข้อมูลไม่พร้อม โหลด PDF ไม่ได้");
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));
+        router.push('/');
         return;
       }
 
@@ -175,16 +179,28 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
           handleShowPdf2(data.R_PDF2);
         } else {
+          alert("PDF format ผิดพลาด");
           console.warn("⚠️ PDF format ผิดพลาด");
           setPdfWarning2('PDF format ผิดพลาด');
+          localStorage.removeItem("productOrderNo");
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
         }
       } else {
+        alert("ไม่พบข้อมูล PDF");
         console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
         setPdfWarning2('ไม่พบข้อมูล PDF');
+        localStorage.removeItem("productOrderNo");
+        window.dispatchEvent(new Event("productOrderNo:removed"));
+        router.push('/');
       }
     } catch (err) {
+      alert("โหลด PDF ผิดพลาด");
       console.error("❌ โหลด PDF ล้มเหลว:", err);
       setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
+      localStorage.removeItem("productOrderNo");
+      window.dispatchEvent(new Event("productOrderNo:removed"));
+      router.push('/');
     }
   };
 
@@ -1472,21 +1488,24 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             ✕
           </button>
 
-          {pdfUrl2 && (
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-              <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
-                <div className="w-full h-full ">
+          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+            <div className="w-full h-full">
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                {pdfUrl2 ? (
                   <Viewer
                     fileUrl={pdfUrl2}
                     defaultScale={SpecialZoomLevel.PageFit}
                     plugins={[zoomPluginInstance]}
                   />
-                </div>
-              </div>
-            </Worker>
-          )}
+                ) : (
+                  <div className="text-center text-gray-500 text-xl">รอผลการวัด...</div>
+                )}
+              </Worker>
+            </div>
+          </div>
         </div>
       )}
+
 
 
 
@@ -1508,7 +1527,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex flex-row w-full justify-center items-center">
                 <div className="flex justify-center items-center w-[40%] text-white">SAME MODEL('รันงานต่อเนื่อง')</div>
-                <div className="flex flex-none w-[5%]"></div>
+                <div className="flex flex-none w-[%]"></div>
                 <button
                   onClick={togglepassmodelbutton}
                   className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
