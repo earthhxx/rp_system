@@ -513,39 +513,43 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
   }, [base64]);
 
   // Fetching Data 120-2
+  let hasFetched = false;
+
   useEffect(() => {
+    if (hasFetched) return;
+    hasFetched = true;
+  
     const fetchData = async () => {
       if (!ProductOrderNo) return;
-
-      setIsLoading120_2(true); // ⏳ เริ่มโหลด
+      setIsLoading120_2(true);
+  
       try {
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
-        // ตรวจสอบว่า data ไม่มีข้อมูลหรือมี error ภายใน payload
+  
         if (!data || !data.data || data.success === false || data.error) {
           alert("ข้อมูลไม่ถูกต้องหรือว่างเปล่า");
           localStorage.removeItem("productOrderNo");
-          window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-          router.push('/'); // นำทางกลับหน้า home
-
+          window.dispatchEvent(new Event("productOrderNo:removed"));
+          router.push('/');
         }
-
-
+  
         setData120_2(data.data);
       } catch (error) {
         console.error("Failed to fetch 120-2:", error);
         alert(`api ผิดพลาด`);
         localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
-        router.push('/'); // นำทางกลับหน้า home
+        window.dispatchEvent(new Event("productOrderNo:removed"));
+        router.push('/');
       } finally {
-        setIsLoading120_2(false); // ✅ โหลดเสร็จแล้ว
+        setIsLoading120_2(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
 
   useEffect(() => {
