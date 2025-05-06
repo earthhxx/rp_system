@@ -287,7 +287,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: "ONCHECKING",
-        Log_User: EmployeeNo
+        Log_User: EmployeeNo,
+        Log_UserID:employeeName ,
       };
 
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -362,7 +363,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: "CHECKED",
-        Log_User: EmployeeNo
+        Log_User: EmployeeNo,
+        Log_UserID:employeeName ,
       };
 
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -399,7 +401,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           R_Model: data120_2.productName,
           productOrderNo: ProductOrderNo,
           ST_Status: "CONTINUOUS",
-          Log_User: EmployeeNo
+          Log_User: EmployeeNo,
+          Log_UserID:employeeName ,
         };
   
         const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -436,7 +439,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: 'Cancel',
-        Log_User: EmployeeNo
+        Log_User: EmployeeNo,
+        Log_UserID:employeeName,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
@@ -472,7 +476,8 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         R_Model: data120_2.productName,
         productOrderNo: ProductOrderNo,
         ST_Status: 'close',
-        Log_User: EmployeeNo
+        Log_User: EmployeeNo,
+        Log_UserID:employeeName ,
       };
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
