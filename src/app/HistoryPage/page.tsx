@@ -27,10 +27,10 @@ const animetion = {
 
 const icons = {
   CHECKED: (
-    <span className="flex items-center justify-center ">
-      <span className="absolute flex justify-center items-center rounded-full opacity-75 animate-ping z-30">✅</span>
-      <span className="z-10 text-[20px] ">✅</span>
-    </span>
+    <div className="flex items-center justify-center ">
+      <div className="absolute flex justify-center items-center rounded-full opacity-75 animate-ping z-30">✅</div>
+      <div className="z-10 text-[20px] ">✅</div>
+    </div>
   ),
   WAITING: "⏳",
   NULL: <div className='flex items-center justify-center text-[20px]'>null</div>,
@@ -116,12 +116,12 @@ export default function HistoryPage() {
 
   const renderLines = () => {
     return (
-      <div className="overflow-x-auto w-full p-4 rounded-2xl ">
-        <table className="w-full rounded-2xl bg-gray-50 text-sm sm:text-[20px] font-kanit ">
+      <div className="overflow-auto p-4 rounded-2xl ">
+        <table className="w-full rounded-2xl bg-gray-50 text-[10px] lg:text-[18px] font-kanit font-normal ">
           <thead className="bg-blue-700 text-white">
             <tr>
               <th className="px-4 py-2 text-left rounded-tl-2xl">ID</th>
-              <th className="px-4 py-2 text-left">Line</th>
+              <th className="px-7 py-2 text-left">Line</th>
               <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-left">Model</th>
               <th className="px-4 py-2 text-left rounded-tr-2xl ">Time</th>
@@ -135,10 +135,10 @@ export default function HistoryPage() {
               >
                 <td className="border px-4 py-2 ">{line.id}</td>
                 <td className="border px-4 py-2">{line.line}</td>
-                <td className="border px-4 py-2 grid grid-cols-2 items-center justify-center gap-2">
-                  <span className={`${colors[line.status]} text-xl ${animetion[line.status]}`}>
+                <td className="border px-4 py-2 flex flex-row items-center justify-center gap-2">
+                  <div className={`${colors[line.status]} ${animetion[line.status]}`}>
                     {icons[line.status]}
-                  </span>
+                  </div>
                   <span>
                     {line.status === "WAITING" && "WAITING (รอวัด)"}
                     {line.status === "ONCHECKING" && "ONCHECKING (กำลังวัด)"}
@@ -224,13 +224,13 @@ export default function HistoryPage() {
 
 
   return (
-    <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-6 text-center">Reflow Log History</h1>
+    <div className="h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center justify-center">
+      <h1 className="text-[60px] font-bold h-[10%] text-center text-blue-900">REFLOW HISTORY LOG</h1>
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
       ) : (
         <>
-          <div className="p-6 m-1 w-full rounded-2xl drop-shadow-2xl backdrop-blur-3xl ">
+          <div className="p-6 m-1 w-full h-[70%] rounded-2xl drop-shadow-2xl backdrop-blur-3xl ">
             <div className="font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-1 gap-5 gap-y-10 w-full h-full rounded-2xl drop-shadow-2xl p-4">
               {renderLines()}
             </div>
