@@ -1514,17 +1514,18 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 placeholder="รหัสพนักงาน"
               />
               <div className="flex flex-row w-full justify-center items-center">
-                <div className="flex flex-col w-[50%]">
-                  <div className="flex justify-center items-center w-[40%] text-white">รันงานต่อเนื่องหรือไม่</div>
+                <div className="flex flex-col text-xl items-center">
+                  <div className="flex justify-center items-center  text-white">continuously or not?</div>
+                  <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
                 </div>
-                <div className="flex flex-none w-[%]"></div>
+                <div className="flex flex-none w-[5%]"></div>
                 <button
                   onClick={togglepassmodelbutton}
-                  className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                  className={`px-4 py-2 size-20 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                     }`}
                 >
                   <pre>
-                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่ใช่'}
+                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
                   </pre>
 
                 </button>
