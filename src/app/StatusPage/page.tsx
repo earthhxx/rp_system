@@ -1503,12 +1503,13 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="รหัสพนักงาน"
               />
+              <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR MODEL ('ตรวจสอบข้อมูลของคุณ') = {data120_2?.productName || "ไม่มีข้อมูล"} </div>
               <button
                 onClick={togglepassmodelbutton}
-                className={`px-4 py-2 rounded ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                className={`px-4 py-2 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                   }`}
               >
-                {passmodelbutton ? 'วัดโปรไฟล์ต่อเนื่อง' : 'วัดโปรไฟล์ใหม่'}
+                {passmodelbutton ? 'YES' : 'NO'}
               </button>
               <div className="flex w-full h-full items-center">
 
@@ -1520,7 +1521,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 <div
                   onClick={() => {
                     if (passmodelbutton === true) {
-                      if (confirmmodel === true) {
+                      if (confirmmodel === true ) {
                         handleNextPageStatusCHECKED();
                         console.log('true');
                       }
@@ -1528,6 +1529,10 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                         alert('Model is not match')
                       }
                     }
+                    // else if (passmodelbutton === false && EmployeeNo === DataInArrayEmployee ) {
+                    //   handleNextPageStatusONCHECKING();
+                    //   console.log('false');
+                    // }
                     else {
                       handleNextPageStatusONCHECKING();
                     }
