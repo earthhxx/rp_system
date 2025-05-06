@@ -272,7 +272,8 @@ const MenuToggle = () => {
                  onClick={() => {
                         console.log("test onclick HistoryPage");
                         setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
-                        router.push('/HistoryPage');
+                        router.push('http://192.168.120.9:3004/HistoryRefiow');
+                        router.push('http://192.168.120.9:3004/RegisterResultReflow')
 
                     }} 
                 className="flex flex-col justify-center items-center w-full h-full text-white">
@@ -281,7 +282,14 @@ const MenuToggle = () => {
                     <div className="font-kanit text-xl">ค้นหาประวัติ</div>
                 </div>
                 <div className="flex w-full h-full"></div>
-                <div className="flex flex-col justify-center items-center w-full h-full text-white">
+                <div
+                onClick={() => {
+                    console.log("test onclick Register");
+                    setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
+                    router.push('http://192.168.120.9:3004/RegisterResultReflow')
+
+                }} 
+                className="flex flex-col justify-center items-center w-full h-full text-white">
                     <VscSignIn className="size-25 text-white m-4" />
                     <div>SIGN IN</div>
                     <div className="font-kanit text-xl">ล็อคอิน</div>
