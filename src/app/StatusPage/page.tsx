@@ -90,6 +90,7 @@ const checkreflowpage = () => {
   const [isPdfOpen, setPdfOpen] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const alertRef = useRef<HTMLDivElement>(null);  
 
 
   const [topper, setTopper] = useState(false);
@@ -1060,6 +1061,22 @@ const checkreflowpage = () => {
   }
 
   useEffect(() => {
+    const handleClickOutsideshowAlert = (event: MouseEvent) => {
+      if (alertRef.current && !alertRef.current.contains(event.target as Node)) {
+        setshowAlert(false);
+      }
+    };
+    if (showAlert) {
+      document.addEventListener("mousedown", handleClickOutsideshowAlert);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideshowAlert);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideshowAlert);
+    };
+  }, [showAlert]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         clearCamera();
@@ -1658,8 +1675,9 @@ const checkreflowpage = () => {
 
       {/* 🔴 User Popup แสดงเมื่อไม่พบรหัสพนักงาน */}
       {showAlert && (
-        <div className="modal-overlay">
-          <div className="modal-content-rg flashing-border">
+        <div 
+        className="modal-overlay">
+          <div ref={alertRef} className="modal-content-rg flashing-border">
             <div className="warning-icon">⚠️</div>
             <h2 style={{ color: "red" }}>ALERT</h2>
             <h2 style={{ color: "red" }}>แจ้งเตือน</h2>
