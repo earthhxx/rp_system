@@ -209,7 +209,7 @@
   border-radius: 8px;
   width: 80%;
   max-width: 1000px;
-  max-height: 90vh;
+  height: 50%;
   overflow: auto;
   z-index: 10000;
   /* สำคัญ: ให้แน่ใจว่าเหนือ PDF Viewer */

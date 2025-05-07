@@ -58,7 +58,7 @@ const checkreflowpage = () => {
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
 
-  const DataInArrayEmployee = ["0506", "E002", "E003", "E004", "E005"];
+  const DataInArrayEmployee = ['0506', '0743', '0965', '3741'];
 
   const [pdfUrl2, setPdfUrl2] = useState<string | null>(null);
   const router = useRouter();
@@ -191,7 +191,7 @@ const checkreflowpage = () => {
         }
       } else if (!data || data.R_PDF2 === "null" || "undifined") {
         setshowAlert(true);
-        setAlertData("ยังไม่มีการอัพโหลด RESULT");
+        setAlertData("ยังไม่มีการอัพโหลดผลการวัดโปรไฟล์");
         console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
         setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
       } else {
@@ -1677,7 +1677,7 @@ const checkreflowpage = () => {
       {showAlert && (
         <div 
         className="modal-overlay">
-          <div ref={alertRef} className="modal-content-rg flashing-border">
+          <div ref={alertRef} className="modal-content-rg flashing-border text-4xl flex flex-col justify-center items-center">
             <div className="warning-icon">⚠️</div>
             <h2 style={{ color: "red" }}>ALERT</h2>
             <h2 style={{ color: "red" }}>แจ้งเตือน</h2>
