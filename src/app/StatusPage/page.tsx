@@ -62,7 +62,7 @@ const ProductOrderNoComponent = () => {
 const checkreflowpage = () => {
   const props = { base64: "someBase64String" };
   const { base64 } = props;
-
+  ProductOrderNoComponent();
   const ProductOrderNo = ProductOrderNoComponent();
 
   const [showAlert, setshowAlert] = useState(false);
@@ -139,10 +139,8 @@ const checkreflowpage = () => {
       setPdfWarning2("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
-  const handleOpenPdf = async () => {
-    setPdfOpen(true);
-    await fetchPdfData2();
-  };
+
+
 
   //LOAD Moldel from local
   useEffect(() => {
@@ -173,49 +171,57 @@ const checkreflowpage = () => {
 
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
-  const fetchPdfData2 = async () => {
 
-    try {
-      if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
-        alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF")
-        console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
-        setPdfWarning2("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
-        return;
-      }
+  
+  useEffect(() => {
+    if (submitStage !== 'CHECKED' || !ProductOrderNo) return;
 
-      const res = await fetch(
-        `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
-      );
-      const { data } = await res.json();
-      console.log("✅ ได้ข้อมูล PDF2:", data);
-
-      if (data?.R_PDF2) {
-        const decoded = atob(data.R_PDF2);
-        if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
-          handleShowPdf2(data.R_PDF2);
-        } else {
-          alert("PDF2 format ผิดพลาด");
-          console.warn("⚠️ PDF2 format ผิดพลาด");
-          setPdfWarning2('PDF2 format ผิดพลาด');
-
+    const fetchPdfData2 = async () => {
+      try {
+        if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
+          console.log(submitStage);
+          alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
+          console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
+          setPdfWarning2("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
+          return;
         }
-      } else if (!data || data.R_PDF2 === "null" || "undifined") {
-        setshowAlert(true);
-        setAlertData("ยังไม่มีการอัพโหลดผลการวัดโปรไฟล์");
-        console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
-        setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
-      } else {
-        alert("ยังไม่มีการอัพโหลด PDF2 error 2");
-        console.warn("⚠️ ไม่พบข้อมูล R_PDF2 error 2");
-        setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
 
+        const res = await fetch(
+          `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
+        );
+        const { data } = await res.json();
+        console.log("✅ ได้ข้อมูล PDF2:", data);
+
+        if (data?.R_PDF2) {
+          const decoded = atob(data.R_PDF2);
+          if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
+            handleShowPdf2(data.R_PDF2);
+            setPdfOpen(true);
+          } else {
+            alert("PDF2 format ผิดพลาด");
+            console.warn("⚠️ PDF2 format ผิดพลาด");
+            setPdfWarning2('PDF2 format ผิดพลาด');
+          }
+        } else if (!data || data.R_PDF2 === "null" || "undefined") {
+          setshowAlert(true);
+          setAlertData("ยังไม่มีการอัพโหลดผลการวัดโปรไฟล์");
+          console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
+          setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
+        } else {
+          alert("ยังไม่มีการอัพโหลด PDF2 error 2");
+          console.warn("⚠️ ไม่พบข้อมูล R_PDF2 error 2");
+          setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
+        }
+      } catch (err) {
+        alert("โหลด PDF2 ผิดพลาด");
+        console.error("❌ โหลด PDF2 ล้มเหลว:", err);
+        setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
       }
-    } catch (err) {
-      alert("โหลด PDF2 ผิดพลาด");
-      console.error("❌ โหลด PDF2 ล้มเหลว:", err);
-      setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
-    }
-  };
+    };
+    
+
+    fetchPdfData2();
+  }, [submitStage, ProductOrderNo]);
 
 
 
@@ -935,6 +941,7 @@ const checkreflowpage = () => {
   let buttonClassL = "";
   let buttonContent = null;
   let buttonClick = () => { };
+  let w = "w-[50%]";
 
 
 
@@ -962,7 +969,7 @@ const checkreflowpage = () => {
 
   switch (submitStage) {
     case "WAITING":
-
+      w = "";
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
       buttonClick = () => setIsCardOpen(true);
@@ -999,7 +1006,7 @@ const checkreflowpage = () => {
       );
       break;
     case "ONCHECKING":
-
+      w = "";
       buttonClass = "bg-[#9ec5fe] text-black";
       buttonClassL = "bg-[#cfe2ff]";
       buttonClick = () => setisCardOpenONCHECKING(true);
@@ -1037,6 +1044,7 @@ const checkreflowpage = () => {
       break;
     case "CHECKED":
       buttonClass = "";
+      w = "w-[100%]";
       buttonClassL = "bg-green-300/10";
       buttonContent = (
         <>
@@ -1213,7 +1221,6 @@ const checkreflowpage = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
-
 
       {(isLoading || isLoading120_9) && renderLoading()}
       {
@@ -1406,7 +1413,7 @@ const checkreflowpage = () => {
               <button
                 // onClick={() => setIsCardOpen(true)}
                 type="button"
-                className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
+                className={`flex size-15 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
               >
                 <svg
                   className="w-20 h-20"
@@ -1503,35 +1510,7 @@ const checkreflowpage = () => {
           </div>
         </div>
       )}
-      {isPdfOpen && (
-        <div className="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center">
-          <button
-            onClick={() => {
-              setPdfOpen(false);
-              setArrowDownButton(true);
-            }}
-            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-49"
-          >
-            ✕
-          </button>
-
-          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
-            <div className="w-full h-full">
-              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                {pdfUrl2 ? (
-                  <Viewer
-                    fileUrl={pdfUrl2}
-                    defaultScale={SpecialZoomLevel.PageFit}
-                    plugins={[zoomPluginInstance]}
-                  />
-                ) : (
-                  <div className="text-center text-gray-500 text-xl">รอผลการวัด...</div>
-                )}
-              </Worker>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
 
 
@@ -1667,9 +1646,10 @@ const checkreflowpage = () => {
       }
       {isLoading120_9 && <p>🔄 กำลังโหลด PDF...</p>}
       {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
+      <div className="flex flex-row justify-center items-center w-full h-full"> 
       {pdfUrl && (
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+          <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 ${w}`}>
             <div className="w-full h-full ">
               <Viewer
                 fileUrl={pdfUrl}
@@ -1680,6 +1660,25 @@ const checkreflowpage = () => {
           </div>
         </Worker>
       )}
+      {isPdfOpen && (
+          <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 [${w}]`}>
+            <div className="w-full h-full">
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                {pdfUrl2 ? (
+                  <Viewer
+                    fileUrl={pdfUrl2}
+                    defaultScale={SpecialZoomLevel.PageFit}
+                    plugins={[zoomPluginInstance]}
+                  />
+                ) : (
+                  <div className="text-center text-gray-500 text-xl">รอผลการวัด...</div>
+                )}
+              </Worker>
+            </div>
+          </div>
+      )}
+      </div>
+      
 
 
       {/* 🔴 User Popup แสดงเมื่อไม่พบรหัสพนักงาน */}
