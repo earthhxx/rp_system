@@ -161,10 +161,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
       if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
         alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF")
         console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
-        setPdfWarning2("ข้อมูลไม่พร้อม โหลด PDF ไม่ได้");
-        localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));
-        router.push('/');
+        setPdfWarning2("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
         return;
       }
 
@@ -172,35 +169,32 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
       );
       const { data } = await res.json();
-      console.log("✅ ได้ข้อมูล PDF:", data);
+      console.log("✅ ได้ข้อมูล PDF2:", data);
 
       if (data?.R_PDF2) {
         const decoded = atob(data.R_PDF2);
         if (decoded.startsWith('%PDF-') || decoded.startsWith('JVBER')) {
           handleShowPdf2(data.R_PDF2);
         } else {
-          alert("PDF format ผิดพลาด");
-          console.warn("⚠️ PDF format ผิดพลาด");
-          setPdfWarning2('PDF format ผิดพลาด');
-          localStorage.removeItem("productOrderNo");
-          window.dispatchEvent(new Event("productOrderNo:removed"));
-          router.push('/');
+          alert("PDF2 format ผิดพลาด");
+          console.warn("⚠️ PDF2 format ผิดพลาด");
+          setPdfWarning2('PDF2 format ผิดพลาด');
+          
         }
-      } else {
-        alert("ไม่พบข้อมูล PDF");
+      } else if (!data || data.R_PDF2 === "null" || "undifined") {
+        alert("ยังไม่มีการอัพโหลด PDF2");
         console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
-        setPdfWarning2('ไม่พบข้อมูล PDF');
-        localStorage.removeItem("productOrderNo");
-        window.dispatchEvent(new Event("productOrderNo:removed"));
-        router.push('/');
+        setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
+      } else {
+        alert("ยังไม่มีการอัพโหลด PDF2 error 2");
+        console.warn("⚠️ ไม่พบข้อมูล R_PDF2 error 2");
+        setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
+        
       }
     } catch (err) {
-      alert("โหลด PDF ผิดพลาด");
-      console.error("❌ โหลด PDF ล้มเหลว:", err);
+      alert("โหลด PDF2 ผิดพลาด");
+      console.error("❌ โหลด PDF2 ล้มเหลว:", err);
       setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
-      localStorage.removeItem("productOrderNo");
-      window.dispatchEvent(new Event("productOrderNo:removed"));
-      router.push('/');
     }
   };
 
