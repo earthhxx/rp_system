@@ -54,7 +54,7 @@ const checkreflowpage = () => {
   const props = { base64: "someBase64String" };
   const { base64 } = props;
 
-  
+
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
 
@@ -189,7 +189,8 @@ const checkreflowpage = () => {
 
         }
       } else if (!data || data.R_PDF2 === "null" || "undifined") {
-        alert("ยังไม่มีการอัพโหลด PDF2");
+        setshowAlert(true);
+        setAlertData("ยังไม่มีการอัพโหลด RESULT");
         console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
         setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
       } else {
@@ -1656,7 +1657,8 @@ const checkreflowpage = () => {
         <div className="modal-overlay">
           <div className="modal-content-rg flashing-border">
             <div className="warning-icon">⚠️</div>
-            <h2 style={{ color: "red" }}>alertData</h2>
+            <h2 style={{ color: "red" }}>ALERT</h2>
+            <h2 style={{ color: "red" }}>แจ้งเตือน</h2>
             <p>{alertData}</p>
             <button className="close-button" onClick={() => setshowAlert(false)}>X</button>
           </div>

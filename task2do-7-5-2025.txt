@@ -6,3 +6,5 @@ SIGN IN CARD
 
 FUNCTION ALERT  ok!
 but btw many ALERT 
+
+CHECKED วัดสำเร็จ
