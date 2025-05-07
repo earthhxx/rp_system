@@ -106,7 +106,6 @@ const MenuToggle = () => {
         if (employeeID.length > 0 && employeeID.length <= 4) {
             const mockID: string[] = ['0506', '0743', '0965', '3741']; // Replace with the actual mock ID values
             if (mockID.includes(employeeID)) {
-                alert("รหัสพนักงานนี้มีอยู่ในระบบแล้ว");
                 router.push('http://192.168.120.9:3004/RegisterResultReflow');
                 setEmployeeID("");
                 clearinputref();
