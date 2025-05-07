@@ -482,14 +482,14 @@ const MenuToggle = () => {
 
     return (
         <>
-            {homeStage === "home" && renderHomeButton()}
-            {homeStage === "menuOpen" && renderMenu()}
-            {homeStage === "scan" && renderScanCard()}
-            {homeStage === "signin" && renderSigninCard()}
+                {homeStage === "home" && renderHomeButton()}
+                {homeStage === "menuOpen" && renderMenu()}
+                {homeStage === "scan" && renderScanCard()}
+                {homeStage === "signin" && renderSigninCard()}
 
-            <div className="absolute bottom-5 left-5 text-white">
-                Position: {`X: ${position.x}, Y: ${position.y}`}
-            </div>
+                <div className="absolute bottom-5 left-5 text-white">
+                    Position: {`X: ${position.x}, Y: ${position.y}`}
+                </div>
         </>
     );
 };

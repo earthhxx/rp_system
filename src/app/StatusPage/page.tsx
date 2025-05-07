@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
@@ -48,12 +48,22 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
   return value ? JSON.parse(value) : null;
 }
 
+const ProductOrderNoComponent = () => {
+  
+
+  const searchParams = useSearchParams();
+  const ProductOrderNo = searchParams.get('productOrderNo');
+
+  return ProductOrderNo;
+};
+
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
   const props = { base64: "someBase64String" };
   const { base64 } = props;
 
+  const ProductOrderNo = ProductOrderNoComponent();
 
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
@@ -76,8 +86,8 @@ const checkreflowpage = () => {
   const [pdfWarning, setPdfWarning] = useState("");
   const [pdfWarning2, setPdfWarning2] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
-  const searchParams = useSearchParams();
-  const ProductOrderNo = searchParams.get('productOrderNo');
+
+
 
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -90,7 +100,7 @@ const checkreflowpage = () => {
   const [isPdfOpen, setPdfOpen] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const alertRef = useRef<HTMLDivElement>(null);  
+  const alertRef = useRef<HTMLDivElement>(null);
 
 
   const [topper, setTopper] = useState(false);
@@ -546,6 +556,7 @@ const checkreflowpage = () => {
       setIsLoading120_2(true);
 
       try {
+        console.log("ProductOrderNo:", ProductOrderNo);
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
@@ -641,7 +652,7 @@ const checkreflowpage = () => {
         setStatusData120_9(statusItem);
 
         const { ST_Status, ST_Prod } = statusItem;
-        const isProdMatch = ST_Prod === ProductOrderNo;
+        const isProdMatch = ST_Prod === data120_2.productOrderNo;
 
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
@@ -1426,10 +1437,6 @@ const checkreflowpage = () => {
             </div>
           </div>
 
-          {/* Success Message */}
-          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/5 z-10">
-            {/* <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div> */}
-          </div>
         </div>
       )}
 
@@ -1474,7 +1481,9 @@ const checkreflowpage = () => {
                   Production No:
                 </div>
                 <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">
-                  {ProductOrderNo || "ไม่พบ ProductOrderNo"}
+                  <Suspense fallback={<div>Loading...</div>}>
+                    {data120_2?.productOrderNo || "ไม่มีข้อมูล ProductOrderNo"}
+                  </Suspense>
                 </div>
               </div>
             </div>
@@ -1675,8 +1684,8 @@ const checkreflowpage = () => {
 
       {/* 🔴 User Popup แสดงเมื่อไม่พบรหัสพนักงาน */}
       {showAlert && (
-        <div 
-        className="modal-overlay">
+        <div
+          className="modal-overlay">
           <div ref={alertRef} className="modal-content-rg flashing-border text-4xl flex flex-col justify-center items-center">
             <div className="warning-icon">⚠️</div>
             <h2 style={{ color: "red" }}>ALERT</h2>
