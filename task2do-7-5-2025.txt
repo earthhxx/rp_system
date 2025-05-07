@@ -1,0 +1,8 @@
+
+ADD ID 
+ID 0743 0506 && IT ID 
+
+SIGN IN CARD
+
+FUNCTION ALERT  ok!
+but btw many ALERT 

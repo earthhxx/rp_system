@@ -35,6 +35,7 @@ type DataItem120_9_Status = {
 
 type DataItem120_9_Result = {
   R_PDF2: string;
+  base64: string;
 };
 
 function setJsonToLocalStorage<T>(key: string, value: T) {
@@ -49,7 +50,13 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
 
 
 //api if !datalocal check status = ??? else back to layout
-const checkreflowpage = ({ base64 }: { base64: string }) => {
+const checkreflowpage = () => {
+  const props = { base64: "someBase64String" };
+  const { base64 } = props;
+
+  
+  const [showAlert, setshowAlert] = useState(false);
+  const [alertData, setAlertData] = useState("");
 
   const DataInArrayEmployee = ["0506", "E002", "E003", "E004", "E005"];
 
@@ -179,7 +186,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
           alert("PDF2 format ผิดพลาด");
           console.warn("⚠️ PDF2 format ผิดพลาด");
           setPdfWarning2('PDF2 format ผิดพลาด');
-          
+
         }
       } else if (!data || data.R_PDF2 === "null" || "undifined") {
         alert("ยังไม่มีการอัพโหลด PDF2");
@@ -189,7 +196,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
         alert("ยังไม่มีการอัพโหลด PDF2 error 2");
         console.warn("⚠️ ไม่พบข้อมูล R_PDF2 error 2");
         setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
-        
+
       }
     } catch (err) {
       alert("โหลด PDF2 ผิดพลาด");
@@ -1196,7 +1203,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
                 placeholder="รหัสพนักงาน"
               />
               <div className="flex w-full h-full items-center">
-              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
                   <span
                     onClick={startScan}
                     className="flex w-1/2 h-32 justify-center">
@@ -1242,7 +1249,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
                   <span
                     onClick={startScan}
                     className="flex w-1/2 h-32 justify-center">
@@ -1595,7 +1602,7 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
               />
               <div className="flex w-full h-full items-center">
 
-              <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
                   <span
                     onClick={startScan}
                     className="flex w-1/2 h-32 justify-center">
@@ -1641,6 +1648,19 @@ const checkreflowpage = ({ base64 }: { base64: string }) => {
             </div>
           </div>
         </Worker>
+      )}
+
+
+      {/* 🔴 User Popup แสดงเมื่อไม่พบรหัสพนักงาน */}
+      {showAlert && (
+        <div className="modal-overlay">
+          <div className="modal-content-rg flashing-border">
+            <div className="warning-icon">⚠️</div>
+            <h2 style={{ color: "red" }}>alertData</h2>
+            <p>{alertData}</p>
+            <button className="close-button" onClick={() => setshowAlert(false)}>X</button>
+          </div>
+        </div>
       )}
 
     </div >
