@@ -42,6 +42,7 @@ const MenuToggle = () => {
     const [position, setPosition] = useState({ x: 0, y: 500 });
     const [dragBounds, setDragBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 });
     const [productOrderNo, setProductOrderNo] = useState("");
+    const [employeeID, setEmployeeID] = useState("");
     const cardRef = useRef<HTMLDivElement>(null);
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -87,7 +88,7 @@ const MenuToggle = () => {
     const handleSaveAndNavigate = () => {
         setJsonToLocalStorage("productOrderNo", productOrderNo);
         router.push(`/StatusPage?productOrderNo=${encodeURIComponent(productOrderNo)}`);
-        setProductOrderNo("");
+        setProductOrderNo
         clearinputref();
     };
     const handleNextPageStatus = () => {
@@ -100,6 +101,38 @@ const MenuToggle = () => {
         handleSaveAndNavigate();
 
     };
+
+    const handleSaveAndNavigateSignin = () => {
+        if (employeeID.length > 0 && employeeID.length <= 4) {
+            const mockID = "1234"; // Replace "123" with the actual mock ID value
+            if (employeeID === mockID) {
+                alert("รหัสพนักงานนี้มีอยู่ในระบบแล้ว");
+                router.push('http://192.168.120.9:3004/RegisterResultReflow');
+                setEmployeeID("");
+                clearinputref();
+                return;
+            }
+            else {
+                alert("รหัสพนักงานนี้ไม่อยู่ในระบบ");
+                setEmployeeID("");
+                clearinputref();
+            }
+        }
+        else {
+            alert("กรุณากรอกรหัสพนักงานอย่างน้อย 3 ตัวอักษร");
+            setEmployeeID("");
+            clearinputref();
+        }
+    };
+    const handleNextPageSignin = () => {
+        const value = inputRef.current?.value.trim();
+
+        if (!value) {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+        handleSaveAndNavigateSignin();
+    }
 
 
     useEffect(() => {
@@ -161,10 +194,21 @@ const MenuToggle = () => {
 
             await html5QrCode.start({ deviceId: { exact: deviceId } }, { fps: 10, qrbox: 300 },
                 (decodedText) => {
-                    setProductOrderNo(decodedText);
-                    if (inputRef.current) inputRef.current.value = decodedText;
-                    html5QrCode.stop().then(() => html5QrCode.clear());
-                    scannerRef.current = null;
+                    if (homeStage === "scan") {
+                        setProductOrderNo(decodedText);
+                        if (inputRef.current) inputRef.current.value = decodedText;
+                        html5QrCode.stop().then(() => html5QrCode.clear());
+                        scannerRef.current = null;
+                    }
+                    else if (homeStage === "signin") {
+                        setEmployeeID(decodedText);
+                        if (inputRef.current) inputRef.current.value = decodedText;
+                        html5QrCode.stop().then(() => html5QrCode.clear());
+                        scannerRef.current = null;
+                    }
+                    else {
+                        console.log("QR code detected but not in scan or signin mode.");
+                    }
                 },
                 (err) => console.warn("Scan error:", err)
             );
@@ -173,31 +217,6 @@ const MenuToggle = () => {
         }
     };
 
-    const startScan2 = async () => {
-        const qrRegionId = "qr-reader";
-        const html5QrCode = new Html5Qrcode(qrRegionId);
-        scannerRef.current = html5QrCode;
-
-        try {
-            const devices = await Html5Qrcode.getCameras();
-            if (!devices || devices.length === 0) return;
-
-            const backCam = devices.find(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment"));
-            const deviceId = backCam ? backCam.id : devices[0].id;
-
-            await html5QrCode.start({ deviceId: { exact: deviceId } }, { fps: 10, qrbox: 300 },
-                (decodedText) => {
-                    setEmployeeID(decodedText);
-                    if (inputIDRef.current) inputIDRef.current.value = decodedText;
-                    html5QrCode.stop().then(() => html5QrCode.clear());
-                    scannerRef.current = null;
-                },
-                (err) => console.warn("Scan error:", err)
-            );
-        } catch (err) {
-            console.error("Camera initialization failed:", err);
-        }
-    };
 
     const clearinputref = () => {
         if (inputRef.current) inputRef.current.value = "";
@@ -328,9 +347,8 @@ const MenuToggle = () => {
                 <div
                     onClick={() => {
                         console.log("test onclick Register");
-                        setHomeStage('signin'); //idk why tf setIsMenuOpen(false); not working
-                        // router.push('http://192.168.120.9:3004/RegisterResultReflow')
-
+                        setHomeStage("signin");
+                        setIsMenuOpen(false);
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <VscSignIn className="size-25 text-white m-4" />
@@ -382,6 +400,7 @@ const MenuToggle = () => {
                         </div>
                         <div
                             onClick={() => {
+
                                 handleNextPageStatus();
                                 setHomeStage("home");
                                 clearinputref();
@@ -419,8 +438,9 @@ const MenuToggle = () => {
                     </div>
                     <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
                     <input
-                        ref={inputIDRef}
+                        ref={inputRef}
                         type="text"
+                        autoComplete="off"
                         id="employee_id"
                         onChange={(e) => setEmployeeID(e.target.value)}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -438,7 +458,7 @@ const MenuToggle = () => {
                         </div>
                         <div
                             onClick={() => {
-                                
+                                handleNextPageSignin();
                                 setHomeStage("home");
                                 clearinputref();
                             }}
