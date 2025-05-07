@@ -1,5 +1,5 @@
 
-ADD ID (  )
+ADD ID ( / )
 ID 0743 0506 0965  && IT ID 
 
 SIGN IN CARD ( / )
