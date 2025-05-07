@@ -8,6 +8,7 @@ import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { AiFillHome } from "react-icons/ai";
 import { VscSignIn } from "react-icons/vsc";
 import { MdHistory } from "react-icons/md";
+import { GoCheckCircle } from "react-icons/go";
 
 
 interface ReflowStatus {
@@ -35,7 +36,7 @@ function removeItemFromLocalStorage(key: string) {
 
 const MenuToggle = () => {
     const router = useRouter();
-    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen">("home");
+    const [homeStage, setHomeStage] = useState<"home" | "scan" | "dashboard" | "menuOpen" | "signin">("home");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 500 });
@@ -86,7 +87,18 @@ const MenuToggle = () => {
     const handleSaveAndNavigate = () => {
         setJsonToLocalStorage("productOrderNo", productOrderNo);
         router.push(`/StatusPage?productOrderNo=${encodeURIComponent(productOrderNo)}`);
+        setProductOrderNo("");
         clearinputref();
+    };
+    const handleNextPageStatus = () => {
+        const value = inputRef.current?.value.trim();
+
+        if (!value) {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+        handleSaveAndNavigate();
+
     };
 
 
@@ -120,6 +132,12 @@ const MenuToggle = () => {
                 setHomeStage("home");
                 clearCamera();
             }
+
+            // ถ้าอยู่หน้า signin แล้วคลิกข้างนอก card ให้กลับ home
+            if (homeStage === "signin" && isClickOutsideCard) {
+                setHomeStage("home");
+                clearCamera();
+            }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
@@ -145,6 +163,32 @@ const MenuToggle = () => {
                 (decodedText) => {
                     setProductOrderNo(decodedText);
                     if (inputRef.current) inputRef.current.value = decodedText;
+                    html5QrCode.stop().then(() => html5QrCode.clear());
+                    scannerRef.current = null;
+                },
+                (err) => console.warn("Scan error:", err)
+            );
+        } catch (err) {
+            console.error("Camera initialization failed:", err);
+        }
+    };
+
+    const startScan2 = async () => {
+        const qrRegionId = "qr-reader";
+        const html5QrCode = new Html5Qrcode(qrRegionId);
+        scannerRef.current = html5QrCode;
+
+        try {
+            const devices = await Html5Qrcode.getCameras();
+            if (!devices || devices.length === 0) return;
+
+            const backCam = devices.find(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("environment"));
+            const deviceId = backCam ? backCam.id : devices[0].id;
+
+            await html5QrCode.start({ deviceId: { exact: deviceId } }, { fps: 10, qrbox: 300 },
+                (decodedText) => {
+                    setEmployeeID(decodedText);
+                    if (inputIDRef.current) inputIDRef.current.value = decodedText;
                     html5QrCode.stop().then(() => html5QrCode.clear());
                     scannerRef.current = null;
                 },
@@ -229,7 +273,7 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <AiFillHome className="size-25 text-white m-4" />
-                    
+
                     <div>HOME</div>
                     <div className="font-kanit text-xl">หน้าหลัก</div>
                 </div>
@@ -255,7 +299,7 @@ const MenuToggle = () => {
                             setHomeStage("home");
                             setIsMenuOpen(false);
                             router.push(`/StatusPage?productOrderNo=${productOrderNo}`);
-                    
+
                         }
                         else {
                             setHomeStage("scan");
@@ -269,32 +313,32 @@ const MenuToggle = () => {
                     <div className="font-kanit text-xl">ค้นหา ข้อกำหนด</div>
                 </div>
                 <div
-                 onClick={() => {
+                    onClick={() => {
                         console.log("test onclick HistoryPage");
                         setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
                         router.push('http://192.168.120.9:3004/HistoryRefiow');
 
-                    }} 
-                className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <MdHistory  className="size-25 text-white m-4" />
+                    }}
+                    className="flex flex-col justify-center items-center w-full h-full text-white">
+                    <MdHistory className="size-25 text-white m-4" />
                     <div>HISTORY SEARCH</div>
                     <div className="font-kanit text-xl">ค้นหาประวัติ</div>
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
-                onClick={() => {
-                    console.log("test onclick Register");
-                    setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
-                    router.push('http://192.168.120.9:3004/RegisterResultReflow')
+                    onClick={() => {
+                        console.log("test onclick Register");
+                        setHomeStage('signin'); //idk why tf setIsMenuOpen(false); not working
+                        // router.push('http://192.168.120.9:3004/RegisterResultReflow')
 
-                }} 
-                className="flex flex-col justify-center items-center w-full h-full text-white">
+                    }}
+                    className="flex flex-col justify-center items-center w-full h-full text-white">
                     <VscSignIn className="size-25 text-white m-4" />
                     <div>SIGN IN</div>
                     <div className="font-kanit text-xl">ล็อคอิน</div>
                 </div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
-                   
+
                 </div>
             </div>
         </div>
@@ -327,20 +371,30 @@ const MenuToggle = () => {
                         placeholder="product id..."
                     />
                     <div className="flex w-full h-fit items-center">
-                        <span
-                            onClick={startScan}
-                            className="flex w-1/2 h-32 justify-center">
-                            <BsUpcScan className="size-32 text-white" />
-                        </span>
+                        <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                            <span
+                                onClick={startScan}
+                                className="flex w-1/2 h-32 justify-center">
+                                <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                            </span>
+                            <div>SCAN</div>
+                            <div>สแกน</div>
+                        </div>
                         <div
                             onClick={() => {
                                 handleNextPageStatus();
+                                setHomeStage("home");
                                 clearinputref();
                             }}
 
-                            className="flex flex-col text-4xl font-bold justify-center items-center font-roboto w-1/2 size-32 bg-green-600 rounded-full cursor-pointer"
-                        >
-                            SUBMIT
+                            className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                            <GoCheckCircle className="size-30 " />
+                            <div>
+                                SUBMIT
+                            </div>
+                            <div>
+                                ส่งข้อมูล
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -348,23 +402,71 @@ const MenuToggle = () => {
         );
     };
 
-    const handleNextPageStatus = () => {
-        const value = inputRef.current?.value.trim();
+    const renderSigninCard = () => {
+        if (homeStage !== "signin") return null;
 
-        if (!value) {
-            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
-            return;
-        }
-        setHomeStage("home");
-        handleSaveAndNavigate();
+        return (
+            <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
+                <div
+                    ref={cardRef}
+                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl h-fit p-6"
+                >
+                    <div className="flex justify-center items-center w-full text-white">
+                        Please enter your ID :
+                    </div>
+                    <div className="flex justify-center items-center w-full text-white">
+                        โปรดใส่รหัสของคุณ :
+                    </div>
+                    <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                    <input
+                        ref={inputIDRef}
+                        type="text"
+                        id="employee_id"
+                        onChange={(e) => setEmployeeID(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Your employee id..."
+                    />
+                    <div className="flex w-full h-fit items-center">
+                        <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                            <span
+                                onClick={startScan}
+                                className="flex w-1/2 h-32 justify-center">
+                                <BsUpcScan className="size-32 text-white"></BsUpcScan>
+                            </span>
+                            <div>SCAN</div>
+                            <div>สแกน</div>
+                        </div>
+                        <div
+                            onClick={() => {
+                                
+                                setHomeStage("home");
+                                clearinputref();
+                            }}
 
+                            className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
+                            <GoCheckCircle className="size-30 " />
+                            <div>
+                                SUBMIT
+                            </div>
+                            <div>
+                                ส่งข้อมูล
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     };
+
+
+
 
     return (
         <>
             {homeStage === "home" && renderHomeButton()}
             {homeStage === "menuOpen" && renderMenu()}
             {homeStage === "scan" && renderScanCard()}
+            {homeStage === "signin" && renderSigninCard()}
 
             <div className="absolute bottom-5 left-5 text-white">
                 Position: {`X: ${position.x}, Y: ${position.y}`}

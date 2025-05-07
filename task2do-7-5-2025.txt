@@ -2,9 +2,10 @@
 ADD ID 
 ID 0743 0506 && IT ID 
 
-SIGN IN CARD
+SIGN IN CARD 
 
-FUNCTION ALERT  ok!
+FUNCTION ALERT  ok! ( / )
 but btw many ALERT 
+ALERT RESULT ( / )
 
-CHECKED วัดสำเร็จ
+CHECKED วัดสำเร็จ 
