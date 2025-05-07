@@ -1391,14 +1391,14 @@ const checkreflowpage = () => {
       </div>
 
       {topper && (
-        <div className="flex flex-col justify-center items-center relative z-40">
+        <div className="flex flex-col justify-center items-center relative z-40 h-[5%]">
           {/* Header Box */}
-          <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+          <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
             {/* Box1 */}
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                <div className="font-roboto text-4xl text-white w-full font-bold">{data120_2?.productName}</div>
+                <div className="font-roboto text-2xl text-white w-full font-bold">{data120_2?.productName}</div>
               </div>
             </div>
             {/* Box2 */}
