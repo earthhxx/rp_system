@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
 import { useSearchParams } from 'next/navigation';
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
@@ -48,22 +48,12 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
   return value ? JSON.parse(value) : null;
 }
 
-const ProductOrderNoComponent = () => {
-  
-
-  const searchParams = useSearchParams();
-  const ProductOrderNo = searchParams.get('productOrderNo');
-
-  return ProductOrderNo;
-};
-
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
   const props = { base64: "someBase64String" };
   const { base64 } = props;
-  ProductOrderNoComponent();
-  const ProductOrderNo = ProductOrderNoComponent();
+
 
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
@@ -86,8 +76,8 @@ const checkreflowpage = () => {
   const [pdfWarning, setPdfWarning] = useState("");
   const [pdfWarning2, setPdfWarning2] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
-
-
+  const searchParams = useSearchParams();
+  const ProductOrderNo = searchParams.get('productOrderNo');
 
   const [isCardOpen, setIsCardOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -100,7 +90,7 @@ const checkreflowpage = () => {
   const [isPdfOpen, setPdfOpen] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const alertRef = useRef<HTMLDivElement>(null);
+  const alertRef = useRef<HTMLDivElement>(null);  
 
 
   const [topper, setTopper] = useState(false);
@@ -144,8 +134,6 @@ const checkreflowpage = () => {
     await fetchPdfData2();
   };
 
-
-
   //LOAD Moldel from local
   useEffect(() => {
     if (data120_2) {
@@ -175,8 +163,6 @@ const checkreflowpage = () => {
 
     if (EmployeeNo) fetchEmployeeName();
   }, [EmployeeNo]);
-
-  
   const fetchPdfData2 = async () => {
 
     try {
@@ -560,7 +546,6 @@ const checkreflowpage = () => {
       setIsLoading120_2(true);
 
       try {
-        console.log("ProductOrderNo:", ProductOrderNo);
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
@@ -656,7 +641,7 @@ const checkreflowpage = () => {
         setStatusData120_9(statusItem);
 
         const { ST_Status, ST_Prod } = statusItem;
-        const isProdMatch = ST_Prod === data120_2.productOrderNo;
+        const isProdMatch = ST_Prod === ProductOrderNo;
 
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
@@ -939,7 +924,6 @@ const checkreflowpage = () => {
   let buttonClassL = "";
   let buttonContent = null;
   let buttonClick = () => { };
-  let w = "w-[50%]";
 
 
 
@@ -967,7 +951,7 @@ const checkreflowpage = () => {
 
   switch (submitStage) {
     case "WAITING":
-      w = "";
+
       buttonClass = "bg-yellow-400 text-black";
       buttonClassL = "bg-yellow-400/50";
       buttonClick = () => setIsCardOpen(true);
@@ -1004,7 +988,7 @@ const checkreflowpage = () => {
       );
       break;
     case "ONCHECKING":
-      w = "";
+
       buttonClass = "bg-[#9ec5fe] text-black";
       buttonClassL = "bg-[#cfe2ff]";
       buttonClick = () => setisCardOpenONCHECKING(true);
@@ -1042,7 +1026,6 @@ const checkreflowpage = () => {
       break;
     case "CHECKED":
       buttonClass = "";
-      w = "w-[100%]";
       buttonClassL = "bg-green-300/10";
       buttonContent = (
         <>
@@ -1220,6 +1203,7 @@ const checkreflowpage = () => {
     <div className="flex flex-col h-screen w-full bg-blue-100">
       {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
 
+
       {(isLoading || isLoading120_9) && renderLoading()}
       {
         isCardOpencancel && (
@@ -1372,7 +1356,6 @@ const checkreflowpage = () => {
                         <div
                           onClick={() => {
                             setArrowDownButtoncard(false);
-                            setArrowDownButton(true);
                             setPdfOpen(true);
                             handleOpenPdf();
                             console.log('pass setpdfopen')
@@ -1397,14 +1380,14 @@ const checkreflowpage = () => {
       </div>
 
       {topper && (
-        <div className="flex flex-col justify-center items-center relative z-40 h-[5%]">
+        <div className="flex flex-col justify-center items-center relative z-40">
           {/* Header Box */}
-          <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+          <div className="flex h-22 w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
             {/* Box1 */}
             <div className="flex flex-col max-h-full justify-center items-center">
               {/* Row2 */}
               <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                <div className="font-roboto text-2xl text-white w-full font-bold">{data120_2?.productName}</div>
+                <div className="font-roboto text-4xl text-white w-full font-bold">{data120_2?.productName}</div>
               </div>
             </div>
             {/* Box2 */}
@@ -1412,7 +1395,7 @@ const checkreflowpage = () => {
               <button
                 // onClick={() => setIsCardOpen(true)}
                 type="button"
-                className={`flex size-15 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
+                className={`flex size-20 items-center px-4 py-2 transition-all duration-300 ${buttonClass}`}
               >
                 <svg
                   className="w-20 h-20"
@@ -1443,6 +1426,10 @@ const checkreflowpage = () => {
             </div>
           </div>
 
+          {/* Success Message */}
+          <div className="fixed flex top-0 justify-center w-full h-full text-5xl text-green-400 bg-green-400/5 z-10">
+            {/* <div className="flex justify-center items-center"> ! SUCCESS ! {ProductOrderNo} </div> */}
+          </div>
         </div>
       )}
 
@@ -1487,9 +1474,7 @@ const checkreflowpage = () => {
                   Production No:
                 </div>
                 <div className="text-white drop-shadow-2xl font-roboto font-bold text-[25px]">
-                  <Suspense fallback={<div>Loading...</div>}>
-                    {data120_2?.productOrderNo || "ไม่มีข้อมูล ProductOrderNo"}
-                  </Suspense>
+                  {ProductOrderNo || "ไม่พบ ProductOrderNo"}
                 </div>
               </div>
             </div>
@@ -1509,7 +1494,35 @@ const checkreflowpage = () => {
           </div>
         </div>
       )}
-      
+      {isPdfOpen && (
+        <div className="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center">
+          <button
+            onClick={() => {
+              setPdfOpen(false);
+              setArrowDownButton(true);
+            }}
+            className="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white font-bold rounded-full shadow-lg z-49"
+          >
+            ✕
+          </button>
+
+          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+            <div className="w-full h-full">
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                {pdfUrl2 ? (
+                  <Viewer
+                    fileUrl={pdfUrl2}
+                    defaultScale={SpecialZoomLevel.PageFit}
+                    plugins={[zoomPluginInstance]}
+                  />
+                ) : (
+                  <div className="text-center text-gray-500 text-xl">รอผลการวัด...</div>
+                )}
+              </Worker>
+            </div>
+          </div>
+        </div>
+      )}
 
 
 
@@ -1645,10 +1658,9 @@ const checkreflowpage = () => {
       }
       {isLoading120_9 && <p>🔄 กำลังโหลด PDF...</p>}
       {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
-      <div className="flex flex-row justify-center items-center w-full h-full"> 
       {pdfUrl && (
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 ${w}`}>
+          <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
             <div className="w-full h-full ">
               <Viewer
                 fileUrl={pdfUrl}
@@ -1659,31 +1671,12 @@ const checkreflowpage = () => {
           </div>
         </Worker>
       )}
-      {isPdfOpen && (
-          <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 [${w}]`}>
-            <div className="w-full h-full">
-              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                {pdfUrl2 ? (
-                  <Viewer
-                    fileUrl={pdfUrl2}
-                    defaultScale={SpecialZoomLevel.PageFit}
-                    plugins={[zoomPluginInstance]}
-                  />
-                ) : (
-                  <div className="text-center text-gray-500 text-xl">รอผลการวัด...</div>
-                )}
-              </Worker>
-            </div>
-          </div>
-      )}
-      </div>
-      
 
 
       {/* 🔴 User Popup แสดงเมื่อไม่พบรหัสพนักงาน */}
       {showAlert && (
-        <div
-          className="modal-overlay">
+        <div 
+        className="modal-overlay">
           <div ref={alertRef} className="modal-content-rg flashing-border text-4xl flex flex-col justify-center items-center">
             <div className="warning-icon">⚠️</div>
             <h2 style={{ color: "red" }}>ALERT</h2>
