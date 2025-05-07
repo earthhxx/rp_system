@@ -127,7 +127,7 @@ const ActiveLinesDashboard: React.FC = () => {
                         <div>ONCHECKING (กำลังวัด)</div>
                     )}
                     {line.status === "CHECKED" && (
-                        <div>CHECKED (เช็คแล้ว)</div>
+                        <div>CHECKED (เช็คสําเร็จ)</div>
                     )}
                 </div>
                 <div className="">MODEL (โมเดล) </div>
