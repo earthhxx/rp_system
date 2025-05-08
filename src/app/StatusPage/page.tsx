@@ -1684,9 +1684,9 @@ const checkreflowpage = () => {
         {pdfWarning && <p className="text-red-500 z-10">{pdfWarning}</p>}
         <div className="flex flex-row justify-center items-center w-full h-full">
           {pdfUrl && (
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Worker workerUrl="./pdf.worker.min.js">
               <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 ${w}`}>
-                <div className="w-full h-full ">
+                <div className="w-full h-full">
                   <Viewer
                     fileUrl={pdfUrl}
                     defaultScale={SpecialZoomLevel.PageFit}
@@ -1696,10 +1696,11 @@ const checkreflowpage = () => {
               </div>
             </Worker>
           )}
+
           {isPdfOpen && (
-            <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 [${w}]`}>
+            <div className={`flex items-center justify-center h-screen w-screen bg-gray-100 ${w}`}>
               <div className="w-full h-full">
-                <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                <Worker workerUrl="./pdf.worker.min.js">
                   {pdfUrl2 ? (
                     <Viewer
                       fileUrl={pdfUrl2}
