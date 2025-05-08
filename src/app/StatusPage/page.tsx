@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
-import { useSearchParams } from 'next/navigation';
+
 import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { FaFilePdf } from "react-icons/fa6";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaHandPointDown } from "react-icons/fa";
+import StatusReader from '../components/UseParams';
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -48,22 +49,13 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
   return value ? JSON.parse(value) : null;
 }
 
-const ProductOrderNoComponent = () => {
-  
-
-  const searchParams = useSearchParams();
-  const ProductOrderNo = searchParams.get('productOrderNo');
-
-  return ProductOrderNo;
-};
 
 
 //api if !datalocal check status = ??? else back to layout
 const checkreflowpage = () => {
   const props = { base64: "someBase64String" };
   const { base64 } = props;
-  ProductOrderNoComponent();
-  const ProductOrderNo = ProductOrderNoComponent();
+  const [ProductOrderNo, setProductOrderNo] = useState<string | null>(null);
 
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
@@ -128,6 +120,13 @@ const checkreflowpage = () => {
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
   const [employeeUserName, setEmployeeUserName] = useState("");
+
+  useEffect(() => {
+    if (ProductOrderNo) {
+        console.log("ProductOrderNo updated:", ProductOrderNo);
+        // You can add additional logic here, such as fetching data based on ProductOrderNo
+    }
+}, [ProductOrderNo]);
 
   const handleShowPdf2 = (base64: string) => {
     try {
@@ -549,14 +548,13 @@ const checkreflowpage = () => {
   }, [base64]);
 
   // Fetching Data 120-2
-  let hasFetched = false;
 
   useEffect(() => {
-    if (hasFetched) return;
-    hasFetched = true;
+    console.log("Fetching data for ProductOrderNo:", ProductOrderNo);
 
     const fetchData = async () => {
       if (!ProductOrderNo) return;
+      console.log("Fetching data for ProductOrderNo:", ProductOrderNo);
       setIsLoading120_2(true);
 
       try {
@@ -585,7 +583,7 @@ const checkreflowpage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [ProductOrderNo]);
 
 
 
@@ -1217,7 +1215,9 @@ const checkreflowpage = () => {
   const [isLoading, setisLoading] = useState(false);
 
   return (
+    
     <div className="flex flex-col h-screen w-full bg-blue-100">
+      <StatusReader onGetproductOrderNo={setProductOrderNo} />
       {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
 
       {(isLoading || isLoading120_9) && renderLoading()}
