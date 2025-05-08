@@ -383,9 +383,9 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log submit failed:", result.message);
+        console.error("Log !res !reult :", result.message);
       } else {
-        console.log("Log submitted successfully");
+        console.log("Log else",result);
       }
 
     } catch (error) {
@@ -798,6 +798,8 @@ const checkreflowpage = () => {
 
   useEffect(() => {
     console.log('inputRef.current:', inputRef.current);
+    console.log("name",employeeName);
+    console.log("no",EmployeeNo);
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
   const clearinputref = () => {
@@ -1220,7 +1222,6 @@ useEffect(() => {
 useEffect(() => {
   if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING) {
     inputRef.current = null;
-    setEmployeeName("");
   }
 }, [isCardOpen, isCardOpencancel, isCardOpenclosepro, isCardOpenONCHECKING]);
 

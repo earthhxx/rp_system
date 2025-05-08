@@ -39,7 +39,10 @@ export async function POST(req: NextRequest) {
         VALUES (@Log_Line, @Log_Model, @Log_ProOrder, @Log_Status , GETDATE())
       `);
 
-    return NextResponse.json({ success: true, message: 'Log inserted successfully' });
+    const result = await pool.request()
+      .query('SELECT TOP 1 * FROM REFLOW_Log ORDER BY Datetime DESC');
+
+    return NextResponse.json({ success: true, message: 'Log inserted successfully reflow_log', result: result.recordset[0] });
 
   } catch (error) {
     console.error('DB Insert Error:', error);
