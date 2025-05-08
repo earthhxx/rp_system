@@ -139,8 +139,10 @@ const checkreflowpage = () => {
     }
   };
   const handleOpenPdf = async () => {
-    setPdfOpen(true);
-    await fetchPdfData2();
+    setPdfOpen((prev) => !prev);
+    if (!isPdfOpen) {
+      await fetchPdfData2();
+    }
   };
 
 
@@ -1373,9 +1375,7 @@ const checkreflowpage = () => {
                           onClick={() => {
                             setArrowDownButtoncard(false);
                             setArrowDownButton(true);
-                            setPdfOpen(true);
                             handleOpenPdf();
-                            console.log('pass setpdfopen')
                           }}
                           className="flex flex-col  justify-center items-center font-kanit text-white ">
                           <div className="flex flex-none"></div>
