@@ -1234,7 +1234,7 @@ const checkreflowpage = () => {
     </div>
   );
   const pointing = () => (
-    <div className="fixed top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
+    <div className="fixed top-50 xl:top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
   );
   const [isLoading, setisLoading] = useState(false);
 
@@ -1461,7 +1461,6 @@ const checkreflowpage = () => {
                 </button>
               </div>
             </div>
-
           </div>
         )}
 
@@ -1480,7 +1479,7 @@ const checkreflowpage = () => {
         ) : (
           // แสดงผลหลัก
           <div
-            className={`fixed z-40 top-110 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
+            className={`fixed z-40 top-60 xl:top-110 flex h-70 w-full backdrop-blur-sm drop-shadow-2xl items-center justify-center ${buttonClassL}`}
           >
             {showBar ? (
               <div className="flex flex-col max-h-full w-full ps-4 pe-4 justify-center items-center">
