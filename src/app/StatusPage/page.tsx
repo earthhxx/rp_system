@@ -1249,7 +1249,7 @@ const checkreflowpage = () => {
         {
           isCardOpencancel && (
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRefcancel} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+              <div ref={cardRefcancel} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4  size-110 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
                 <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
                 <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
                 <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
@@ -1263,21 +1263,19 @@ const checkreflowpage = () => {
                   placeholder="รหัสพนักงาน"
                 />
                 <div className="flex w-full h-full items-center">
-                  <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <span
-                      onClick={startScan}
-                      className="flex w-1/2 h-32 justify-center">
-                      <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                    </span>
-                    <div>SCAN</div>
-                    <div>สแกน</div>
+                  <div className="flex flex-col  text-white justify-center items-center font-kanit w-1/2">
+                    <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                      <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                      <div>SCAN</div>
+                      <div>สแกน</div>
+                    </div>
                   </div>
                   <div
                     onClick={() => {
                       handleNextPageStatuscancel();
                     }}
-                    className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-30 " />
+                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <GoCheckCircle className="size-15 xl:size-30 " />
                     <div>
                       SUBMIT
                     </div>
@@ -1295,7 +1293,7 @@ const checkreflowpage = () => {
         {
           isCardOpenclosepro && (
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRefClosepro} className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
+              <div ref={cardRefClosepro} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4  size-110 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
                 <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
                 <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
                 <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
@@ -1310,21 +1308,19 @@ const checkreflowpage = () => {
                 />
                 <div className="flex w-full h-full items-center">
 
-                  <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <span
-                      onClick={startScan}
-                      className="flex w-1/2 h-32 justify-center">
-                      <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                    </span>
-                    <div>SCAN</div>
-                    <div>สแกน</div>
+                  <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                      <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                      <div>SCAN</div>
+                      <div>สแกน</div>
+                    </div>
                   </div>
                   <div
                     onClick={() => {
                       handleNextPageStatuscloseprod();
                     }}
-                    className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-30 " />
+                    className="flex flex-col  text-white justify-center items-center font-kanit w-1/2">
+                    <GoCheckCircle className="size-15 xl:size-30 " />
                     <div>
                       SUBMIT
                     </div>
@@ -1357,8 +1353,8 @@ const checkreflowpage = () => {
           {arrowdownbuttoncard && (
             <>
               <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-49">
-                <div ref={cardarrowRef} className="content-center-safe m-4 w-150 justify-center items-center h-60 rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
-                  <div className="flex flex-none h-10"></div>
+                <div ref={cardarrowRef} className="content-center-safe m-4 w-110 xl:w-150 h-30 xl:h-60 text-[10px] justify-center items-center  rounded-4xl bg-gray-800/70 backdrop-blur-md  ">
+                  <div className="flex flex-none h-5 xl:h-10"></div>
                   <div className="flex flex-row justify-center items-center ">
                     <div className="flex w-full h-full justify-center">
                       <div className="flex flex-none"></div>
@@ -1369,7 +1365,7 @@ const checkreflowpage = () => {
                         }}
                         className="flex flex-col justify-center items-center font-kanit text-white">
                         <div className="flex flex-none"></div>
-                        <GoSkipFill className="size-30 text-white " />
+                        <GoSkipFill className="size-15 xl:size-30 text-white " />
                         <div>CANCEL PRODUCT</div>
                         <div>ยกเลิก โปรไฟล์</div>
                       </div>
@@ -1386,7 +1382,7 @@ const checkreflowpage = () => {
                             }}
                             className="flex flex-col  justify-center items-center font-kanit text-white">
                             <div className="flex flex-none"></div>
-                            <GoCheckCircle className="size-30 text-white" />
+                            <GoCheckCircle className="size-15 xl:size-30 text-white" />
                             <div>SUBMIT PRODUCT</div>
                             <div>สำเร็จการวัดโปรไฟล์</div>
                           </div>
@@ -1402,7 +1398,7 @@ const checkreflowpage = () => {
                             }}
                             className="flex flex-col  justify-center items-center font-kanit text-white ">
                             <div className="flex flex-none"></div>
-                            <FaFilePdf className="size-28 text-white" />
+                            <FaFilePdf className=" size-15 xl:size-28 text-white" />
                             <div>RESULT</div>
                             <div>ผลการวัดโปรไฟล์</div>
                           </div>
@@ -1541,7 +1537,7 @@ const checkreflowpage = () => {
         {
           isCardOpen && (
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRef} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+              <div ref={cardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
                 <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
                 <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
                 <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
@@ -1556,7 +1552,7 @@ const checkreflowpage = () => {
                   placeholder="รหัสพนักงาน"
                 />
                 <div className="flex flex-row w-full justify-center items-center">
-                  <div className="flex flex-col text-xl items-center">
+                  <div className="flex flex-col items-center">
                     <div className="flex justify-center items-center  text-white">continuously or not?</div>
                     <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
                   </div>
@@ -1573,10 +1569,10 @@ const checkreflowpage = () => {
                       console.log('employeeNO', EmployeeNo);
                       togglepassmodelbutton();
                     }}
-                    className={`px-4 py-2 size-20 rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                    className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                       }`}
                   >
-                    <pre>
+                    <pre className="text-[10px] xl:text-xl">
                       {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
                     </pre>
 
@@ -1585,12 +1581,8 @@ const checkreflowpage = () => {
                 </div>
 
                 <div className="flex w-full h-full items-center">
-                  <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <span
-                      onClick={startScan}
-                      className="flex w-1/2 h-32 justify-center">
-                      <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                    </span>
+                  <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
                     <div>SCAN</div>
                     <div>สแกน</div>
                   </div>
@@ -1616,8 +1608,8 @@ const checkreflowpage = () => {
                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                       }
                     }}
-                    className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-30 " />
+                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <GoCheckCircle className="size-15 xl:size-30 " />
                     <div>
                       SUBMIT
                     </div>
@@ -1633,7 +1625,7 @@ const checkreflowpage = () => {
         {
           isCardOpenONCHECKING && (
             <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRefONCHECKING} className="transition-all duration-300 scale-100 opacity-100 flex flex-col h-fit gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+              <div ref={cardRefONCHECKING} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
                 <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
                 <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
                 <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
@@ -1648,14 +1640,12 @@ const checkreflowpage = () => {
                 />
                 <div className="flex w-full h-full items-center">
 
-                  <div className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <span
-                      onClick={startScan}
-                      className="flex w-1/2 h-32 justify-center">
-                      <BsUpcScan className="size-32 text-white"></BsUpcScan>
-                    </span>
-                    <div>SCAN</div>
-                    <div>สแกน</div>
+                  <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                      <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                      <div>SCAN</div>
+                      <div>สแกน</div>
+                    </div>
                   </div>
                   <div
                     onClick={() => {
@@ -1666,8 +1656,8 @@ const checkreflowpage = () => {
                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                       }
                     }}
-                    className="flex flex-col text-xl text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-30 " />
+                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                    <GoCheckCircle className="size-15 xl:size-30 " />
                     <div>
                       SUBMIT
                     </div>

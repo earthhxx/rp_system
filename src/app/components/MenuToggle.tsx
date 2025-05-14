@@ -278,7 +278,7 @@ const MenuToggle = () => {
         <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-95 bg-black/20 backdrop-blur-sm">
             <div
                 ref={menuRef}
-                className="grid grid-cols-3 gap-4 size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-4"
+                className="grid grid-cols-3 gap-4 size-110 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-4"
             >
                 <div className="flex w-full h-full"></div>
                 <div
@@ -290,10 +290,10 @@ const MenuToggle = () => {
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <AiFillHome className="size-25 text-white m-4" />
+                    <AiFillHome className="size-12 xl:size-25 text-white m-4" />
 
-                    <div>HOME</div>
-                    <div className="font-kanit text-xl">หน้าหลัก</div>
+                    <div className=" text-[10px] xl:text-xl">HOME</div>
+                    <div className="font-kanit text-[14px] xl:text-xl">หน้าหลัก</div>
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -305,9 +305,9 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
 
-                    <BsClipboard2DataFill className="size-25 text-white m-4" />
-                    <div>REALTIME CHECK</div>
-                    <div className="font-kanit text-xl">เช็คสถานะ โปรไฟล์</div>
+                    <BsClipboard2DataFill className="size-12 xl:size-25 text-white m-4" />
+                    <div className="text-[10px] xl:text-xl">REALTIME CHECK</div>
+                    <div className="font-kanit text-[14px] xl:text-xl">เช็คสถานะ โปรไฟล์</div>
 
 
                 </div>
@@ -326,9 +326,9 @@ const MenuToggle = () => {
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white cursor-pointer"
                 >
-                    <BsUpcScan className="size-25 text-white m-4" />
-                    <div>STANDARD SEARCH</div>
-                    <div className="font-kanit text-xl">ค้นหา ข้อกำหนด</div>
+                    <BsUpcScan className="size-12 xl:size-25 text-white m-4" />
+                    <div className="text-[10px] xl:text-xl">STANDARD SEARCH</div>
+                    <div className="font-kanit text-[14px] xl:text-xl">ค้นหา ข้อกำหนด</div>
                 </div>
                 <div
                     onClick={() => {
@@ -338,9 +338,9 @@ const MenuToggle = () => {
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <MdHistory className="size-25 text-white m-4" />
-                    <div>HISTORY SEARCH</div>
-                    <div className="font-kanit text-xl">ค้นหาประวัติ</div>
+                    <MdHistory className="size-15 xl:size-25 text-white m-4" />
+                    <div className="text-[10px] xl:text-xl">HISTORY SEARCH</div>
+                    <div className="font-kanit text-[14px] xl:text-xl">ค้นหาประวัติ</div>
                 </div>
                 <div className="flex w-full h-full"></div>
                 <div
@@ -350,9 +350,9 @@ const MenuToggle = () => {
                         setIsMenuOpen(false);
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
-                    <VscSignIn className="size-25 text-white m-4" />
-                    <div>SIGN IN</div>
-                    <div className="font-kanit text-xl">ล็อคอิน</div>
+                    <VscSignIn className="size-12 xl:size-25 text-white m-4" />
+                    <div className="text-[10px] xl:text-xl">SIGN IN</div>
+                    <div className="font-kanit text-[14px] xl:text-xl">ล็อคอิน</div>
                 </div>
                 <div className="flex flex-col justify-center items-center w-full h-full text-white">
 
@@ -370,7 +370,7 @@ const MenuToggle = () => {
 
                 <div
                     ref={cardRef}
-                    className="transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl h-fit p-6"
+                    className="transition-all duration-300 opacity-100 flex flex-col gap-4 size-110 xl:size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6"
                 >
                     <div className="flex justify-center items-center w-full text-white">
                         Please enter Product ID :
