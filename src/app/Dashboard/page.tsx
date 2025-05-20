@@ -20,6 +20,23 @@ const animetion = {
     NULL: "",
 };
 
+// Util สำหรับจัดการ localStorage
+function setJsonToLocalStorage<T>(key: string, value: T) {
+    localStorage.setItem(key, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value } }));
+}
+
+function getJsonFromLocalStorage<T>(key: string): T | null {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+}
+
+function removeItemFromLocalStorage(key: string) {
+    localStorage.removeItem(key);
+    window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value: null } }));
+}
+
+
 const icons = {
     CHECKED: (
         <span className="flex items-center justify-center size-[56px]">
@@ -65,35 +82,29 @@ const ActiveLinesDashboard: React.FC = () => {
     const cardRef = useRef<HTMLDivElement>(null);
 
 
-    const handleCopyConfirm = () => {
-        if (selectedOrder) {
-            navigator.clipboard.writeText(selectedOrder);
-        }
-        setShowConfirm(false);
-    };
 
     const handleCancel = () => {
         setSelectedOrder(null);
         setShowConfirm(false);
+        removeItemFromLocalStorage("productOrderNo")
     };
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            const isClickOutsideCard = cardRef.current && !cardRef.current.contains(event.target as Node);
 
-            // ถ้าเปิดเมนูอยู่ แล้วคลิกข้างนอก ให้ปิดเมนู
-            if (showConfirm) {
+
+    useEffect(() => {
+        const handleStorageChange = (event: Event) => {
+            const customEvent = event as CustomEvent;
+            if (customEvent.detail.key === "productOrderNo" && customEvent.detail.value === null) {
+                console.log("LocalStorage 'productOrderNo' ถูกลบแล้ว, ปรับ state");
+                setSelectedOrder(null);
+                setSelectedLineId(null);
                 setShowConfirm(false);
             }
-
-
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        window.addEventListener("local-storage-change", handleStorageChange);
+        return () => window.removeEventListener("local-storage-change", handleStorageChange);
+    }, []);
 
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [showConfirm]);
 
 
     useEffect(() => {
@@ -147,6 +158,9 @@ const ActiveLinesDashboard: React.FC = () => {
             return linesState.filter((line) => line.status);
         }
     };
+    useEffect(() => {
+        console.log("selectedOrder updated:", selectedOrder);
+    }, [selectedOrder]);
 
     const renderLines = () => {
         return filteredLines().map((line) => (
@@ -154,6 +168,7 @@ const ActiveLinesDashboard: React.FC = () => {
                 key={line.id}
                 onClick={() => {
                     setSelectedOrder(line.workOrder);
+                    console.log(selectedOrder);
                     setSelectedLineId(line.id);
                     setShowConfirm(true);
                 }}
@@ -258,7 +273,7 @@ const ActiveLinesDashboard: React.FC = () => {
 
             </div>
             {showConfirm && (
-                <div ref={cardRef} className="fixed font-kanit inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+                <div ref={cardRef} className="fixed font-kanit inset-0 z-49 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white rounded-2xl shadow-xl px-6 py-5 sm:p-8 text-center w-full max-w-md mx-4">
                         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">
                             ต้องการคัดลอกหมายเลข Order นี้หรือไม่?
@@ -272,13 +287,30 @@ const ActiveLinesDashboard: React.FC = () => {
 
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                             <button
-                                onClick={handleCopyConfirm}
-                                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
+                                onClick={() => {
+                                    console.log(selectedLineId);
+                                    console.log(selectedOrder);
+                                    if (selectedOrder) {
+                                        try {
+                                            setJsonToLocalStorage("productOrderNo", selectedOrder);
+                                            alert("Saved ProductOrder! /n บันทึกเลข ProductOrder");
+                                            setShowConfirm(false);
+                                        } catch (err) {
+                                            alert("Save failed: " + err);
+                                        }
+                                    }
+                                }}
+
+                                className=" bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
                             >
                                 ✅ ใช่, คัดลอกเลย
                             </button>
                             <button
-                                onClick={handleCancel}
+
+                                onClick={() => {
+                                    console.log('s'),
+                                        handleCancel();
+                                }}
                                 className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
                             >
                                 ❌ ยกเลิก

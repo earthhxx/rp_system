@@ -82,7 +82,7 @@ const MenuToggle = () => {
         return () => {
             window.removeEventListener("storage", handleStorageChange);
         };
-    }, []);
+    }, [homeStage]);
 
 
     const handleSaveAndNavigate = () => {
