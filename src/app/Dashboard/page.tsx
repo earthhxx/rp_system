@@ -62,7 +62,7 @@ const ActiveLinesDashboard: React.FC = () => {
     useEffect(() => {
         const fetchLines = async () => {
             try {
-                
+
                 const response = await fetch("/api/120-9/dashboard/select_status");
                 if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
                 const raw = await response.json();
@@ -131,7 +131,8 @@ const ActiveLinesDashboard: React.FC = () => {
                     )}
                 </div>
                 <div className="">MODEL (โมเดล) </div>
-                <div className="model text-[16px] pb-2 ">{` ${line.model}`}</div>
+                <div className="model text-[16px] ">{` ${line.model}`}</div>
+                <div className="model text-[12px] ">{`Order : ${line.workOrder}`}</div>
                 <div className="WAITING text-sm pt-2 text-red-600">
                     {line.status === "WAITING"
                         ? `WAITING: ${line.waitTime} minutes`
@@ -151,16 +152,16 @@ const ActiveLinesDashboard: React.FC = () => {
             { value: 'ONCHECKING', label: 'ONCHECKING\n (กำลังวัด)' },
             { value: 'CHECKED', label: 'CHECKED\n (เช็คแล้ว)' },
         ];
-    
+
         const activeClass = {
             ALL: "bg-gray-300 text-gray-800",
             WAITING: "bg-[#f7e1a7] text-yellow-900",
             ONCHECKING: "bg-[#9ec5fe] text-blue-600",
             CHECKED: "bg-[#a0d3a9] text-green-900",
         };
-    
+
         return (
-            <div className="w-full flex justify-center mb-4">
+            <div className="w-full flex justify-center ">
                 <div className="whitespace-pre-line flex flex-row flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 rounded-full shadow-2xl bg-sky-800/80 justify-center items-center w-full min-w-0 lg:w-lg xl:w-2xl">
                     {filterOptions.map(({ label, value }) => (
                         <button
@@ -178,7 +179,7 @@ const ActiveLinesDashboard: React.FC = () => {
             </div>
         );
     };
-    
+
 
     return (
         <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
@@ -190,7 +191,7 @@ const ActiveLinesDashboard: React.FC = () => {
                     alt="Picture of the author"
                 />
                 <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
-                    <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 mt-2 sm:text-2xl md:text-2xl xl:text-4xl ">
+                    <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 sm:text-2xl md:text-2xl xl:text-4xl ">
                         <div>
                             PROFILE MEASUREMENT REALTIME
                         </div>
