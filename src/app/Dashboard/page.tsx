@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from 'next/image';
 
 // Type definitions
 type LineStatus = {
-    id: number;
+    id: string;
     model: string;
     workOrder: string;
     status: 'NULL' | 'WAITING' | 'ONCHECKING' | 'CHECKED';
@@ -58,6 +58,43 @@ const colors = {
 const ActiveLinesDashboard: React.FC = () => {
     const [linesState, setLinesState] = useState<LineStatus[]>([]);
     const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED'>('ALL');
+
+    const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+    const [selectedLineId, setSelectedLineId] = useState<string | null>(null);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+
+    const handleCopyConfirm = () => {
+        if (selectedOrder) {
+            navigator.clipboard.writeText(selectedOrder);
+        }
+        setShowConfirm(false);
+    };
+
+    const handleCancel = () => {
+        setSelectedOrder(null);
+        setShowConfirm(false);
+    };
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const isClickOutsideCard = cardRef.current && !cardRef.current.contains(event.target as Node);
+
+            // ถ้าเปิดเมนูอยู่ แล้วคลิกข้างนอก ให้ปิดเมนู
+            if (showConfirm) {
+                setShowConfirm(false);
+            }
+
+
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showConfirm]);
+
 
     useEffect(() => {
         const fetchLines = async () => {
@@ -115,6 +152,12 @@ const ActiveLinesDashboard: React.FC = () => {
         return filteredLines().map((line) => (
             <div
                 key={line.id}
+                onClick={() => {
+                    setSelectedOrder(line.workOrder);
+                    setSelectedLineId(line.id);
+                    setShowConfirm(true);
+                }}
+
                 className={`card ${backgrounds[line.status]} whitespace-pre-line w-full pt-4 ps-4 pe-4 rounded-lg shadow-lg text-center text-black font-kanit`}
             >
                 <div className="line-name font-bold text-2xl  pb-1">{`${line.id}`}</div>
@@ -144,6 +187,8 @@ const ActiveLinesDashboard: React.FC = () => {
             </div>
         ));
     };
+
+
 
     const renderFilterBar = () => {
         const filterOptions: { label: string; value: 'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED' }[] = [
@@ -182,34 +227,67 @@ const ActiveLinesDashboard: React.FC = () => {
 
 
     return (
-        <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
-            <div className="flex flex-row justify-center items-center me-2 ms-2 w-fit ">
-                <Image className="flex flex-none"
-                    src="/images/438764.png"
-                    width={100}
-                    height={100}
-                    alt="Picture of the author"
-                />
-                <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
-                    <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 sm:text-2xl md:text-2xl xl:text-4xl ">
-                        <div>
-                            PROFILE MEASUREMENT REALTIME
-                        </div>
-                        <div className="font-kanit text-blue-800/90">
-                            โปรไฟล์การวัดผลแบบเรียลไทม์
-                        </div>
-                    </h3>
-                    {renderFilterBar()}
+        <>
+            <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
+                <div className="flex flex-row justify-center items-center me-2 ms-2 w-fit ">
+                    <Image className="flex flex-none"
+                        src="/images/438764.png"
+                        width={100}
+                        height={100}
+                        alt="Picture of the author"
+                    />
+                    <div className="flex flex-col justify-center items-center w-full xl:w-3xl">
+                        <h3 className="flex flex-col w-full h-full justify-center items-center font-noto font-extrabold text-blue-800 mb-2 sm:text-2xl md:text-2xl xl:text-4xl ">
+                            <div>
+                                PROFILE MEASUREMENT REALTIME
+                            </div>
+                            <div className="font-kanit text-blue-800/90">
+                                โปรไฟล์การวัดผลแบบเรียลไทม์
+                            </div>
+                        </h3>
+                        {renderFilterBar()}
+                    </div>
+                    <div className="flex flex-none w-[100px]"></div>
                 </div>
-                <div className="flex flex-none w-[100px]"></div>
-            </div>
 
-            <div className="p-6 m-1 w-full">
-                <div className={` font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full`}>
-                    {renderLines()}
+                <div className="p-6 m-1 w-full">
+                    <div className={` font-bold grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 gap-y-10 w-full h-full`}>
+                        {renderLines()}
+                    </div>
                 </div>
+
             </div>
-        </div>
+            {showConfirm && (
+                <div ref={cardRef} className="fixed font-kanit inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-xl px-6 py-5 sm:p-8 text-center w-full max-w-md mx-4">
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">
+                            ต้องการคัดลอกหมายเลข Order นี้หรือไม่?
+                        </h2>
+                        <p className="text-black font-medium text-2xl mb-6 break-words">
+                            Line {selectedLineId}
+                        </p>
+                        <p className="text-blue-700 text-2xl font-medium mb-6 break-words">
+                            {selectedOrder}
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                            <button
+                                onClick={handleCopyConfirm}
+                                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
+                            >
+                                ✅ ใช่, คัดลอกเลย
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
+                            >
+                                ❌ ยกเลิก
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
