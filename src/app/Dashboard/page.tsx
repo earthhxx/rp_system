@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from 'next/image';
+import { useRouter, usePathname, } from "next/navigation";
 
 // Type definitions
 type LineStatus = {
@@ -73,6 +74,7 @@ const colors = {
 };
 
 const ActiveLinesDashboard: React.FC = () => {
+    const router = useRouter();
     const [linesState, setLinesState] = useState<LineStatus[]>([]);
     const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED'>('ALL');
 
@@ -83,33 +85,18 @@ const ActiveLinesDashboard: React.FC = () => {
 
 
 
-    const handleCancel = () => {
-        setSelectedOrder(null);
-        setShowConfirm(false);
-        removeItemFromLocalStorage("productOrderNo")
-    };
-
     useEffect(() => {
-        const handleStorageChange = (event: StorageEvent | CustomEvent) => {
-            if ((event as StorageEvent).key === "productOrderNo") {
-                setSelectedOrder((event as StorageEvent).newValue || "");
-            } else if ("detail" in event && event.detail.key === "productOrderNo") {
-                setSelectedOrder(event.detail.value || "");
+        const handleClickOutside = (event: MouseEvent) => {
+            const isClickOutsideCard = cardRef.current && !cardRef.current.contains(event.target as Node);
+
+            // ถ้าเปิดเมนูอยู่ แล้วคลิกข้างนอก ให้ปิดเมนู
+            if (isClickOutsideCard) {
+                setShowConfirm(false);
             }
         };
-
-        window.addEventListener("storage", handleStorageChange); // ฟังจาก tab อื่น
-        window.addEventListener("local-storage-change", handleStorageChange as EventListener); // ฟังจาก custom dispatch
-
-        // โหลดค่าครั้งแรก
-        const stored = getJsonFromLocalStorage<string>("productOrderNo");
-        if (stored && typeof stored === "string") {
-            setSelectedOrder(stored);
-        }
-
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            window.removeEventListener("storage", handleStorageChange);
-            window.removeEventListener("local-storage-change", handleStorageChange as EventListener);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -167,9 +154,6 @@ const ActiveLinesDashboard: React.FC = () => {
             return linesState.filter((line) => line.status);
         }
     };
-    useEffect(() => {
-        console.log("selectedOrder updated:", selectedOrder);
-    }, [selectedOrder]);
 
     const renderLines = () => {
         return filteredLines().map((line) => (
@@ -282,11 +266,9 @@ const ActiveLinesDashboard: React.FC = () => {
 
             </div>
             {showConfirm && (
-                <div ref={cardRef} className="fixed font-kanit inset-0 z-49 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-xl px-6 py-5 sm:p-8 text-center w-full max-w-md mx-4">
-                        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">
-                            ต้องการคัดลอกหมายเลข Order นี้หรือไม่?
-                        </h2>
+                <div  className="fixed font-kanit inset-0 z-49 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+                    <div ref={cardRef} className="bg-white rounded-2xl shadow-xl px-6 py-5 sm:p-8 text-center w-full max-w-md mx-4">
+                        
                         <p className="text-black font-medium text-2xl mb-6 break-words">
                             Line {selectedLineId}
                         </p>
@@ -294,39 +276,8 @@ const ActiveLinesDashboard: React.FC = () => {
                             {selectedOrder}
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                            <button
-                                onClick={() => {
-                                    console.log(selectedLineId);
-                                    console.log(selectedOrder);
-                                    if (selectedOrder) {
-                                        try {
-                                            setJsonToLocalStorage("productOrderNo", selectedOrder);
-                                            setSelectedOrder('')
-                                            alert("Saved ProductOrder! บันทึกเลข ProductOrder");
-                                            setShowConfirm(false);
-                                        } catch (err) {
-                                            alert("Save failed: " + err);
-                                        }
-                                    }
-                                }}
-
-                                className=" bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
-                            >
-                                ✅ ใช่, คัดลอกเลย
-                            </button>
-                            <button
-
-                                onClick={() => {
-                                    console.log('s'),
-                                        handleCancel();
-
-                                }}
-                                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
-                            >
-                                ❌ ยกเลิก
-                            </button>
-                        </div>
+                  
+                
                     </div>
                 </div>
             )}
