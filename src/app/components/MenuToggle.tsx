@@ -64,16 +64,18 @@ const MenuToggle = () => {
 
 
     useEffect(() => {
-        //เช็ค event ถ้ามีค่า === prod or ค่าใหม่
-        const handleStorageChange = (event: StorageEvent) => {
-            if (event.key === "productOrderNo") {
-                setProductOrderNo(event.newValue || "");
+        const handleStorageChange = (event: StorageEvent | CustomEvent) => {
+            if ((event as StorageEvent).key === "productOrderNo") {
+                setProductOrderNo((event as StorageEvent).newValue || "");
+            } else if ("detail" in event && event.detail.key === "productOrderNo") {
+                setProductOrderNo(event.detail.value || "");
             }
         };
 
-        window.addEventListener("storage", handleStorageChange);
+        window.addEventListener("storage", handleStorageChange); // ฟังจาก tab อื่น
+        window.addEventListener("local-storage-change", handleStorageChange as EventListener); // ฟังจาก custom dispatch
 
-        // โหลดค่าจาก localStorage
+        // โหลดค่าครั้งแรก
         const stored = getJsonFromLocalStorage<string>("productOrderNo");
         if (stored && typeof stored === "string") {
             setProductOrderNo(stored);
@@ -81,8 +83,10 @@ const MenuToggle = () => {
 
         return () => {
             window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("local-storage-change", handleStorageChange as EventListener);
         };
-    }, [homeStage]);
+    }, []);
+
 
 
     const handleSaveAndNavigate = () => {
@@ -482,14 +486,14 @@ const MenuToggle = () => {
 
     return (
         <>
-                {homeStage === "home" && renderHomeButton()}
-                {homeStage === "menuOpen" && renderMenu()}
-                {homeStage === "scan" && renderScanCard()}
-                {homeStage === "signin" && renderSigninCard()}
+            {homeStage === "home" && renderHomeButton()}
+            {homeStage === "menuOpen" && renderMenu()}
+            {homeStage === "scan" && renderScanCard()}
+            {homeStage === "signin" && renderSigninCard()}
 
-                <div className="absolute bottom-5 left-5 text-white">
-                    Position: {`X: ${position.x}, Y: ${position.y}`}
-                </div>
+            <div className="absolute bottom-5 left-5 text-white">
+                Position: {`X: ${position.x}, Y: ${position.y}`}
+            </div>
         </>
     );
 };

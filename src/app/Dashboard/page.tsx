@@ -89,21 +89,30 @@ const ActiveLinesDashboard: React.FC = () => {
         removeItemFromLocalStorage("productOrderNo")
     };
 
-
     useEffect(() => {
-        const handleStorageChange = (event: Event) => {
-            const customEvent = event as CustomEvent;
-            if (customEvent.detail.key === "productOrderNo" && customEvent.detail.value === null) {
-                console.log("LocalStorage 'productOrderNo' ถูกลบแล้ว, ปรับ state");
-                setSelectedOrder(null);
-                setSelectedLineId(null);
-                setShowConfirm(false);
+        const handleStorageChange = (event: StorageEvent | CustomEvent) => {
+            if ((event as StorageEvent).key === "productOrderNo") {
+                setSelectedOrder((event as StorageEvent).newValue || "");
+            } else if ("detail" in event && event.detail.key === "productOrderNo") {
+                setSelectedOrder(event.detail.value || "");
             }
         };
 
-        window.addEventListener("local-storage-change", handleStorageChange);
-        return () => window.removeEventListener("local-storage-change", handleStorageChange);
+        window.addEventListener("storage", handleStorageChange); // ฟังจาก tab อื่น
+        window.addEventListener("local-storage-change", handleStorageChange as EventListener); // ฟังจาก custom dispatch
+
+        // โหลดค่าครั้งแรก
+        const stored = getJsonFromLocalStorage<string>("productOrderNo");
+        if (stored && typeof stored === "string") {
+            setSelectedOrder(stored);
+        }
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("local-storage-change", handleStorageChange as EventListener);
+        };
     }, []);
+
 
 
 
@@ -293,7 +302,8 @@ const ActiveLinesDashboard: React.FC = () => {
                                     if (selectedOrder) {
                                         try {
                                             setJsonToLocalStorage("productOrderNo", selectedOrder);
-                                            alert("Saved ProductOrder! /n บันทึกเลข ProductOrder");
+                                            setSelectedOrder('')
+                                            alert("Saved ProductOrder! บันทึกเลข ProductOrder");
                                             setShowConfirm(false);
                                         } catch (err) {
                                             alert("Save failed: " + err);
@@ -310,6 +320,7 @@ const ActiveLinesDashboard: React.FC = () => {
                                 onClick={() => {
                                     console.log('s'),
                                         handleCancel();
+
                                 }}
                                 className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition w-full sm:w-auto"
                             >
