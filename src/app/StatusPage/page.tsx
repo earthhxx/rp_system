@@ -60,7 +60,7 @@ const checkreflowpage = () => {
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
 
-  const DataInArrayEmployee = ['0506', '0743', '0965', '3741'];
+  const DataInArrayEmployee = ['0506', '0743', '0965', '3741','1534','1912','2050','3015','3222','3744','3745'];
 
   const [pdfUrl2, setPdfUrl2] = useState<string | null>(null);
   const router = useRouter();
