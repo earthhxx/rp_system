@@ -1234,7 +1234,7 @@ const checkreflowpage = () => {
     </div>
   );
   const pointing = () => (
-    <div className="fixed top-50 xl:top-100 right-40 z-44"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
+    <div className="fixed top-50 xl:top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
   );
   const [isLoading, setisLoading] = useState(false);
 
