@@ -106,7 +106,7 @@ const MenuToggle = () => {
         if (employeeID.length > 0 && employeeID.length <= 4) {
             const mockID: string[] = ['0506', '0743', '0965', '3741']; // Replace with the actual mock ID values
             if (mockID.includes(employeeID)) {
-                router.push('http://192.168.120.9:3004/RegisterResultReflow');
+                router.push('http://192.168.120.9:3310/ManuReFlow');
                 setEmployeeID("");
                 clearinputref();
                 return;
@@ -334,7 +334,7 @@ const MenuToggle = () => {
                     onClick={() => {
                         console.log("test onclick HistoryPage");
                         setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
-                        router.push('http://192.168.120.9:3004/HistoryRefiow');
+                        router.push('http://192.168.120.9:3310/ManuReFlow');
 
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">

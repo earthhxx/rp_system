@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
 //https://localhost:3003/api/120-9/checkreflow/load-pdf-data2?R_Line=SMT-5&R_Model=NPVV067AA11MBO&productOrderNo=202504080022
+//https://localhost:3003/api/120-9/checkreflow/load-pdf-data2?R_Line=SMT-2&R_Model=15F5ST80600AO
 // Correct type for database record
 type Data = {
   success: boolean;
@@ -14,9 +15,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const model = searchParams.get('R_Model');
     const line = searchParams.get('R_Line');
-    const productOrderNo = searchParams.get('productOrderNo');
 
-    if (!model || !line || !productOrderNo) {
+
+    if (!model || !line ) {
       return NextResponse.json(
         { success: false, message: 'Missing R_Model or R_Line query parameter' },
         { status: 400 }
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Fetching PDF for:', { model, line,productOrderNo });
+      console.log('Fetching PDF for:', { model, line});
     }
 
     const pool = await getDashboardConnection();
@@ -32,11 +33,10 @@ export async function GET(req: NextRequest) {
     const result = await pool.request()
       .input('R_Model', sql.NVarChar, model)
       .input('R_Line', sql.NVarChar, line)
-      .input('productOrderNo',sql.NVarChar,productOrderNo)
       .query(`
         SELECT TOP 1 PDF_Loc
         FROM REFLOW_Result
-        WHERE Result_Line = @R_Line AND Result_Model = @R_Model AND Result_ProOrder = @productOrderNo
+        WHERE Result_Line = @R_Line AND Result_Model = @R_Model
         ORDER BY CreateDate DESC
       `);
 

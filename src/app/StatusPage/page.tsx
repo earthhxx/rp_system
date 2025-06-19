@@ -187,7 +187,7 @@ const checkreflowpage = () => {
   const fetchPdfData2 = async () => {
 
     try {
-      if (!data120_2?.ProcessLine || !data120_2?.productName || !ProductOrderNo) {
+      if (!data120_2?.ProcessLine || !data120_2?.productName) {
         alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF")
         console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
         setPdfWarning2("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
@@ -195,7 +195,7 @@ const checkreflowpage = () => {
       }
 
       const res = await fetch(
-        `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}&productOrderNo=${ProductOrderNo}`
+        `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`
       );
       const { data } = await res.json();
       console.log("✅ ได้ข้อมูล PDF2:", data);
