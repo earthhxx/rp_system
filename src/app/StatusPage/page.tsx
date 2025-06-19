@@ -60,7 +60,7 @@ const checkreflowpage = () => {
   const [showAlert, setshowAlert] = useState(false);
   const [alertData, setAlertData] = useState("");
 
-  const DataInArrayEmployee = ['0506', '0743', '0965', '3741','1534','1912','2050','3015','3222','3744','3745'];
+  const DataInArrayEmployee = ['0506', '0743', '0965', '3741', '1534', '1912', '2050', '3015', '3222', '3744', '3745'];
 
   const [pdfUrl2, setPdfUrl2] = useState<string | null>(null);
   const router = useRouter();
@@ -576,6 +576,13 @@ const checkreflowpage = () => {
         const data = await res.json();
         console.log("Fetched Data from 120-2:", data);
 
+
+        console.log("✅ raw response:", data);
+        console.log("✅ json.success:", data.success);
+        console.log("✅ json.data:", data.data);
+        console.log("✅ typeof json.data:", typeof data.data);
+        console.log("✅ json.data.productOrderNo:", data.data?.productOrderNo);
+
         if (!data || !data.data || data.success === false || data.error) {
           alert("ข้อมูลไม่ถูกต้องหรือว่างเปล่า");
           localStorage.removeItem("productOrderNo");
@@ -686,7 +693,7 @@ const checkreflowpage = () => {
           setSubmitStage("CHECKED");
           await fetchPdfData();
         } else {
-          alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง`);
+          alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง หรือ มี pro ข้างอยู่แล้ว`);
           localStorage.removeItem("productOrderNo");
           window.dispatchEvent(new Event("productOrderNo:removed"));
           router.push('/');
