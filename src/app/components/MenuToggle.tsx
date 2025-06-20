@@ -345,9 +345,10 @@ const MenuToggle = () => {
                 <div className="flex w-full h-full"></div>
                 <div
                     onClick={() => {
-                        console.log("test onclick signin");
-                        setHomeStage("signin");
-                        setIsMenuOpen(false);
+                        console.log("test onclick HistoryPage");
+                        setHomeStage('home'); //idk why tf setIsMenuOpen(false); not working
+                        router.push('http://192.168.120.9:3310/ManuReFlow');
+
                     }}
                     className="flex flex-col justify-center items-center w-full h-full text-white">
                     <VscSignIn className="size-12 xl:size-25 text-white m-4" />
