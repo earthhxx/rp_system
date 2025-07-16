@@ -113,7 +113,7 @@ const ActiveLinesDashboard: React.FC = () => {
 
                 const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
                     const stDatetime = item.ST_Datetime;
-                    console.log(stDatetime);
+                    // console.log(stDatetime);
                     // แปลงจาก UTC+7 ไปเป็น UTC
                     const dateInUTC = new Date(new Date(stDatetime).getTime() - 7 * 60 * 60 * 1000);
                     const waitMinutes = Math.max(
@@ -162,7 +162,7 @@ const ActiveLinesDashboard: React.FC = () => {
                 key={line.id}
                 onClick={() => {
                     setSelectedOrder(line.workOrder);
-                    console.log(selectedOrder);
+                    // console.log(selectedOrder);
                     setSelectedLineId(line.id);
                     setShowConfirm(true);
                 }}

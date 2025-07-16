@@ -16,7 +16,7 @@ interface ReflowStatusUpdateRequest {
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ReflowStatusUpdateRequest;
-    console.log('body', body);
+    // console.log('body', body);
     const { ST_Line, ST_Model, ST_Prod, ST_Status, ST_EmployeeID } = body;
 
     if (!ST_Line || !ST_Model || !ST_Prod || !ST_Status) {
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
           WHERE ST_Line = @ST_Line;
       `);
 
-    console.log('✅ rowsAffected:', result.rowsAffected); // เพิ่มตรงนี้
+    // console.log('✅ rowsAffected:', result.rowsAffected); // เพิ่มตรงนี้
 
 
     const newStatus = result.recordset?.[0]?.ST_Status;
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
 
   } catch (error) {
-    console.error('DB Update Error:', error);
+    // console.error('DB Update Error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal Server Error' },
       { status: 500 }
