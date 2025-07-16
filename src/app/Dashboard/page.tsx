@@ -162,7 +162,6 @@ const ActiveLinesDashboard: React.FC = () => {
                 key={line.id}
                 onClick={() => {
                     setSelectedOrder(line.workOrder);
-                    // console.log(selectedOrder);
                     setSelectedLineId(line.id);
                     setShowConfirm(true);
                 }}
