@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
         SET ST_Model = NULL,
             ST_Prod = NULL,
             ST_Status = NULL,
-            ST_Datetime = NULL
+            ST_Datetime = NULL,
+            ST_EmployeeID = NULL
         WHERE ST_Line = @ST_Line
       `);
 
