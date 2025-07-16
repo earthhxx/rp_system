@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from 'next/image';
-import { useRouter, usePathname, } from "next/navigation";
+
 
 // Type definitions
 type LineStatus = {
@@ -12,6 +12,7 @@ type LineStatus = {
     status: 'NULL' | 'WAITING' | 'ONCHECKING' | 'CHECKED';
     lastMeasured: string;
     waitTime: number;
+    EmployeeID: string;
 };
 
 const animetion = {
@@ -74,7 +75,6 @@ const colors = {
 };
 
 const ActiveLinesDashboard: React.FC = () => {
-    const router = useRouter();
     const [linesState, setLinesState] = useState<LineStatus[]>([]);
     const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'ONCHECKING' | 'CHECKED'>('ALL');
 
@@ -130,6 +130,7 @@ const ActiveLinesDashboard: React.FC = () => {
                         status: (item.ST_Status || "NULL") as LineStatus["status"],
                         lastMeasured: item.ST_Datetime || "-",
                         waitTime: waitMinutes,
+                        EmployeeID: item.ST_EmployeeID || "",
                     };
                 });
                 setLinesState(mappedData);
@@ -184,11 +185,18 @@ const ActiveLinesDashboard: React.FC = () => {
                 <div className="">MODEL (โมเดล) </div>
                 <div className="model text-[16px] ">{` ${line.model}`}</div>
                 <div className="model text-[12px] ">{`Order : ${line.workOrder}`}</div>
-                <div className="WAITING text-sm pt-2 text-red-600">
-                    {line.status === "WAITING"
-                        ? `WAITING: ${line.waitTime} minutes`
-                        : "-"}
-                </div>
+                {line.status === "WAITING" && (
+                    <div className="WAITING text-sm pt-2 text-red-600">
+                        WAITING: {line.waitTime} minutes
+                    </div>
+                )}
+                {["ONCHECKING", "CHECKED"].includes(line.status) && (
+                    <div className="text-sm pt-2 text-black">
+                        รหัสพนักงาน ( ID ) : {line.EmployeeID}
+                    </div>
+                )}
+
+
                 <div className="last-measured text-sm text-gray-600 pb-1">
                     {`Start time (เวลา เริ่ม):\n ${line.lastMeasured.replace("T", " ").substring(0, 19)}`}
                 </div>
@@ -266,9 +274,9 @@ const ActiveLinesDashboard: React.FC = () => {
 
             </div>
             {showConfirm && (
-                <div  className="fixed font-kanit inset-0 z-49 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+                <div className="fixed font-kanit inset-0 z-49 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
                     <div ref={cardRef} className="bg-white rounded-2xl shadow-xl px-6 py-5 sm:p-8 text-center w-full max-w-md mx-4">
-                        
+
                         <p className="text-black font-medium text-2xl mb-6 break-words">
                             Line {selectedLineId}
                         </p>
@@ -276,8 +284,8 @@ const ActiveLinesDashboard: React.FC = () => {
                             {selectedOrder}
                         </p>
 
-                  
-                
+
+
                     </div>
                 </div>
             )}
