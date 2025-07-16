@@ -245,8 +245,8 @@ const checkreflowpage = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        ST_Line: datamock120_2?.data.ProcessLine,
-        ST_Model: datamock120_2?.data.productName,
+        ST_Line: data120_2?.ProcessLine,
+        ST_Model: data120_2?.productName,
         ST_Prod: ProductOrderNo,
         ST_Status: "WAITING"
       })
@@ -282,8 +282,8 @@ const checkreflowpage = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        ST_Line: datamock120_2?.data.ProcessLine,
-        ST_Model: datamock120_2?.data.productName,
+        ST_Line: data120_2?.ProcessLine,
+        ST_Model: data120_2?.productName,
         ST_Prod: ProductOrderNo,
         ST_Status: "ONCHECKING",
         ST_EmployeeID: EmployeeNo,
@@ -634,7 +634,7 @@ const checkreflowpage = () => {
       setPdfUrl(null);
 
       try {
-        const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${datamock120_2.data.ProcessLine}&R_Model=${datamock120_2.data.productName}`);
+        const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
         const { data, success, message } = await res.json();
 
         if (!success || !data || !data.R_PDF || data.R_PDF === "null") {
@@ -677,7 +677,7 @@ const checkreflowpage = () => {
     //STAGE VALIDATION CHECK
     const fetchReflowStatus = async () => {
       try {
-        const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${datamock120_2.data.ProcessLine}`);
+        const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${data120_2.ProcessLine}`);
         const { data, success, message } = await res.json();
 
         if (!success || !data || data.length === 0) {
@@ -692,7 +692,7 @@ const checkreflowpage = () => {
         setStatusData120_9(statusItem);
 
         const { ST_Status, ST_Prod } = statusItem;
-        const isProdMatch = ST_Prod === datamock120_2.data.productOrderNo;
+        const isProdMatch = ST_Prod === data120_2.productOrderNo;
 
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
           setSubmitStage("WAITING");
