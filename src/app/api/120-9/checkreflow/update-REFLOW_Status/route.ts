@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
           WHERE ST_Line = @ST_Line;
       `);
 
-    // console.log('✅ rowsAffected:', result.rowsAffected); // เพิ่มตรงนี้
+
 
 
     const newStatus = result.recordset?.[0]?.ST_Status;

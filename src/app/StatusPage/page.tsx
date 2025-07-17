@@ -14,7 +14,6 @@ import { FaFilePdf } from "react-icons/fa6";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaHandPointDown } from "react-icons/fa";
 import StatusReader from '../components/UseParams';
-import { count } from "console";
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -130,20 +129,13 @@ const checkreflowpage = () => {
   const [employeeName, setEmployeeName] = useState("");
   const [employeeUserName, setEmployeeUserName] = useState("");
 
-  useEffect(() => {
-    if (ProductOrderNo) {
-      console.log("ProductOrderNo updated:", ProductOrderNo);
-      // You can add additional logic here, such as fetching data based on ProductOrderNo
-    }
-  }, [ProductOrderNo]);
 
   const handleShowPdf2 = (base64: string) => {
     try {
       const dataUri = `data:application/pdf;base64,${base64}`;
       setPdfUrl2(dataUri);
-      console.log("✅ Data URI set for PDF", dataUri);
     } catch (err) {
-      console.error("❌ Failed to convert base64 to data URI:", err);
+      alert("❌ Failed to convert base64 to data URI:");
       setPdfWarning2("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
@@ -165,9 +157,9 @@ const checkreflowpage = () => {
       if (getmodel === data120_2.productName) {
         setconfirmmodel(true);
         setconfirmemployee(getemployee);
-        console.log('confirmemployee', confirmemployee);
+
       } else {
-        console.log('Model is not match');
+        alert('Model is not match');
         setconfirmmodel(false); // เผื่อเคส model ไม่ตรง
 
       }
@@ -197,7 +189,7 @@ const checkreflowpage = () => {
     try {
       if (!data120_2?.ProcessLine || !data120_2?.productName) {
         alert("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF")
-        console.warn("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
+
         setPdfWarning2("⛔ พารามิเตอร์ไม่ครบ ไม่โหลด PDF");
         return;
       }
@@ -206,7 +198,7 @@ const checkreflowpage = () => {
         `/api/120-9/checkreflow/load-pdf-data2?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`
       );
       const { data } = await res.json();
-      console.log("✅ ได้ข้อมูล PDF2:", data);
+
 
       if (data?.R_PDF2) {
         const decoded = atob(data.R_PDF2);
@@ -214,24 +206,24 @@ const checkreflowpage = () => {
           handleShowPdf2(data.R_PDF2);
         } else {
           alert("PDF2 format ผิดพลาด");
-          console.warn("⚠️ PDF2 format ผิดพลาด");
+
           setPdfWarning2('PDF2 format ผิดพลาด');
 
         }
       } else if (!data || data.R_PDF2 === "null" || "undifined") {
         setshowAlert(true);
         setAlertData("ยังไม่มีการอัพโหลดผลการวัดโปรไฟล์");
-        console.warn("⚠️ ไม่พบข้อมูล R_PDF2");
+
         setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
       } else {
         alert("ยังไม่มีการอัพโหลด PDF2 error 2");
-        console.warn("⚠️ ไม่พบข้อมูล R_PDF2 error 2");
+
         setPdfWarning2('ยังไม่มีการอัพโหลด PDF2');
 
       }
     } catch (err) {
       alert("โหลด PDF2 ผิดพลาด");
-      console.error("❌ โหลด PDF2 ล้มเหลว:", err);
+
       setPdfWarning2("เกิดข้อผิดพลาดระหว่างโหลด PDF");
     }
   };
@@ -253,7 +245,7 @@ const checkreflowpage = () => {
     });
 
     const result = await res.json();
-    console.log(result);
+
   };
 
   const updateReflowStatusCHECKED = async () => {
@@ -272,7 +264,7 @@ const checkreflowpage = () => {
     });
 
     const result = await res.json();
-    console.log(result);
+
   };
 
   const updateReflowStatusONCHECKING = async () => {
@@ -291,7 +283,7 @@ const checkreflowpage = () => {
     });
 
     const result = await res.json();
-    console.log(result);
+
   };
 
   const updateReflowStatusCancel = async () => {
@@ -307,7 +299,7 @@ const checkreflowpage = () => {
     });
 
     const result = await res.json();
-    console.log(result);
+
   };
 
   const updateReflowStatusClosepro = async () => {
@@ -322,13 +314,13 @@ const checkreflowpage = () => {
     });
 
     const result = await res.json();
-    console.log(result);
+
   };
   //ONCHECKING
   //submit log state to check
   const submitLogToReflow120_9_ONCHECKING = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
 
@@ -353,20 +345,20 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log submit failed:", result.message);
+        alert("Log submit failed:");
       } else {
-        console.log("Log submitted successfully");
+
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log:");
     }
   };
 
   //submit log state to waiting
   const submitLogToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
 
@@ -390,13 +382,12 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log !res !reult :", result.message);
+        alert("Log !res !reult :");
       } else {
-        console.log("Log else", result);
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log:");
     }
   };
 
@@ -404,10 +395,9 @@ const checkreflowpage = () => {
   //submit log state to check
   const submitLogToReflow120_9_CHECK = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
-    console.log(employeeName);
     try {
       const payload = {
         R_Line: data120_2.ProcessLine,
@@ -419,7 +409,6 @@ const checkreflowpage = () => {
       };
 
 
-      console.log(payload);
       const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
         method: 'POST',
         headers: {
@@ -432,22 +421,20 @@ const checkreflowpage = () => {
 
 
       if (!res.ok || !result.success) {
-        console.log('test:', employeeName);
-        console.error("Log submit failed:", result.message);
-        console.log(employeeName);
+
       } else {
-        console.log("Log submitted successfully");
+
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log:");
     }
   };
 
   //submit log state to check
   const submitLogToReflow120_9_continuous = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
 
@@ -472,20 +459,20 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log submit failed:", result);
+        alert("Log submit failed:");
       } else {
-        console.log("Log submitted successfully");
+
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log");
     }
   };
 
   // //submit log state to cancel
   const submitLogcancelToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
 
@@ -509,20 +496,20 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log submit failed:", result.message);
+        alert("Log submit failed:");
       } else {
-        console.log("Log submitted successfully");
+
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log:");
     }
   };
 
   // //submit log state to cancel
   const submitLogCloseprodToReflow120_9 = async () => {
     if (!data120_2 || !submitStage) {
-      console.warn("Missing required fields to submit log");
+      alert("Missing required fields to submit log");
       return;
     }
 
@@ -546,13 +533,13 @@ const checkreflowpage = () => {
       const result = await res.json();
 
       if (!res.ok || !result.success) {
-        console.error("Log submit failed:", result.message);
+        alert("Log submit failed:");
       } else {
-        console.log("Log submitted successfully");
+
       }
 
     } catch (error) {
-      console.error("Error submitting log:", error);
+      alert("Error submitting log:");
     }
   };
 
@@ -571,25 +558,15 @@ const checkreflowpage = () => {
   // Fetching Data 120-2
 
   useEffect(() => {
-    console.log("Fetching data for ProductOrderNo:", ProductOrderNo);
 
     const fetchData = async () => {
       if (!ProductOrderNo) return;
-      console.log("Fetching data for ProductOrderNo:", ProductOrderNo);
       setIsLoading120_2(true);
 
       try {
-        console.log("ProductOrderNo:", ProductOrderNo);
         const res = await fetch(`/api/120-2/scan-to-db-120-2?productOrderNo=${ProductOrderNo}`);
         const data = await res.json();
-        console.log("Fetched Data from 120-2:", data);
 
-
-        console.log("✅ raw response:", data);
-        console.log("✅ json.success:", data.success);
-        console.log("✅ json.data:", data.data);
-        console.log("✅ typeof json.data:", typeof data.data);
-        console.log("✅ json.data.productOrderNo:", data.data?.productOrderNo);
 
         if (!data || !data.data || data.success === false || data.error) {
           alert("ข้อมูลไม่ถูกต้องหรือว่างเปล่า");
@@ -600,7 +577,6 @@ const checkreflowpage = () => {
 
         setData120_2(data.data);
       } catch (error) {
-        console.error("Failed to fetch 120-2:", error);
         alert(`api ผิดพลาด`);
         localStorage.removeItem("productOrderNo");
         window.dispatchEvent(new Event("productOrderNo:removed"));
@@ -615,7 +591,7 @@ const checkreflowpage = () => {
 
   //.9
   //datamock120_2
-  
+
   const datamock120_2 = {
     "success": true,
     "data": {
@@ -661,7 +637,6 @@ const checkreflowpage = () => {
         return true;
 
       } catch (err) {
-        console.error("โหลด PDF ล้มเหลว:", err);
         setPdfWarning("เกิดข้อผิดพลาดระหว่างโหลด PDF");
         alert("ไม่พบข้อมูล STANDARD PDF");
         localStorage.removeItem("productOrderNo");
@@ -717,7 +692,6 @@ const checkreflowpage = () => {
           router.push('/');
         }
       } catch (err) {
-        console.error("โหลด REFLOW Status ล้มเหลว:", err);
         alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
         localStorage.removeItem("productOrderNo");
         window.dispatchEvent(new Event("productOrderNo:removed"));
@@ -735,18 +709,13 @@ const checkreflowpage = () => {
     try {
       const dataUri = `data:application/pdf;base64,${base64}`;
       setPdfUrl(dataUri);
-      console.log("✅ Data URI set for PDF", pdfUrl);
+
     } catch (err) {
-      console.error("❌ Failed to convert base64 to data URI:", err);
       setPdfWarning("เกิดข้อผิดพลาดขณะแปลง PDF");
     }
   };
 
-  useEffect(() => {
-    if (pdfUrl) {
-      console.log("📎 PDF URL is ready:", pdfUrl);
-    }
-  }, [pdfUrl]);
+
   const startScan = async () => {
     const qrRegionId = "qr-reader";
     const html5QrCode = new Html5Qrcode(qrRegionId);
@@ -756,7 +725,7 @@ const checkreflowpage = () => {
       const devices = await Html5Qrcode.getCameras();
 
       if (!devices || devices.length === 0) {
-        console.error("ไม่พบกล้องบนอุปกรณ์");
+
         return;
       }
 
@@ -782,8 +751,12 @@ const checkreflowpage = () => {
 
           html5QrCode.stop().then(() => html5QrCode.clear());
         },
-        (err) => console.warn("QR Scan Error:", err)
+        (errorMessage) => {
+          // 📌 คุณจะใส่ log, ignore หรือแจ้งเตือนก็ได้
+          console.warn("QR Code scan error:", errorMessage);
+        }
       );
+
 
       setTimeout(() => {
         const video = document.querySelector("#qr-reader video") as HTMLVideoElement;
@@ -795,7 +768,7 @@ const checkreflowpage = () => {
         }
       }, 300);
     } catch (err) {
-      console.error("Camera initialization error:", err);
+
     }
   };
 
@@ -806,7 +779,7 @@ const checkreflowpage = () => {
         scannerRef.current
           .stop()      // หยุดกล้อง
           .then(() => scannerRef.current!.clear()) // ล้าง DOM และ memory
-          .catch((e: Error) => console.error("Stop error:", e));
+          .catch();
       }
       // ถ้าเป็น Html5QrcodeScanner instance
       else {
@@ -815,16 +788,11 @@ const checkreflowpage = () => {
           .then(() => {
             scannerRef.current = null;
           })
-          .catch((e: Error) => console.error("Clear error:", e));
+          .catch();
       }
     }
   };
 
-  useEffect(() => {
-    console.log('inputRef.current:', inputRef.current);
-    console.log("name", employeeName);
-    console.log("no", EmployeeNo);
-  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro]);
 
   const clearinputref = () => {
     // เคลียร์ inputRef และ state
@@ -851,13 +819,12 @@ const checkreflowpage = () => {
 
         goToHome(); // นำทางกลับหน้า home
       } catch (err) {
-        console.error("Error during cancel process:", err);
+
       } finally {
         setisLoading(false);
       }
     } else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo");
     }
 
     clearinputref();
@@ -883,13 +850,13 @@ const checkreflowpage = () => {
 
         goToHome();
       } catch (err) {
-        console.error("Error during closeprod process:", err);
+        alert("Error during closeprod process:");
       } finally {
         setisLoading(false);
       }
     } else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo");
+
     }
 
     clearinputref();
@@ -897,7 +864,6 @@ const checkreflowpage = () => {
 
   const handleNextPageStatusCHECKED = () => {
     const value = EmployeeNo;
-    console.log("EmployeeNo:", EmployeeNo);
     if (!value && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
 
     }
@@ -907,7 +873,6 @@ const checkreflowpage = () => {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
-    console.log(employeeName)
     if (EmployeeNo === employeeUserName) {
 
       if (submitStage === "ONCHECKING") {
@@ -921,8 +886,6 @@ const checkreflowpage = () => {
         setJsonToLocalStorage('employeelocal', (EmployeeNo));
 
 
-        console.log("CHECKED");
-        console.log("Scanned ID:", EmployeeNo);
       }
       else if (submitStage === "WAITING") {
         setSubmitStage("CHECKED");
@@ -931,19 +894,15 @@ const checkreflowpage = () => {
         setShowBar(false);
         setIsCardOpen(false);
 
-
-        console.log("CHECKED PASS FROM WAITING");
-        console.log("Scanned ID:", EmployeeNo);
       }
       else {
         clearinputref();
-        console.log(submitStage);
         // window.location.reload();
       }
     }
     else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo")
+
     }
   };
 
@@ -956,7 +915,7 @@ const checkreflowpage = () => {
       alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
       return;
     }
-    console.log(employeeName)
+
     if (EmployeeNo === employeeUserName) {
 
       if (submitStage === "WAITING") {
@@ -968,8 +927,7 @@ const checkreflowpage = () => {
 
         setIsCardOpen(false);
 
-        console.log("ONCHECKING");
-        console.log("Scanned ID:", EmployeeNo);
+
       }
       else {
         clearinputref();
@@ -979,7 +937,7 @@ const checkreflowpage = () => {
     }
     else {
       alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-      console.log("employeeName != EmployeeNo")
+
     }
   };
 
@@ -1249,6 +1207,13 @@ const checkreflowpage = () => {
     }
   }, [isCardOpen, isCardOpencancel, isCardOpenclosepro, isCardOpenONCHECKING]);
 
+  const handleChangeInputID = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length === 4) {
+      setEmployeeNo(e.target.value);
+    }
+  };
+
+
   const renderLoading = () => (
     <div className="fixed inset-0 flex flex-col w-screen h-screen justify-center items-center z-50 bg-black/20 backdrop-blur-sm">
       <div
@@ -1283,7 +1248,7 @@ const checkreflowpage = () => {
                   ref={inputRef}
                   type="text"
                   autoComplete="off"
-                  onChange={(e) => setEmployeeNo(e.target.value)}
+                  onChange={(e) =>  {handleChangeInputID}}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />
@@ -1327,7 +1292,7 @@ const checkreflowpage = () => {
                   ref={inputRef}
                   type="text"
                   autoComplete="off"
-                  onChange={(e) => setEmployeeNo(e.target.value)}
+                  onChange={(e) =>  {handleChangeInputID}}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />
@@ -1571,7 +1536,7 @@ const checkreflowpage = () => {
                   type="password"
                   autoComplete="off"
                   value={EmployeeNo}
-                  onChange={(e) => setEmployeeNo(e.target.value)}
+                  onChange={(e) =>  {handleChangeInputID}}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />
@@ -1585,12 +1550,12 @@ const checkreflowpage = () => {
                     onClick={() => {
                       getJsonFromLocalStorage('modellocal');
                       const modellocal = getJsonFromLocalStorage<string>('modellocal');
-                      console.log('modellocal', modellocal);
+
                       getJsonFromLocalStorage('employeelocal');
                       const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
-                      console.log('employeelocal', employeelocal);
+
                       setEmployeeNo(employeelocal ? employeelocal.toString() : "");
-                      console.log('employeeNO', EmployeeNo);
+
                       togglepassmodelbutton();
                     }}
                     className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
@@ -1618,7 +1583,7 @@ const checkreflowpage = () => {
 
                         if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
                           handleNextPageStatusCHECKED();
-                          console.log('true');
+
                         }
                         else {
                           alert('Model is not match or')
@@ -1626,7 +1591,7 @@ const checkreflowpage = () => {
                       }
                       else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
                         handleNextPageStatusONCHECKING();
-                        console.log('false and EmployeeNo is match to Arrey');
+                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
                       }
                       else {
                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
@@ -1658,7 +1623,7 @@ const checkreflowpage = () => {
                   ref={inputRef}
                   type="text"
                   autoComplete="off"
-                  onChange={(e) => setEmployeeNo(e.target.value)}
+                  onChange={(e) =>  {handleChangeInputID}}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />

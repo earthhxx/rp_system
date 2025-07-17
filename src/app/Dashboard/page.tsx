@@ -242,7 +242,7 @@ const ActiveLinesDashboard: React.FC = () => {
 
 
     return (
-        <>
+        <> 
             <div className="min-h-screen w-full p-4 bg-gray-100 backdrop-blur-3xl flex flex-col items-center">
                 <div className="flex flex-row justify-center items-center me-2 ms-2 w-fit ">
                     <Image className="flex flex-none"
