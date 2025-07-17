@@ -14,6 +14,7 @@ import { FaFilePdf } from "react-icons/fa6";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaHandPointDown } from "react-icons/fa";
 import StatusReader from '../components/UseParams';
+import EmployeeIdCard from "../components/EmployeeIdCard";
 
 type DataItem120_2 = {
   productOrderNo: string;
@@ -74,7 +75,6 @@ const checkreflowpage = () => {
   const goToHome = () => {
     router.push('/');
   };
-  const [employeelocal, setemployeelocal] = useState<string | null>(null);
   const togglepassmodelbutton = () => {
     setpassmodelbutton(prev => !prev); // สลับสถานะ
   };
@@ -87,15 +87,16 @@ const checkreflowpage = () => {
   const [pdfWarning2, setPdfWarning2] = useState("");
   const [isLoading120_9, setIsLoading120_9] = useState(true);
 
-
+  const cardRef = useRef<HTMLDivElement>(null!);
+  const inputRef = useRef<HTMLInputElement>(null!);
+  const cardRefcancel = useRef<HTMLDivElement>(null!);
+  const cardRefClosepro = useRef<HTMLInputElement>(null!);
 
   const [isCardOpen, setIsCardOpen] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [showBar, setShowBar] = useState(true);
   const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
   const [showChecked, setShowChecked] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [EmployeeNo, setEmployeeNo] = useState("");
   const [isPdfOpen, setPdfOpen] = useState(false);
 
@@ -112,10 +113,10 @@ const checkreflowpage = () => {
 
 
   const [isCardOpencancel, setisCardOpencancel] = useState(false);
-  const cardRefcancel = useRef<HTMLInputElement>(null);
+
 
   const [isCardOpenclosepro, setisCardOpenclosepro] = useState(false);
-  const cardRefClosepro = useRef<HTMLInputElement>(null);
+  
 
   const [isCardOpenONCHECKING, setisCardOpenONCHECKING] = useState(false);
   const cardRefONCHECKING = useRef<HTMLInputElement>(null);
@@ -128,6 +129,8 @@ const checkreflowpage = () => {
   const [statusData120_9, setStatusData120_9] = useState<DataItem120_9_Status | null>(null);
   const [employeeName, setEmployeeName] = useState("");
   const [employeeUserName, setEmployeeUserName] = useState("");
+
+
 
 
   const handleShowPdf2 = (base64: string) => {
@@ -164,7 +167,6 @@ const checkreflowpage = () => {
 
       }
     }
-
   }, [data120_2]);
 
 
@@ -1201,11 +1203,7 @@ const checkreflowpage = () => {
     };
   }, [isCardOpenONCHECKING]);
 
-  useEffect(() => {
-    if (!isCardOpen && !isCardOpencancel && !isCardOpenclosepro && !isCardOpenONCHECKING) {
-      inputRef.current = null;
-    }
-  }, [isCardOpen, isCardOpencancel, isCardOpenclosepro, isCardOpenONCHECKING]);
+
 
   const handleChangeInputID = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length === 4) {
@@ -1224,7 +1222,7 @@ const checkreflowpage = () => {
     </div>
   );
   const pointing = () => (
-    <div className="fixed top-50 xl:top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
+    <div className="fixed top-49 xl:top-100 right-40 z-50"><FaHandPointDown className="size-[60px] text-sky-500 animate-bounce" /> </div>
   );
   const [isLoading, setisLoading] = useState(false);
 
@@ -1236,94 +1234,27 @@ const checkreflowpage = () => {
         {(submitStage === 'WAITING' || submitStage === 'ONCHECKING') && pointing()}
 
         {(isLoading || isLoading120_9) && renderLoading()}
-        {
-          isCardOpencancel && (
-            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRefcancel} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4  size-110 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-                <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  autoComplete="off"
-                  onChange={(e) =>  {handleChangeInputID}}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="รหัสพนักงาน"
-                />
-                <div className="flex w-full h-full items-center">
-                  <div className="flex flex-col  text-white justify-center items-center font-kanit w-1/2">
-                    <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                      <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                      <div>SCAN</div>
-                      <div>สแกน</div>
-                    </div>
-                  </div>
-                  <div
-                    onClick={() => {
-                      handleNextPageStatuscancel();
-                    }}
-                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-15 xl:size-30 " />
-                    <div>
-                      SUBMIT
-                    </div>
-                    <div>
-                      ส่งข้อมูล
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )
-        }
+        {isCardOpencancel && (
+          <EmployeeIdCard
+            cardRef={cardRefcancel}
+            inputRef={inputRef}
+            employeeName={employeeName}
+            onChangeID={handleChangeInputID}
+            onScan={startScan}
+            onSubmit={handleNextPageStatuscancel}
+          />
+        )}
 
-
-        {
-          isCardOpenclosepro && (
-            <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-              <div ref={cardRefClosepro} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4  size-110 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl mb-5 p-6">
-                <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  autoComplete="off"
-                  onChange={(e) =>  {handleChangeInputID}}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="รหัสพนักงาน"
-                />
-                <div className="flex w-full h-full items-center">
-
-                  <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                    <div onClick={startScan} className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                      <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                      <div>SCAN</div>
-                      <div>สแกน</div>
-                    </div>
-                  </div>
-                  <div
-                    onClick={() => {
-                      handleNextPageStatuscloseprod();
-                    }}
-                    className="flex flex-col  text-white justify-center items-center font-kanit w-1/2">
-                    <GoCheckCircle className="size-15 xl:size-30 " />
-                    <div>
-                      SUBMIT
-                    </div>
-                    <div>
-                      ส่งข้อมูล
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )
-        }
-
+        {isCardOpenclosepro && (
+          <EmployeeIdCard
+            cardRef={cardRefClosepro}
+            inputRef={inputRef}
+            employeeName={employeeName}
+            onChangeID={handleChangeInputID}
+            onScan={startScan}
+            onSubmit={handleNextPageStatuscloseprod}
+          />
+        )}
 
         <div>
           {arrowdownbutton && (
@@ -1536,7 +1467,7 @@ const checkreflowpage = () => {
                   type="password"
                   autoComplete="off"
                   value={EmployeeNo}
-                  onChange={(e) =>  {handleChangeInputID}}
+                  onChange={(e) => { handleChangeInputID }}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />
@@ -1583,10 +1514,9 @@ const checkreflowpage = () => {
 
                         if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
                           handleNextPageStatusCHECKED();
-
                         }
                         else {
-                          alert('Model is not match or')
+                          alert('Model is not match or user not allow')
                         }
                       }
                       else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
@@ -1623,7 +1553,7 @@ const checkreflowpage = () => {
                   ref={inputRef}
                   type="text"
                   autoComplete="off"
-                  onChange={(e) =>  {handleChangeInputID}}
+                  onChange={(e) => { handleChangeInputID }}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="รหัสพนักงาน"
                 />
