@@ -26,9 +26,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Log input in development mode only
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Fetching PDF for:', { model, line });
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('Fetching PDF for:', { model, line });
+    // }
 
     // Connect to SQL Server
     const pool = await getDashboardConnection();

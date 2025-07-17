@@ -14,14 +14,14 @@ export async function GET(req: Request) {
 
     // 🔍 DEBUG SECTION
     const dbNameResult = await pool.request().query('SELECT DB_NAME() AS dbName');
-    console.log('📌 [DEBUG] Connected to DB:', dbNameResult.recordset[0].dbName);
+  
 
     const tableCheck = await pool.request().query(`
       SELECT TOP 1 * 
       FROM INFORMATION_SCHEMA.TABLES 
       WHERE TABLE_NAME = 'tb_ProductOrders'
     `);
-    console.log('📌 [DEBUG] Table exists:', tableCheck.recordset.length > 0);
+    
 
     // 🔍 Query จริง
     const result = await pool.request()
