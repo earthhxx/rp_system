@@ -88,7 +88,7 @@ const PageStatus = () => {
 
             try {
                 const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${data120_2.ProcessLine}&R_Model=${data120_2.productName}`);
-                const { data, success, message } = await res.json();
+                const { data, success} = await res.json();
 
                 if (!success || !data || !data.R_PDF || data.R_PDF === "null") {
                     alert("ไม่พบข้อมูล STANDARD PDF");
@@ -263,8 +263,6 @@ const PageStatus = () => {
                 const dataUri = `data:application/pdf;base64,${bytes}`;
                 setPdfUrl(dataUri);
             }
-
-
         } catch (err) {
             alert("เกิดข้อผิดพลาดขณะแปลง PDF");
         }
