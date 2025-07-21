@@ -164,7 +164,6 @@ const checkreflowpage = () => {
       } else {
         alert('Model is not match');
         setconfirmmodel(false); // เผื่อเคส model ไม่ตรง
-
       }
     }
   }, [data120_2]);
@@ -665,10 +664,7 @@ const checkreflowpage = () => {
           return;
         }
 
-        const statusItem: DataItem120_9_Status = data[0];
-        setStatusData120_9(statusItem);
-
-        const { ST_Status, ST_Prod } = statusItem;
+        const { ST_Status, ST_Prod } = data;
         const isProdMatch = ST_Prod === data120_2.productOrderNo;
 
         if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
