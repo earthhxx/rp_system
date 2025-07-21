@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
-import { convert } from 'pdf-poppler';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 import crypto from 'crypto';
+import { convertWithBinary } from '@/lib/pdfPopplerWrapper'; // ฟังก์ชันที่ใช้ spawn ตัว pdftocairo.exe
+
+const pdftocairoPath = 'C:\\Tools\\poppler-24.08.0\\Library\\bin\\pdftocairo.exe';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +19,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Missing params' }, { status: 400 });
     }
 
-    // 1. Connect to SQL and get PDF buffer
     const pool = await getDashboardConnection();
     const result = await pool.request()
       .input('R_Model', sql.NVarChar, model)
@@ -33,24 +34,21 @@ export async function GET(req: NextRequest) {
 
     const pdfBuffer = result.recordset[0].R_PDF;
 
-    // 2. Save to temp file
     const tempDir = path.join(os.tmpdir(), 'pdf-img');
     await fs.mkdir(tempDir, { recursive: true });
 
-    
     const fileName = `pdf_${crypto.randomUUID()}.pdf`;
     const pdfPath = path.join(tempDir, fileName);
     await fs.writeFile(pdfPath, pdfBuffer);
 
-    // 3. Convert PDF → PNG (all pages)
-    await convert(pdfPath, {
+    // เรียกฟังก์ชัน convertWithBinary ที่ใช้ spawn ตัว pdftocairo.exe
+    await convertWithBinary(pdfPath, {
       format: 'png',
       out_dir: tempDir,
       out_prefix: 'page',
-      page: undefined,
+      binary: pdftocairoPath,
     });
 
-    // 4. Read image(s) and return as base64
     const files = await fs.readdir(tempDir);
     const pngFiles = files.filter(f => f.endsWith('.png')).sort();
 
