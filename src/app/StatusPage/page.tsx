@@ -57,7 +57,7 @@ const PageStatus = () => {
 
         const fetchPdfImages = async (): Promise<boolean> => {
             try {
-                const res = await fetch(`/api/120-9/checkreflow/load-pdf-data?R_Line=${encodeURIComponent(data120_2.ProcessLine)}&R_Model=${encodeURIComponent(data120_2.productName)}`);
+                const res = await fetch(`/api/120-9/checkreflow/load-pdf-standard?R_Line=${encodeURIComponent(data120_2.ProcessLine)}&R_Model=${encodeURIComponent(data120_2.productName)}`);
                 const json = await res.json();
 
                 if (!json.success || !json.images || json.images.length === 0) {
