@@ -140,14 +140,14 @@ const PageStatus = () => {
             <StatusReader onGetproductOrderNo={setProductOrderNo} />
 
             {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
-            <div className="flex flex-col items-center p-4 space-y-4 overflow-auto max-h-[80vh]">
+            <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[80vh]">
                 {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
                 {pdfImages.map((src, idx) => (
                     <img
                         key={idx}
                         src={src}
                         alt={`Page ${idx + 1}`}
-                        className="max-w-full max-h-[90vh] shadow-md border border-gray-300 rounded"
+                        className="max-w-full h-full shadow-md border border-gray-300 rounded"
                     />
                 ))}
             </div>
