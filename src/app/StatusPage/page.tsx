@@ -15,6 +15,11 @@ type DataItem120_2 = {
     ProcessLine: string;
 };
 
+type DataItem120_9 = {
+  R_Model: string;
+  R_Line: string;
+  R_PDF: string;
+};
 
 function setJsonToLocalStorage<T>(key: string, value: T) {
     localStorage.setItem(key, JSON.stringify(value));
@@ -36,6 +41,9 @@ const PageStatus = () => {
 
     //data120_2
     const [data120_2, setData120_2] = useState<DataItem120_2 | null>(null);
+
+    //data120_9
+    const [data120_9, setData120_9] = useState<DataItem120_9 | null>(null);
 
     //ภาพ PNG base64 array จาก API
     const [pdfImages, setPdfImages] = useState<string[]>([]);
@@ -118,7 +126,7 @@ const PageStatus = () => {
                 const isProdMatch = ST_Prod === data120_2.productOrderNo;
 
                 if ((!ST_Status || ST_Status === "null") && (!ST_Prod || ST_Prod === "null")) {
-                    //setSubmitStage("WAITING");
+                    setSubmitStage("WAITING");
                     const pdfSuccess = await fetchPdfImages();
                     if (pdfSuccess) {
                         //submitLogToReflow120_9();
@@ -126,15 +134,15 @@ const PageStatus = () => {
                     }
                 } else if (ST_Status === "WAITING" && isProdMatch) {
                     setSubmitStage("WAITING");
-                    //setData120_9(data.data);
+                    setData120_9(data.data);
                     await fetchPdfImages();
                 } else if (ST_Status === "ONCHECKING" && isProdMatch) {
                     setSubmitStage("ONCHECKING");
-                    //setData120_9(data.data);
+                    setData120_9(data.data);
                     await fetchPdfImages();
                 } else if (ST_Status === "CHECKED" && isProdMatch) {
                     setSubmitStage("CHECKED");
-                    //setData120_9(data.data);
+                    setData120_9(data.data);
                     await fetchPdfImages();
                 } else {
                     alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง หรือ มี pro ข้างอยู่แล้ว`);
@@ -149,9 +157,7 @@ const PageStatus = () => {
                 router.push('/');
             }
         };
-
         fetchReflowStatus();
-
     }, [data120_2]);
 
 
@@ -300,6 +306,12 @@ const PageStatus = () => {
         if (EmployeeNo) fetchEmployeeName();
     }, [EmployeeNo]);
 
+    const handleChangeInputID = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.value.length === 4) {
+            setEmployeeNo(e.target.value);
+        }
+    };
+
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
             <StatusReader onGetproductOrderNo={setProductOrderNo} />
@@ -347,14 +359,14 @@ const PageStatus = () => {
                 arrowcard()
             )}
 
-            //STAGE
+
             {submitStage === "WAITING" && (
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
-                    <div className="flex w-full h-[30%] bg-red-400">
+                    <div className="flex w-full h-[30%] bg-yellow-400/50 mt-20">
                         <div className="w-full">
-
+                            {data120_9?.R_Line || "ไม่มีข้อมูล R_Line"}
                         </div>
-                        <div onClick={() => { setSubmitcard(true);}} className="flex justify-center items-center w-[40%]">
+                        <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-yellow-400/80">
                             <div className="flex flex-col justify-center items-center w-86">
                                 <div className="flex flex-col justify-center items-center">
                                     <div className="font-roboto font-bold text-[25px] mb-6">Waiting for Measurement</div>
@@ -488,11 +500,9 @@ const PageStatus = () => {
                         <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
                         <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
                         <input
-
                             type="password"
                             autoComplete="off"
-
-
+                            onChange={handleChangeInputID}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="รหัสพนักงาน"
                         />
@@ -517,9 +527,7 @@ const PageStatus = () => {
                                 <pre className="text-[10px] xl:text-xl">
                                     {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
                                 </pre>
-
                             </button>
-
                         </div>
 
                         <div className="flex w-full h-full items-center">
