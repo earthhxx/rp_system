@@ -7,12 +7,25 @@ import StatusReader from '../components/UseParams';
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoSkipFill, GoCheckCircle } from "react-icons/go";
 import { FaFilePdf } from "react-icons/fa6";
+import { BsUpcScan } from "react-icons/bs";
 
 type DataItem120_2 = {
     productOrderNo: string;
     productName: string;
     ProcessLine: string;
 };
+
+
+function setJsonToLocalStorage<T>(key: string, value: T) {
+    localStorage.setItem(key, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key, value } }));
+}
+
+function getJsonFromLocalStorage<T>(key: string): T | null {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+}
+
 
 const PageStatus = () => {
     const router = useRouter();
@@ -171,7 +184,7 @@ const PageStatus = () => {
                 <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-49">
                     <div
                         ref={cardarrowRef}
-                        className="content-center-safe m-4 w-[110px] xl:w-[150px] h-[30px] xl:h-[60px] text-[10px] justify-center items-center rounded-4xl bg-gray-800/70 backdrop-blur-md"
+                        className="content-center-safe m-4 w-[110px] xl:w-[150px] h-fit text-[10px] justify-center items-center rounded-4xl bg-gray-800/70 backdrop-blur-md"
                     >
                         <div className="flex flex-none h-5 xl:h-10"></div>
                         <div className="flex flex-row justify-center items-center ">
@@ -236,9 +249,23 @@ const PageStatus = () => {
         );
     };
 
+    //submitcard
+    const statecardRef = useRef<HTMLDivElement>(null!);
+    const togglepassmodelbutton = () => {
+        setpassmodelbutton(prev => !prev); // สลับสถานะ
+    };
+    const [passmodelbutton, setpassmodelbutton] = useState(false);
+    const [confirmmodel, setconfirmmodel] = useState(false);
+    const [confirmemployee, setconfirmemployee] = useState<string | null>(null);
 
+    //allow employee
+    const DataInArrayEmployee = ['0506', '0743', '0965', '3741', '1534', '1912', '2050', '3015', '3222', '3744', '3745'];
 
-    const [statusCard, setstatusCard] = useState(false);
+    //Employee .2
+    const [EmployeeNo, setEmployeeNo] = useState("");
+    const [employeeName, setEmployeeName] = useState("");
+    const [employeeUserName, setEmployeeUserName] = useState("");
+
 
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
@@ -283,8 +310,101 @@ const PageStatus = () => {
                     </div>
                 </div>
             )}
-            {arrowcard && (
+            {arrowdownbuttoncard && (
                 arrowcard()
+            )}
+
+            //STAGE
+            {submitStage === "WAITING" && (
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={statecardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
+
+                            type="password"
+                            autoComplete="off"
+
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex flex-row w-full justify-center items-center">
+                            <div className="flex flex-col items-center">
+                                <div className="flex justify-center items-center  text-white">continuously or not?</div>
+                                <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
+                            </div>
+                            <div className="flex flex-none w-[5%]"></div>
+                            <button
+                                onClick={() => {
+                                    getJsonFromLocalStorage('modellocal');
+                                    const modellocal = getJsonFromLocalStorage<string>('modellocal');
+
+                                    getJsonFromLocalStorage('employeelocal');
+                                    const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
+
+                                    setEmployeeNo(employeelocal ? employeelocal.toString() : "");
+
+                                    togglepassmodelbutton();
+                                }}
+                                className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                                    }`}
+                            >
+                                <pre className="text-[10px] xl:text-xl">
+                                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
+                                </pre>
+                            </button>
+                        </div>
+
+                        <div className="flex w-full h-full items-center">
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                <div>SCAN</div>
+                                <div>สแกน</div>
+                            </div>
+                            <div
+                                onClick={() => {
+
+                                    if (passmodelbutton === true) {
+                                        if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+                                            // handleNextPageStatusCHECKED();
+                                        }
+                                        else {
+                                            alert('Model is not match or user not allow')
+                                        }
+                                    }
+                                    else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
+                                        // handleNextPageStatusONCHECKING();
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
+                                    }
+                                    else {
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                    }
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            )}
+            {submitStage === "ONCHECKING" && (
+                <div>
+
+                </div>
+            )}
+            {submitStage === "CHECKED" && (
+                <div>
+
+                </div>
             )}
 
         </div>

@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
           WHERE ST_Line = @ST_Line;
 
           SELECT ST_Status 
-          FROM REFLOW_Status 
+          FROM REFLOW_TEST_Status 
           WHERE ST_Line = @ST_Line;
       `);
 

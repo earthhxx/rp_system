@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       .input('ST_Line', sql.NVarChar, line)
       .query(`
         SELECT ST_Line,ST_Model,ST_Prod,ST_Status
-        FROM REFLOW_Status 
+        FROM REFLOW_TEST_Status 
         WHERE ST_Line = @ST_Line 
       `);
 
