@@ -713,7 +713,6 @@ const PageStatus = () => {
                             placeholder="รหัสพนักงาน"
                         />
                         <div className="flex w-full h-full items-center">
-
                             <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
                                 <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
                                     <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
