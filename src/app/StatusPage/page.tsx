@@ -394,19 +394,101 @@ const PageStatus = () => {
                         </div>
                     </div>
                 </div>
-
             )}
             {submitStage === "ONCHECKING" && (
-                <div>
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={statecardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
 
+                            type="text"
+                            autoComplete="off"
+
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex w-full h-full items-center">
+
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                    <div>SCAN</div>
+                                    <div>สแกน</div>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    if (DataInArrayEmployee.includes(EmployeeNo)) {
+                                        // handleNextPageStatusCHECKED();
+                                    }
+                                    else {
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                    }
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
             {submitStage === "CHECKED" && (
-                <div>
-
+                <div className="flex flex-col justify-center items-center relative z-40 h-[5%]">
+                    {/* Header Box */}
+                    <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+                        {/* Box1 */}
+                        <div className="flex flex-col max-h-full justify-center items-center">
+                            {/* Row2 */}
+                            <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
+                                <div className="font-roboto text-2xl text-white w-full font-bold">{data120_2?.productName}</div>
+                            </div>
+                        </div>
+                        {/* Box2 */}
+                        <div className="flex h-full items-center justify-center">
+                            <button
+                                // onClick={() => setIsCardOpen(true)}
+                                type="button"
+                                className={`flex size-15 items-center px-4 py-2 transition-all duration-300 `}
+                            >
+                                <svg
+                                    className="w-20 h-20"
+                                    viewBox="0 0 56 56"
+                                >
+                                    {/* วงกลม */}
+                                    <circle
+                                        className="check-circle "
+                                        cx="26"
+                                        cy="26"
+                                        r="23"
+                                        fill="none"
+                                        stroke="#4ade80"
+                                        strokeWidth="4"
+                                    />
+                                    {/* เครื่องหมายถูก */}
+                                    <path
+                                        className="check-mark"
+                                        fill="none"
+                                        stroke="#4ade80"
+                                        strokeWidth="4"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M14 27 L22 35 L38 19"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
-
         </div>
     );
 };
