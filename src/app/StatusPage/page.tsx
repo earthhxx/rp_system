@@ -1,7 +1,12 @@
 'use client';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import StatusReader from '../components/UseParams';
+
+//icons
+import { MdKeyboardArrowDown } from "react-icons/md";
+import { GoSkipFill, GoCheckCircle } from "react-icons/go";
+import { FaFilePdf } from "react-icons/fa6";
 
 type DataItem120_2 = {
     productOrderNo: string;
@@ -11,6 +16,7 @@ type DataItem120_2 = {
 
 const PageStatus = () => {
     const router = useRouter();
+    const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
 
     //param
     const [ProductOrderNo, setProductOrderNo] = useState<string | null>(null);
@@ -135,22 +141,152 @@ const PageStatus = () => {
 
     }, [data120_2]);
 
-    return (
-        <div className="flex flex-col h-screen w-full bg-blue-100 overflow-auto">
-            <StatusReader onGetproductOrderNo={setProductOrderNo} />
 
-            {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
-            <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[80vh]">
-                {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
-                {pdfImages.map((src, idx) => (
-                    <img
-                        key={idx}
-                        src={src}
-                        alt={`Page ${idx + 1}`}
-                        className="max-w-full h-full shadow-md border border-gray-300 rounded"
-                    />
-                ))}
+    const [arrowdownbuttoncard, setArrowDownButtoncard] = useState(false);
+    const [arrowdownbutton, setArrowDownButton] = useState(true);
+    const cardarrowRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutsidearrow = (event: MouseEvent) => {
+            if (cardarrowRef.current && !cardarrowRef.current.contains(event.target as Node)) {
+                setArrowDownButtoncard(false);
+                setArrowDownButton(true);
+
+            }
+        };
+        if (arrowdownbuttoncard) {
+            document.addEventListener("mousedown", handleClickOutsidearrow);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutsidearrow);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutsidearrow);
+        };
+    }, [arrowdownbuttoncard]);
+
+
+    const arrowcard = () => {
+        return (
+            <>
+                <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-49">
+                    <div
+                        ref={cardarrowRef}
+                        className="content-center-safe m-4 w-[110px] xl:w-[150px] h-[30px] xl:h-[60px] text-[10px] justify-center items-center rounded-4xl bg-gray-800/70 backdrop-blur-md"
+                    >
+                        <div className="flex flex-none h-5 xl:h-10"></div>
+                        <div className="flex flex-row justify-center items-center ">
+                            <div className="flex w-full h-full justify-center">
+                                <div className="flex flex-none"></div>
+                                <div
+                                    onClick={() => {
+                                        // setArrowDownButtoncard(false);
+                                        // setisCardOpencancel(true);
+                                    }}
+                                    className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
+                                >
+                                    <div className="flex flex-none"></div>
+                                    <GoSkipFill className="w-6 h-6 xl:w-8 xl:h-8 text-white" />
+                                    <div>CANCEL PRODUCT</div>
+                                    <div>ยกเลิก โปรไฟล์</div>
+                                </div>
+                                <div className="flex flex-none"></div>
+                            </div>
+                            {submitStage === "CHECKED" && (
+                                <>
+                                    <div className="flex w-full h-full justify-center">
+                                        <div className="flex flex-none"></div>
+                                        <div
+                                            onClick={() => {
+                                                // setArrowDownButtoncard(false);
+                                                // setisCardOpenclosepro(true);
+                                            }}
+                                            className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
+                                        >
+                                            <div className="flex flex-none"></div>
+                                            <GoCheckCircle className="w-6 h-6 xl:w-8 xl:h-8 text-white" />
+                                            <div>SUBMIT PRODUCT</div>
+                                            <div>สำเร็จการวัดโปรไฟล์</div>
+                                        </div>
+                                        <div className="flex flex-none"></div>
+                                    </div>
+                                    <div className="flex w-full h-full justify-center">
+                                        <div className="flex flex-none"></div>
+                                        <div
+                                            onClick={() => {
+                                                // setArrowDownButtoncard(false);
+                                                // setArrowDownButton(true);
+                                                // handleOpenPdf();
+                                            }}
+                                            className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
+                                        >
+                                            <div className="flex flex-none"></div>
+                                            <FaFilePdf className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
+                                            <div>RESULT</div>
+                                            <div>ผลการวัดโปรไฟล์</div>
+                                        </div>
+                                        <div className="flex flex-none"></div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <div className="flex-none h-10"></div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+
+
+    const [statusCard, setstatusCard] = useState(false);
+
+    return (
+        <div className="flex flex-col h-screen w-full bg-blue-100">
+            <StatusReader onGetproductOrderNo={setProductOrderNo} />
+            <div className="flex">
+                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
+                <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
+                    {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
+                    {pdfImages.map((src, idx) => (
+                        <img
+                            key={idx}
+                            src={src}
+                            alt={`Page ${idx + 1}`}
+                            className="max-w-full h-full shadow-md border border-gray-300 rounded"
+                        />
+                    ))}
+                </div>
+                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
+                <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
+                    {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
+                    {pdfImages.map((src, idx) => (
+                        <img
+                            key={idx}
+                            src={src}
+                            alt={`Page ${idx + 1}`}
+                            className="max-w-full h-full shadow-md border border-gray-300 rounded"
+                        />
+                    ))}
+                </div>
             </div>
+
+            {arrowdownbutton && (
+                <div className="fixed mt-16 mr-4 z-49 flex w-full justify-end right-10">
+                    <div
+                        onClick={() => {
+                            setArrowDownButtoncard(true);
+                            setArrowDownButton(false);
+                        }}
+                        className="flex flex-none ">
+                        <MdKeyboardArrowDown
+                            className="size-12 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
+                    </div>
+                </div>
+            )}
+            {arrowcard && (
+                arrowcard()
+            )}
+
         </div>
     );
 };
