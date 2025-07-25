@@ -244,9 +244,6 @@ const checkreflowpage = () => {
         ST_Status: "WAITING"
       })
     });
-
-    const result = await res.json();
-
   };
 
   const updateReflowStatusCHECKED = async () => {
@@ -263,9 +260,6 @@ const checkreflowpage = () => {
         ST_EmployeeID: EmployeeNo,
       })
     });
-
-    const result = await res.json();
-
   };
 
   const updateReflowStatusONCHECKING = async () => {
@@ -282,9 +276,6 @@ const checkreflowpage = () => {
         ST_EmployeeID: EmployeeNo,
       })
     });
-
-    const result = await res.json();
-
   };
 
   const updateReflowStatusCancel = async () => {
@@ -313,10 +304,8 @@ const checkreflowpage = () => {
         ST_Line: data120_2?.ProcessLine
       })
     });
-
-    const result = await res.json();
-
   };
+  
   //ONCHECKING
   //submit log state to check
   const submitLogToReflow120_9_ONCHECKING = async () => {

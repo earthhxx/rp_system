@@ -29,7 +29,7 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
 
 const PageStatus = () => {
     const router = useRouter();
-    const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
+
 
     //param
     const [ProductOrderNo, setProductOrderNo] = useState<string | null>(null);
@@ -125,15 +125,15 @@ const PageStatus = () => {
                         //updateReflowStatus();
                     }
                 } else if (ST_Status === "WAITING" && isProdMatch) {
-                    //setSubmitStage("WAITING");
+                    setSubmitStage("WAITING");
                     //setData120_9(data.data);
                     await fetchPdfImages();
                 } else if (ST_Status === "ONCHECKING" && isProdMatch) {
-                    //setSubmitStage("ONCHECKING");
+                    setSubmitStage("ONCHECKING");
                     //setData120_9(data.data);
                     await fetchPdfImages();
                 } else if (ST_Status === "CHECKED" && isProdMatch) {
-                    //setSubmitStage("CHECKED");
+                    setSubmitStage("CHECKED");
                     //setData120_9(data.data);
                     await fetchPdfImages();
                 } else {
@@ -250,13 +250,32 @@ const PageStatus = () => {
     };
 
     //submitcard
-    const statecardRef = useRef<HTMLDivElement>(null!);
+    const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
+    const [submitcard, setSubmitcard] = useState(false);
+    const submitcardRef = useRef<HTMLDivElement>(null!);
     const togglepassmodelbutton = () => {
         setpassmodelbutton(prev => !prev); // สลับสถานะ
     };
     const [passmodelbutton, setpassmodelbutton] = useState(false);
     const [confirmmodel, setconfirmmodel] = useState(false);
     const [confirmemployee, setconfirmemployee] = useState<string | null>(null);
+
+    useEffect(() => {
+        const handleClickOutsubmitcard = (event: MouseEvent) => {
+            if (submitcardRef.current && !submitcardRef.current.contains(event.target as Node)) {
+                setSubmitcard(false);
+            }
+        };
+        if (submitcard) {
+            document.addEventListener("mousedown", handleClickOutsubmitcard);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutsubmitcard);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutsubmitcard);
+        };
+    }, [submitcard]);
+
 
     //allow employee
     const DataInArrayEmployee = ['0506', '0743', '0965', '3741', '1534', '1912', '2050', '3015', '3222', '3744', '3745'];
@@ -266,6 +285,20 @@ const PageStatus = () => {
     const [employeeName, setEmployeeName] = useState("");
     const [employeeUserName, setEmployeeUserName] = useState("");
 
+    useEffect(() => {
+        const fetchEmployeeName = async () => {
+            const res = await fetch(`/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
+            const { success, data } = await res.json();
+
+
+            if (success && data?.Name && data?.UserName) {
+                setEmployeeName(data.Name);
+                setEmployeeUserName(data.UserName);
+            }
+        };
+
+        if (EmployeeNo) fetchEmployeeName();
+    }, [EmployeeNo]);
 
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
@@ -316,80 +349,38 @@ const PageStatus = () => {
 
             //STAGE
             {submitStage === "WAITING" && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={statecardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                        <input
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
+                    <div className="flex w-full h-[30%] bg-red-400">
+                        <div className="w-full">
 
-                            type="password"
-                            autoComplete="off"
-
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="รหัสพนักงาน"
-                        />
-                        <div className="flex flex-row w-full justify-center items-center">
-                            <div className="flex flex-col items-center">
-                                <div className="flex justify-center items-center  text-white">continuously or not?</div>
-                                <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
-                            </div>
-                            <div className="flex flex-none w-[5%]"></div>
-                            <button
-                                onClick={() => {
-                                    getJsonFromLocalStorage('modellocal');
-                                    const modellocal = getJsonFromLocalStorage<string>('modellocal');
-
-                                    getJsonFromLocalStorage('employeelocal');
-                                    const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
-
-                                    setEmployeeNo(employeelocal ? employeelocal.toString() : "");
-
-                                    togglepassmodelbutton();
-                                }}
-                                className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
-                                    }`}
-                            >
-                                <pre className="text-[10px] xl:text-xl">
-                                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
-                                </pre>
-                            </button>
                         </div>
-
-                        <div className="flex w-full h-full items-center">
-                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                                <div>SCAN</div>
-                                <div>สแกน</div>
-                            </div>
-                            <div
-                                onClick={() => {
-
-                                    if (passmodelbutton === true) {
-                                        if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
-                                            // handleNextPageStatusCHECKED();
-                                        }
-                                        else {
-                                            alert('Model is not match or user not allow')
-                                        }
-                                    }
-                                    else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
-                                        // handleNextPageStatusONCHECKING();
-                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
-                                    }
-                                    else {
-                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
-                                    }
-                                }}
-                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <GoCheckCircle className="size-15 xl:size-30 " />
-                                <div>
-                                    SUBMIT
+                        <div onClick={() => { setSubmitcard(true);}} className="flex justify-center items-center w-[40%]">
+                            <div className="flex flex-col justify-center items-center w-86">
+                                <div className="flex flex-col justify-center items-center">
+                                    <div className="font-roboto font-bold text-[25px] mb-6">Waiting for Measurement</div>
+                                    <svg
+                                        className="size-24 animate-spin text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+                                        />
+                                    </svg>
+                                    <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์..</div>
                                 </div>
-                                <div>
-                                    ส่งข้อมูล
-                                </div>
+                                <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
                             </div>
                         </div>
                     </div>
@@ -397,7 +388,7 @@ const PageStatus = () => {
             )}
             {submitStage === "ONCHECKING" && (
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={statecardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                    <div className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
                         <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
                         <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
                         <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
@@ -485,6 +476,88 @@ const PageStatus = () => {
                                     />
                                 </svg>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {submitcard && submitStage === 'WAITING' && (
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
+
+                            type="password"
+                            autoComplete="off"
+
+
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex flex-row w-full justify-center items-center">
+                            <div className="flex flex-col items-center">
+                                <div className="flex justify-center items-center  text-white">continuously or not?</div>
+                                <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
+                            </div>
+                            <div className="flex flex-none w-[5%]"></div>
+                            <button
+                                onClick={() => {
+                                    getJsonFromLocalStorage('employeelocal');
+                                    const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
+
+                                    setEmployeeNo(employeelocal ? employeelocal.toString() : "");
+
+                                    togglepassmodelbutton();
+                                }}
+                                className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                                    }`}
+                            >
+                                <pre className="text-[10px] xl:text-xl">
+                                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
+                                </pre>
+
+                            </button>
+
+                        </div>
+
+                        <div className="flex w-full h-full items-center">
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                <div>SCAN</div>
+                                <div>สแกน</div>
+                            </div>
+                            <div
+                                onClick={() => {
+
+                                    if (passmodelbutton === true) {
+
+
+                                        if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+                                            // handleNextPageStatusCHECKED();
+                                        }
+                                        else {
+                                            alert('Model is not match or user not allow')
+                                        }
+                                    }
+                                    else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
+                                        // handleNextPageStatusONCHECKING();
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
+                                    }
+                                    else {
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                    }
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
