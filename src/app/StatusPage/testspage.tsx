@@ -305,7 +305,7 @@ const checkreflowpage = () => {
       })
     });
   };
-  
+
   //ONCHECKING
   //submit log state to check
   const submitLogToReflow120_9_ONCHECKING = async () => {
@@ -892,9 +892,6 @@ const checkreflowpage = () => {
 
     }
   };
-
-
-
 
   const handleNextPageStatusONCHECKING = () => {
     const value = inputRef.current?.value.trim();

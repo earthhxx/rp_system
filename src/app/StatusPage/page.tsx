@@ -274,6 +274,21 @@ const PageStatus = () => {
     const [confirmmodel, setconfirmmodel] = useState(false);
     const [confirmemployee, setconfirmemployee] = useState<string | null>(null);
 
+    //LOAD Moldel from local
+    useEffect(() => {
+        if (data120_2) {
+            const getmodel: string | null = getJsonFromLocalStorage('modellocal');
+            const getemployee: string | null = getJsonFromLocalStorage('employeelocal');
+
+            if (getmodel === data120_2.productName) {
+                setconfirmmodel(true);
+                setconfirmemployee(getemployee);
+            } else {
+                setconfirmmodel(false); // เผื่อเคส model ไม่ตรง
+            }
+        }
+    }, [data120_2]);
+
     useEffect(() => {
         const handleClickOutsubmitcard = (event: MouseEvent) => {
             if (submitcardRef.current && !submitcardRef.current.contains(event.target as Node)) {
