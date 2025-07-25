@@ -15,7 +15,7 @@ interface ReflowRecordStatus {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const line = searchParams.get('R_Line');
+    const line = searchParams.get('ST_Line');
 
     // Validate input
     if (!line) {

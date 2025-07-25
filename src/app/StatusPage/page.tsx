@@ -16,10 +16,14 @@ type DataItem120_2 = {
 };
 
 type DataItem120_9 = {
-  R_Model: string;
-  R_Line: string;
-  R_PDF: string;
+    ST_Line: string;
+    ST_Model: string;
+    ST_Prod: string;
+    ST_Status: string;
+    ST_EmployeeID: string;
 };
+
+
 
 function setJsonToLocalStorage<T>(key: string, value: T) {
     localStorage.setItem(key, JSON.stringify(value));
@@ -34,7 +38,6 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
 
 const PageStatus = () => {
     const router = useRouter();
-
 
     //param
     const [ProductOrderNo, setProductOrderNo] = useState<string | null>(null);
@@ -84,7 +87,7 @@ const PageStatus = () => {
 
         const fetchPdfImages = async (): Promise<boolean> => {
             try {
-                const res = await fetch(`/api/120-9/checkreflow/load-pdf-standard?R_Line=${encodeURIComponent(data120_2.ProcessLine)}&R_Model=${encodeURIComponent(data120_2.productName)}`);
+                const res = await fetch(`/api/120-9/checkreflow/load-pdf-standard?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}&ST_Model=${encodeURIComponent(data120_2.productName)}`);
                 const json = await res.json();
 
                 if (!json.success || !json.images || json.images.length === 0) {
@@ -109,7 +112,7 @@ const PageStatus = () => {
         // STAGE VALIDATION CHECK (เดิม)
         const fetchReflowStatus = async () => {
             try {
-                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?R_Line=${encodeURIComponent(data120_2.ProcessLine)}`);
+                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}`);
                 const { data, success } = await res.json();
 
                 if (!success || !data || data.length === 0) {
@@ -121,7 +124,7 @@ const PageStatus = () => {
                 }
 
                 // สมมติ data เป็น object เดียว (แก้ตามจริงถ้าไม่ใช่)
-                const { ST_Status, ST_Prod } = data;
+                const { ST_Status, ST_Prod } = data[0];
 
                 const isProdMatch = ST_Prod === data120_2.productOrderNo;
 
@@ -134,15 +137,16 @@ const PageStatus = () => {
                     }
                 } else if (ST_Status === "WAITING" && isProdMatch) {
                     setSubmitStage("WAITING");
-                    setData120_9(data.data);
+                    setData120_9(data[0]);
+                    console.log('pass', data)
                     await fetchPdfImages();
                 } else if (ST_Status === "ONCHECKING" && isProdMatch) {
                     setSubmitStage("ONCHECKING");
-                    setData120_9(data.data);
+                    setData120_9(data[0]);
                     await fetchPdfImages();
                 } else if (ST_Status === "CHECKED" && isProdMatch) {
                     setSubmitStage("CHECKED");
-                    setData120_9(data.data);
+                    setData120_9(data[0]);
                     await fetchPdfImages();
                 } else {
                     alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง หรือ มี pro ข้างอยู่แล้ว`);
@@ -259,6 +263,8 @@ const PageStatus = () => {
     const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
     const [submitcard, setSubmitcard] = useState(false);
     const submitcardRef = useRef<HTMLDivElement>(null!);
+    const inputRef = useRef<HTMLInputElement>(null!);
+
     const togglepassmodelbutton = () => {
         setpassmodelbutton(prev => !prev); // สลับสถานะ
     };
@@ -312,6 +318,72 @@ const PageStatus = () => {
         }
     };
 
+
+    //handle click submit state
+    const handleNextPageStatusONCHECKING = () => {
+        const value = inputRef.current?.value.trim();
+        if (!value || value.length !== 4) {
+            alert("กรุณากรอกรหัสให้ครบก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+        if (EmployeeNo === employeeUserName) {
+            if (submitStage === "WAITING") {
+                setSubmitStage("ONCHECKING");
+                submitLogToReflow120_9_ONCHECKING();
+                // updateReflowStatusONCHECKING();
+                setJsonToLocalStorage('modellocal', (data120_2?.productName));
+                setJsonToLocalStorage('employeelocal', (EmployeeNo));
+                setSubmitcard(false);
+            }
+            else {
+                alert('รหัสไม่มีอยู่ในฐานข้อมูล');
+            }
+        }
+        else {
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+
+        }
+    };
+
+    //submit log state to check
+    const submitLogToReflow120_9_ONCHECKING = async () => {
+        if (!data120_2 || !submitStage) {
+            alert("Missing required fields to submit log");
+            return;
+        }
+
+        try {
+            const payload = {
+                R_Line: data120_2.ProcessLine,
+                R_Model: data120_2.productName,
+                productOrderNo: ProductOrderNo,
+                ST_Status: submitStage,
+                Log_User: employeeName,
+                Log_UserID: EmployeeNo,
+            };
+
+            const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (!res.ok || !result.success) {
+                alert("Log submit failed:");
+            } else {
+
+            }
+
+        } catch (error) {
+            alert("Error submitting log:");
+        }
+    };
+
+
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
             <StatusReader onGetproductOrderNo={setProductOrderNo} />
@@ -364,7 +436,7 @@ const PageStatus = () => {
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
                     <div className="flex w-full h-[30%] bg-yellow-400/50 mt-20">
                         <div className="w-full">
-                            {data120_9?.R_Line || "ไม่มีข้อมูล R_Line"}
+                            {data120_9?.ST_Line || "ไม่มีข้อมูล R_Line"}
                         </div>
                         <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-yellow-400/80">
                             <div className="flex flex-col justify-center items-center w-86">
@@ -445,7 +517,7 @@ const PageStatus = () => {
                 </div>
             )}
             {submitStage === "CHECKED" && (
-                <div className="flex flex-col justify-center items-center relative z-40 h-[5%]">
+                <div className="fixed flex flex-col justify-center items-center z-40 w-full h-[5%]">
                     {/* Header Box */}
                     <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
                         {/* Box1 */}
@@ -500,6 +572,7 @@ const PageStatus = () => {
                         <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
                         <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
                         <input
+                            ref={inputRef}
                             type="password"
                             autoComplete="off"
                             onChange={handleChangeInputID}
@@ -538,10 +611,7 @@ const PageStatus = () => {
                             </div>
                             <div
                                 onClick={() => {
-
                                     if (passmodelbutton === true) {
-
-
                                         if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
                                             // handleNextPageStatusCHECKED();
                                         }
@@ -552,6 +622,52 @@ const PageStatus = () => {
                                     else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
                                         // handleNextPageStatusONCHECKING();
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
+                                    }
+                                    else {
+                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                    }
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {submitcard && submitStage === 'ONCHECKING' && (
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            autoComplete="off"
+                            onChange={handleChangeInputID}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex w-full h-full items-center">
+
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                    <div>SCAN</div>
+                                    <div>สแกน</div>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    if (DataInArrayEmployee.includes(EmployeeNo)) {
+                                        // handleNextPageStatusCHECKED();
                                     }
                                     else {
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')

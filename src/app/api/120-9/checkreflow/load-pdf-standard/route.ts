@@ -12,8 +12,8 @@ const pdftocairoPath = 'C:\\Tools\\poppler-24.08.0\\Library\\bin\\pdftocairo.exe
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const model = searchParams.get('R_Model');
-    const line = searchParams.get('R_Line');
+    const model = searchParams.get('ST_Model');
+    const line = searchParams.get('ST_Line');
 
     if (!model || !line) {
       return NextResponse.json({ success: false, message: 'Missing params' }, { status: 400 });
