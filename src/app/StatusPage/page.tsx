@@ -133,7 +133,7 @@ const PageStatus = () => {
                     const pdfSuccess = await fetchPdfImages();
                     if (pdfSuccess) {
                         //submitLogToReflow120_9();
-                        //updateReflowStatus();
+                        updateReflowStatus("WAITING");
                     }
                 } else if (ST_Status === "WAITING" && isProdMatch) {
                     setSubmitStage("WAITING");
@@ -265,6 +265,7 @@ const PageStatus = () => {
     const inputRef = useRef<HTMLInputElement>(null!);
 
     const togglepassmodelbutton = () => {
+        const modellocal = getJsonFromLocalStorage<string>('modellocal');
         const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
         setEmployeeNo(employeelocal ? employeelocal.toString() : "");
         setpassmodelbutton(prev => !prev); // สลับสถานะ
@@ -345,6 +346,42 @@ const PageStatus = () => {
         }
     };
 
+    const handleNextPageStatusCHECKED = () => {
+        const value = EmployeeNo;
+        if (!value && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+
+        }
+        else if (value) {
+        }
+        else {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+        if (EmployeeNo === employeeUserName) {
+            if (submitStage === "ONCHECKING") {
+                setSubmitStage("CHECKED");
+                // submitLogToReflow120_9_CHECK();
+                updateReflowStatus('CHECKED');
+                setJsonToLocalStorage('modellocal', (data120_2?.productName));
+                setJsonToLocalStorage('employeelocal', (EmployeeNo));
+            }
+            else if (submitStage === "WAITING") {
+                setSubmitStage("CHECKED");
+                // submitLogToReflow120_9_continuous();
+                updateReflowStatus('CHECKED');
+                setJsonToLocalStorage('modellocal', (data120_2?.productName));
+                setJsonToLocalStorage('employeelocal', (EmployeeNo));
+            }
+            else {
+                clearinputref();
+            }
+        }
+        else {
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+
+        }
+    };
+
     //state update
     const updateReflowStatus = async (stage: "WAITING" | "ONCHECKING" | "CHECKED") => {
         const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
@@ -360,7 +397,6 @@ const PageStatus = () => {
             })
         });
     };
-
 
     //submit log state to check
     const submitLogToReflow120_9_ONCHECKING = async () => {
@@ -400,6 +436,12 @@ const PageStatus = () => {
         }
     };
 
+    const clearinputref = () => {
+        // เคลียร์ inputRef และ state
+        if (inputRef.current) {
+            inputRef.current.value = "";
+        }
+    };
 
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
@@ -625,17 +667,21 @@ const PageStatus = () => {
                                 onClick={() => {
                                     if (passmodelbutton === true) {
                                         if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
-                                            //handleNextPageStatusCHECKED();
+                                            handleNextPageStatusCHECKED();
+                                            clearinputref();
                                         }
                                         else {
                                             alert('Model is not match lastest Model or user not allow')
+                                            clearinputref();
                                         }
                                     }
                                     else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
                                         handleNextPageStatusONCHECKING();
+                                        clearinputref();
                                     }
                                     else {
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                        clearinputref();
                                     }
                                 }}
                                 className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
@@ -679,9 +725,11 @@ const PageStatus = () => {
                                 onClick={() => {
                                     if (DataInArrayEmployee.includes(EmployeeNo)) {
                                         // handleNextPageStatusCHECKED();
+                                        clearinputref();
                                     }
                                     else {
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                        clearinputref();
                                     }
                                 }}
                                 className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
