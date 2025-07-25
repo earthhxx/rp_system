@@ -138,7 +138,6 @@ const PageStatus = () => {
                 } else if (ST_Status === "WAITING" && isProdMatch) {
                     setSubmitStage("WAITING");
                     setData120_9(data[0]);
-                    console.log('pass', data)
                     await fetchPdfImages();
                 } else if (ST_Status === "ONCHECKING" && isProdMatch) {
                     setSubmitStage("ONCHECKING");
@@ -266,6 +265,8 @@ const PageStatus = () => {
     const inputRef = useRef<HTMLInputElement>(null!);
 
     const togglepassmodelbutton = () => {
+        const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
+        setEmployeeNo(employeelocal ? employeelocal.toString() : "");
         setpassmodelbutton(prev => !prev); // สลับสถานะ
     };
     const [passmodelbutton, setpassmodelbutton] = useState(false);
@@ -328,11 +329,11 @@ const PageStatus = () => {
         }
         if (EmployeeNo === employeeUserName) {
             if (submitStage === "WAITING") {
-                setSubmitStage("ONCHECKING");
-                submitLogToReflow120_9_ONCHECKING();
-                // updateReflowStatusONCHECKING();
-                setJsonToLocalStorage('modellocal', (data120_2?.productName));
-                setJsonToLocalStorage('employeelocal', (EmployeeNo));
+                const newStage = "ONCHECKING";
+                setSubmitStage(newStage);
+                updateReflowStatus(newStage); // ส่งค่าที่จะใช้จริง
+                setJsonToLocalStorage("modellocal", data120_2?.productName);
+                setJsonToLocalStorage("employeelocal", EmployeeNo);
                 setSubmitcard(false);
             }
             else {
@@ -341,9 +342,25 @@ const PageStatus = () => {
         }
         else {
             alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
-
         }
     };
+
+    //state update
+    const updateReflowStatus = async (stage: "WAITING" | "ONCHECKING" | "CHECKED") => {
+        const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ST_Line: data120_2?.ProcessLine,
+                ST_Model: data120_2?.productName,
+                ST_Prod: ProductOrderNo,
+                ST_Status: stage, // ใช้ค่าที่ส่งมา
+            })
+        });
+    };
+
 
     //submit log state to check
     const submitLogToReflow120_9_ONCHECKING = async () => {
@@ -587,11 +604,6 @@ const PageStatus = () => {
                             <div className="flex flex-none w-[5%]"></div>
                             <button
                                 onClick={() => {
-                                    getJsonFromLocalStorage('employeelocal');
-                                    const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
-
-                                    setEmployeeNo(employeelocal ? employeelocal.toString() : "");
-
                                     togglepassmodelbutton();
                                 }}
                                 className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
@@ -613,15 +625,14 @@ const PageStatus = () => {
                                 onClick={() => {
                                     if (passmodelbutton === true) {
                                         if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
-                                            // handleNextPageStatusCHECKED();
+                                            //handleNextPageStatusCHECKED();
                                         }
                                         else {
-                                            alert('Model is not match or user not allow')
+                                            alert('Model is not match lastest Model or user not allow')
                                         }
                                     }
                                     else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
-                                        // handleNextPageStatusONCHECKING();
-                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง err: Array')
+                                        handleNextPageStatusONCHECKING();
                                     }
                                     else {
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
