@@ -318,27 +318,21 @@ const PageStatus = () => {
     const [employeeName, setEmployeeName] = useState("");
     const [employeeUserName, setEmployeeUserName] = useState("");
 
-    useEffect(() => {
-        const fetchEmployeeName = async () => {
-            const res = await fetch(`/api/120-2/select-Employee-id?UserName=${EmployeeNo}`);
-            const { success, data } = await res.json();
+    const handleChangeInputID = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
 
+        if (value.length === 4) {
+            setEmployeeNo(value); // อาจยังไม่ได้อัปเดตทันที
+
+            const res = await fetch(`/api/120-2/select-Employee-id?UserName=${value}`);
+            const { success, data } = await res.json();
 
             if (success && data?.Name && data?.UserName) {
                 setEmployeeName(data.Name);
                 setEmployeeUserName(data.UserName);
             }
-        };
-
-        if (EmployeeNo) fetchEmployeeName();
-    }, [EmployeeNo]);
-
-    const handleChangeInputID = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value.length === 4) {
-            setEmployeeNo(e.target.value);
         }
     };
-
 
     //handle click submit state
     const handleNextPageStatusONCHECKING = () => {
