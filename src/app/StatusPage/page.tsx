@@ -352,6 +352,7 @@ const PageStatus = () => {
                 const newStage = "ONCHECKING";
                 setSubmitStage(newStage);
                 updateReflowStatus(newStage); // ส่งค่าที่จะใช้จริง
+                submitLogToReflow120_9(newStage);
                 setJsonToLocalStorage("modellocal", data120_2?.productName);
                 setJsonToLocalStorage("employeelocal", EmployeeNo);
                 setSubmitcard(false);
@@ -380,7 +381,7 @@ const PageStatus = () => {
             if (submitStage === "ONCHECKING") {
                 const newStage = "CHECKED";
                 setSubmitStage(newStage);
-                // submitLogToReflow120_9_CHECK();
+                submitLogToReflow120_9(newStage);
                 updateReflowStatus(newStage);
                 setJsonToLocalStorage('modellocal', (data120_2?.productName));
                 setJsonToLocalStorage('employeelocal', (EmployeeNo));
@@ -388,7 +389,7 @@ const PageStatus = () => {
             else if (submitStage === "WAITING") {
                 const newStage = "CHECKED";
                 setSubmitStage(newStage);
-                // submitLogToReflow120_9_CHECK(); continuous
+                submitLogToReflow120_9("CONTINUOUS"); //CONTINUOUS
                 updateReflowStatus(newStage);
                 setJsonToLocalStorage('modellocal', (data120_2?.productName));
                 setJsonToLocalStorage('employeelocal', (EmployeeNo));
@@ -443,7 +444,7 @@ const PageStatus = () => {
 
         if (EmployeeNo === employeeUserName) {
             try {
-                //await submitLogCloseprodToReflow120_9();
+                await submitLogToReflow120_9("CANCEL");
                 await updateReflowStatusCloseproCancelpro();
                 setCardCancelpro(false);
                 localStorage.removeItem("localProductOrderNo");
@@ -472,7 +473,7 @@ const PageStatus = () => {
 
         if (EmployeeNo === employeeUserName) {
             try {
-                //await submitLogCloseprodToReflow120_9();
+                await submitLogToReflow120_9("CLOSE");
                 await updateReflowStatusCloseproCancelpro();
                 setCardClosepro(false);
                 localStorage.removeItem("localProductOrderNo");
@@ -494,7 +495,7 @@ const PageStatus = () => {
 
 
     //submit log state to check
-    const submitLogToReflow120_9_ONCHECKING = async () => {
+    const submitLogToReflow120_9 = async (stage: "WAITING" | "ONCHECKING" | "CHECKED" | "CONTINUOUS" | "CLOSE" | "CANCEL") => {
         if (!data120_2 || !submitStage) {
             alert("Missing required fields to submit log");
             return;
@@ -506,7 +507,7 @@ const PageStatus = () => {
                 R_Model: data120_2.productName,
                 productOrderNo: ProductOrderNo,
                 ST_Status: submitStage,
-                Log_User: employeeName,
+                Log_User: stage,
                 Log_UserID: EmployeeNo,
             };
 
@@ -586,17 +587,17 @@ const PageStatus = () => {
                 </div>
                 {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
                 {handleOpenResult && (
-                <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
-                    {resultpdfimg.length === 0 && <p className="flex justify-center items-center w-full h-full">โปรดรอ ผลการวัดโปรไฟล์...</p>}
-                    {resultpdfimg.map((src, idx) => (
-                        <img
-                            key={idx}
-                            src={src}
-                            alt={`Page ${idx + 1}`}
-                            className="max-w-full h-full shadow-md border border-gray-300 rounded"
-                        />
-                    ))}
-                </div>
+                    <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
+                        {resultpdfimg.length === 0 && <p className="flex justify-center items-center w-full h-full">โปรดรอ ผลการวัดโปรไฟล์...</p>}
+                        {resultpdfimg.map((src, idx) => (
+                            <img
+                                key={idx}
+                                src={src}
+                                alt={`Page ${idx + 1}`}
+                                className="max-w-full h-full shadow-md border border-gray-300 rounded"
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
 
