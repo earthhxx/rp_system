@@ -42,7 +42,7 @@ function removeItemFromLocalStorage(key: string) {
 const icons = {
     CHECKED: (
         <span className="flex items-center justify-center size-[56px]">
-            <span className="absolute flex justify-center items-center rounded-full  opacity-75 animate-ping z-30">✅</span>
+            <span className="absolute flex justify-center items-center rounded-full  opacity-75 z-30">✅</span>
             <span className="z-10 text-[40px] ">✅</span>
         </span>
     ),
