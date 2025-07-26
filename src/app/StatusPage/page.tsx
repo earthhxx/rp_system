@@ -38,6 +38,10 @@ function getJsonFromLocalStorage<T>(key: string): T | null {
 
 const PageStatus = () => {
     const router = useRouter();
+    //home
+    const goToHome = () => {
+        router.push('/');
+    };
 
     //param
     const [ProductOrderNo, setProductOrderNo] = useState<string | null>(null);
@@ -201,8 +205,8 @@ const PageStatus = () => {
                                 <div className="flex flex-none"></div>
                                 <div
                                     onClick={() => {
-                                        // setArrowDownButtoncard(false);
-                                        // setisCardOpencancel(true);
+                                        setArrowDownButtoncard(false);
+                                        setCardCancelpro(true);
                                     }}
                                     className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
                                 >
@@ -219,8 +223,8 @@ const PageStatus = () => {
                                         <div className="flex flex-none"></div>
                                         <div
                                             onClick={() => {
-                                                // setArrowDownButtoncard(false);
-                                                // setisCardOpenclosepro(true);
+                                                setArrowDownButtoncard(false);
+                                                setCardClosepro(true);
                                             }}
                                             className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
                                         >
@@ -259,7 +263,7 @@ const PageStatus = () => {
     };
 
     //submitcard
-    const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED">("WAITING");
+    const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" | "">("");
     const [submitcard, setSubmitcard] = useState(false);
     const submitcardRef = useRef<HTMLDivElement>(null!);
     const inputRef = useRef<HTMLInputElement>(null!);
@@ -415,6 +419,80 @@ const PageStatus = () => {
         });
     };
 
+    const [CardCancelpro, setCardCancelpro] = useState(false);
+    const [CardClosepro, setCardClosepro] = useState(false);
+    //handle close pro || cancel pro
+    const updateReflowStatusCloseproCancelpro = async () => {
+        const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status_Closeprod', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ST_Line: data120_2?.ProcessLine
+            })
+        });
+    };
+
+    const handleNextPageStatusCancelpro = async () => {
+        const value = inputRef.current?.value.trim();
+        if (!value) {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+
+        if (EmployeeNo === employeeUserName) {
+            try {
+                //await submitLogCloseprodToReflow120_9();
+                await updateReflowStatusCloseproCancelpro();
+                setCardCancelpro(false);
+                localStorage.removeItem("productOrderNo");
+                window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+
+                goToHome();
+            } catch (err) {
+                alert("Error during closeprod process:");
+            } finally {
+
+            }
+        } else {
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+
+        }
+
+        clearinputref();
+    };
+
+    const handleNextPageStatusclosepro = async () => {
+        const value = inputRef.current?.value.trim();
+        if (!value) {
+            alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
+            return;
+        }
+
+        if (EmployeeNo === employeeUserName) {
+            try {
+                //await submitLogCloseprodToReflow120_9();
+                await updateReflowStatusCloseproCancelpro();
+                setCardClosepro(false);
+                localStorage.removeItem("productOrderNo");
+                window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+
+                goToHome();
+            } catch (err) {
+                alert("Error during closeprod process:");
+            } finally {
+
+            }
+        } else {
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+
+        }
+
+        clearinputref();
+    };
+
+
     //submit log state to check
     const submitLogToReflow120_9_ONCHECKING = async () => {
         if (!data120_2 || !submitStage) {
@@ -506,7 +584,6 @@ const PageStatus = () => {
             {arrowdownbuttoncard && (
                 arrowcard()
             )}
-
 
             {submitStage === "WAITING" && (
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
@@ -739,6 +816,86 @@ const PageStatus = () => {
                                         alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                                         clearinputref();
                                     }
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {CardClosepro && (
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            autoComplete="off"
+                            onChange={handleChangeInputID}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex w-full h-full items-center">
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                    <div>SCAN</div>
+                                    <div>สแกน</div>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    handleNextPageStatusclosepro();
+                                }}
+                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <GoCheckCircle className="size-15 xl:size-30 " />
+                                <div>
+                                    SUBMIT
+                                </div>
+                                <div>
+                                    ส่งข้อมูล
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {CardCancelpro && (
+                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            autoComplete="off"
+                            onChange={handleChangeInputID}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="รหัสพนักงาน"
+                        />
+                        <div className="flex w-full h-full items-center">
+                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                    <div>SCAN</div>
+                                    <div>สแกน</div>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    handleNextPageStatusCancelpro();
                                 }}
                                 className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
                                 <GoCheckCircle className="size-15 xl:size-30 " />

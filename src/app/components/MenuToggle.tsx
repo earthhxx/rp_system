@@ -50,15 +50,15 @@ const MenuToggle = () => {
     useEffect(() => {
         const handler = () => {
             // เช่น reset state หรือ redirect
-            console.log("productOrderNo ถูกลบแล้ว");
+            // console.log("productOrderNo ถูกลบแล้ว");
             // อัปเดต state เพื่อให้ component รู้ว่ามีการลบ
             setProductOrderNo("");
         };
 
-        window.addEventListener("productOrderNo:removed", handler);
+        window.addEventListener("localProductOrderNo:removed", handler);
 
         return () => {
-            window.removeEventListener("productOrderNo:removed", handler);
+            window.removeEventListener("localProductOrderNo:removed", handler);
         };
     }, []);
 
@@ -74,7 +74,7 @@ const MenuToggle = () => {
         window.addEventListener("storage", handleStorageChange);
 
         // โหลดค่าจาก localStorage
-        const stored = getJsonFromLocalStorage<string>("productOrderNo");
+        const stored = getJsonFromLocalStorage<string>("localProductOrderNo");
         if (stored && typeof stored === "string") {
             setProductOrderNo(stored);
         }
@@ -86,7 +86,7 @@ const MenuToggle = () => {
 
 
     const handleSaveAndNavigate = () => {
-        setJsonToLocalStorage("productOrderNo", productOrderNo);
+        setJsonToLocalStorage("localProductOrderNo", productOrderNo);
         router.push(`/StatusPage?productOrderNo=${encodeURIComponent(productOrderNo)}`);
         setProductOrderNo
         clearinputref();
