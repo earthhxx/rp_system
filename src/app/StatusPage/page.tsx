@@ -422,6 +422,7 @@ const PageStatus = () => {
                 ST_Model: data120_2?.productName,
                 ST_Prod: ProductOrderNo,
                 ST_Status: stage, // ใช้ค่าที่ส่งมา
+                ST_EmployeeID: EmployeeNo || null,
             })
         });
     };
