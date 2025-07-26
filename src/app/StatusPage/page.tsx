@@ -589,7 +589,7 @@ const PageStatus = () => {
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
                     <div className="flex w-full h-[30%] bg-yellow-400/50 mt-20">
                         <div className="w-full">
-                            {data120_9?.ST_Line || "ไม่มีข้อมูล R_Line"}
+                            {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
                         </div>
                         <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-yellow-400/80">
                             <div className="flex flex-col justify-center items-center w-86">
@@ -627,7 +627,7 @@ const PageStatus = () => {
                 <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
                     <div className="flex w-full h-[30%] bg-blue-400/50 mt-20">
                         <div className="w-full">
-                            {data120_9?.ST_Line || "ไม่มีข้อมูล R_Line"}
+                            {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
                         </div>
                         <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-blue-400/80">
                             <div className="flex flex-col justify-center items-center w-86">
