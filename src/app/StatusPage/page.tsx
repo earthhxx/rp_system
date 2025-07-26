@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter } from 'next/navigation';
 import StatusReader from '../components/UseParams';
 
@@ -192,75 +192,62 @@ const PageStatus = () => {
 
 
     const arrowcard = () => {
+
         return (
-            <>
-                <div className="fixed mt-20 flex w-full flex-row justify-center items-center z-49">
-                    <div
-                        ref={cardarrowRef}
-                        className="content-center-safe m-4 w-[110px] xl:w-[150px] h-fit text-[10px] justify-center items-center rounded-4xl bg-gray-800/70 backdrop-blur-md"
-                    >
-                        <div className="flex flex-none h-5 xl:h-10"></div>
-                        <div className="flex flex-row justify-center items-center ">
-                            <div className="flex w-full h-full justify-center">
-                                <div className="flex flex-none"></div>
+            <div className="fixed inset-x-0 top-20 z-50 flex justify-center">
+                <div
+                    ref={cardarrowRef}
+                    className="bg-gray-800/80 backdrop-blur-md rounded-3xl px-10 py-6 flex flex-col items-center shadow-2xl w-fit"
+                >
+                    <div className="flex flex-row justify-center gap-12 text-white text-sm xl:text-base font-kanit">
+                        {/* CANCEL PRODUCT */}
+                        <div
+                            onClick={() => {
+                                setArrowDownButtoncard(false);
+                                setCardCancelpro(true);
+                            }}
+                            className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform min-w-[160px]"
+                        >
+                            <GoSkipFill className="w-10 h-10 mb-2" />
+                            <span className="text-base xl:text-lg">CANCEL PRODUCT</span>
+                            <span className="text-sm">ยกเลิก โปรไฟล์</span>
+                        </div>
+
+                        {/* SUBMIT PRODUCT + RESULT */}
+                        {submitStage === "CHECKED" && (
+                            <>
                                 <div
                                     onClick={() => {
                                         setArrowDownButtoncard(false);
-                                        setCardCancelpro(true);
+                                        setCardClosepro(true);
                                     }}
-                                    className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
+                                    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform min-w-[160px]"
                                 >
-                                    <div className="flex flex-none"></div>
-                                    <GoSkipFill className="w-6 h-6 xl:w-8 xl:h-8 text-white" />
-                                    <div>CANCEL PRODUCT</div>
-                                    <div>ยกเลิก โปรไฟล์</div>
+                                    <GoCheckCircle className="w-10 h-10 mb-2" />
+                                    <span className="text-base xl:text-lg">SUBMIT PRODUCT</span>
+                                    <span className="text-sm">สำเร็จการวัดโปรไฟล์</span>
                                 </div>
-                                <div className="flex flex-none"></div>
-                            </div>
-                            {submitStage === "CHECKED" && (
-                                <>
-                                    <div className="flex w-full h-full justify-center">
-                                        <div className="flex flex-none"></div>
-                                        <div
-                                            onClick={() => {
-                                                setArrowDownButtoncard(false);
-                                                setCardClosepro(true);
-                                            }}
-                                            className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
-                                        >
-                                            <div className="flex flex-none"></div>
-                                            <GoCheckCircle className="w-6 h-6 xl:w-8 xl:h-8 text-white" />
-                                            <div>SUBMIT PRODUCT</div>
-                                            <div>สำเร็จการวัดโปรไฟล์</div>
-                                        </div>
-                                        <div className="flex flex-none"></div>
-                                    </div>
-                                    <div className="flex w-full h-full justify-center">
-                                        <div className="flex flex-none"></div>
-                                        <div
-                                            onClick={() => {
-                                                setArrowDownButtoncard(false);
-                                                setArrowDownButton(true);
-                                                sethandleOpenResult((prev) => !prev);
-                                            }}
-                                            className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
-                                        >
-                                            <div className="flex flex-none"></div>
-                                            <FaFilePdf className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
-                                            <div>RESULT</div>
-                                            <div>ผลการวัดโปรไฟล์</div>
-                                        </div>
-                                        <div className="flex flex-none"></div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        <div className="flex-none h-10"></div>
+
+                                <div
+                                    onClick={() => {
+                                        setArrowDownButtoncard(false);
+                                        setArrowDownButton(true);
+                                        sethandleOpenResult((prev) => !prev);
+                                    }}
+                                    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform min-w-[160px]"
+                                >
+                                    <FaFilePdf className="w-10 h-10 mb-2" />
+                                    <span className="text-base xl:text-lg">RESULT</span>
+                                    <span className="text-sm">ผลการวัดโปรไฟล์</span>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-            </>
+            </div>
         );
     };
+
 
     //submitcard
     const [submitStage, setSubmitStage] = useState<"WAITING" | "ONCHECKING" | "CHECKED" | "">("");
@@ -613,7 +600,9 @@ const PageStatus = () => {
 
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
-            <StatusReader onGetproductOrderNo={setProductOrderNo} />
+            <Suspense fallback={<div>Loading...</div>}>
+                <StatusReader onGetproductOrderNo={setProductOrderNo} />
+            </Suspense>
             <div className="flex">
                 {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
                 <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
