@@ -136,7 +136,7 @@ const PageStatus = () => {
                     setSubmitStage("WAITING");
                     const pdfSuccess = await fetchPdfImages();
                     if (pdfSuccess) {
-                        //submitLogToReflow120_9();
+                        submitLogToReflow120_9("WAITING");
                         updateReflowStatus("WAITING");
                     }
                 } else if (ST_Status === "WAITING" && isProdMatch) {
