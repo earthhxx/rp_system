@@ -603,34 +603,7 @@ const PageStatus = () => {
             <Suspense fallback={<div>Loading...</div>}>
                 <StatusReader onGetproductOrderNo={setProductOrderNo} />
             </Suspense>
-            <div className="flex">
-                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
-                <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
-                    {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
-                    {pdfImages.map((src, idx) => (
-                        <img
-                            key={idx}
-                            src={src}
-                            alt={`Page ${idx + 1}`}
-                            className="max-w-full h-full shadow-md border border-gray-300 rounded"
-                        />
-                    ))}
-                </div>
-                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
-                {handleOpenResult && (
-                    <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
-                        {resultpdfimg.length === 0 && <p className="flex justify-center items-center w-full h-full">โปรดรอ ผลการวัดโปรไฟล์...</p>}
-                        {resultpdfimg.map((src, idx) => (
-                            <img
-                                key={idx}
-                                src={src}
-                                alt={`Page ${idx + 1}`}
-                                className="max-w-full h-full shadow-md border border-gray-300 rounded"
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+
 
             {
                 arrowdownbutton && (
@@ -764,7 +737,7 @@ const PageStatus = () => {
             )}
             {
                 submitStage === "CHECKED" && (
-                    <div className="fixed flex flex-col justify-center items-center z-40 w-full h-[5%]">
+                    <div className=" flex flex-col justify-center items-center z-40 w-full h-[5%]">
                         {/* Header Box */}
                         <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
                             {/* Box1 */}
@@ -1024,6 +997,34 @@ const PageStatus = () => {
                     </div>
                 )
             }
+            <div className="flex w-full h-full bg-blue-100">
+                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
+                <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
+                    {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
+                    {pdfImages.map((src, idx) => (
+                        <img
+                            key={idx}
+                            src={src}
+                            alt={`Page ${idx + 1}`}
+                            className="max-w-full h-full shadow-md border border-gray-300 rounded"
+                        />
+                    ))}
+                </div>
+                {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
+                {handleOpenResult && (
+                    <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
+                        {resultpdfimg.length === 0 && <p className="flex justify-center items-center w-full h-full">โปรดรอ ผลการวัดโปรไฟล์...</p>}
+                        {resultpdfimg.map((src, idx) => (
+                            <img
+                                key={idx}
+                                src={src}
+                                alt={`Page ${idx + 1}`}
+                                className="max-w-full h-full shadow-md border border-gray-300 rounded"
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div >
     );
 };
