@@ -15,6 +15,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const model = searchParams.get('ST_Model');
     const line = searchParams.get('ST_Line');
+    console.log(model,'model')
+    console.log(line,'line')
 
     if (!model || !line) {
       return NextResponse.json({ success: false, message: 'Missing params' }, { status: 400 });
@@ -31,11 +33,11 @@ export async function GET(req: NextRequest) {
         ORDER BY CreateDate DESC
       `);
 
-    if (!result.recordset.length || !result.recordset[0].R_PDF) {
+    if (!result.recordset.length || !result.recordset[0].PDF_Loc) {
       return NextResponse.json({ success: false, message: 'PDF not found' }, { status: 404 });
     }
 
-    const pdfBuffer = result.recordset[0].R_PDF;
+    const pdfBuffer = result.recordset[0].PDF_Loc;
     
     const tempDir = path.join(os.tmpdir(), `pdf-img-${crypto.randomUUID()}`);
     await fs.mkdir(tempDir, { recursive: true });
