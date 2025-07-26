@@ -269,9 +269,12 @@ const PageStatus = () => {
     const inputRef = useRef<HTMLInputElement>(null!);
 
     const togglepassmodelbutton = () => {
-        const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
-        setEmployeeNo(employeelocal ? employeelocal.toString() : "");
-        setpassmodelbutton(prev => !prev); // สลับสถานะ
+        setpassmodelbutton(prev => !prev);
+        const getemployee = getJsonFromLocalStorage<string>('employeelocal');
+        if (getemployee) {
+            setEmployeeNo(getemployee);
+            loadEmployeeData(getemployee);
+        }
     };
     const [passmodelbutton, setpassmodelbutton] = useState(false);
     const [confirmmodel, setconfirmmodel] = useState(false);
@@ -280,17 +283,18 @@ const PageStatus = () => {
     //LOAD Moldel from local
     useEffect(() => {
         if (data120_2) {
-            const getmodel: string | null = getJsonFromLocalStorage('modellocal');
-            const getemployee: string | null = getJsonFromLocalStorage('employeelocal');
+            const getmodel = getJsonFromLocalStorage<string>('modellocal');
+            const getemployee = getJsonFromLocalStorage<string>('employeelocal');
 
             if (getmodel === data120_2.productName) {
                 setconfirmmodel(true);
                 setconfirmemployee(getemployee);
             } else {
-                setconfirmmodel(false); // เผื่อเคส model ไม่ตรง
+                setconfirmmodel(false);
             }
         }
     }, [data120_2]);
+
 
     useEffect(() => {
         const handleClickOutsubmitcard = (event: MouseEvent) => {
@@ -317,19 +321,20 @@ const PageStatus = () => {
     const [employeeName, setEmployeeName] = useState("");
     const [employeeUserName, setEmployeeUserName] = useState("");
 
+    const loadEmployeeData = async (employeeID: string) => {
+        const res = await fetch(`/api/120-2/select-Employee-id?UserName=${employeeID}`);
+        const { success, data } = await res.json();
+        if (success && data?.Name && data?.UserName) {
+            setEmployeeName(data.Name);
+            setEmployeeUserName(data.UserName);
+        }
+    };
+
     const handleChangeInputID = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-
+        setEmployeeNo(value);
         if (value.length === 4) {
-            setEmployeeNo(value); // อาจยังไม่ได้อัปเดตทันที
-
-            const res = await fetch(`/api/120-2/select-Employee-id?UserName=${value}`);
-            const { success, data } = await res.json();
-
-            if (success && data?.Name && data?.UserName) {
-                setEmployeeName(data.Name);
-                setEmployeeUserName(data.UserName);
-            }
+            await loadEmployeeData(value);
         }
     };
 
@@ -355,12 +360,14 @@ const PageStatus = () => {
             }
         }
         else {
-            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ ERR:ONCHECKING");
         }
     };
 
     const handleNextPageStatusCHECKED = () => {
         const value = EmployeeNo;
+        console.log('employeeName', employeeName)
+        console.log('employeeNo', EmployeeNo)
         if (value && DataInArrayEmployee.includes(value?.toString() || "")) {
 
         }
@@ -394,7 +401,7 @@ const PageStatus = () => {
             }
         }
         else {
-            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ ERR:CHECKED");
 
         }
     };
@@ -452,7 +459,7 @@ const PageStatus = () => {
 
             }
         } else {
-            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ ERR:CANCELPRO");
 
         }
 
@@ -481,7 +488,7 @@ const PageStatus = () => {
 
             }
         } else {
-            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ");
+            alert("รหัสพนักงานไม่ตรงกับผู้ใช้ที่เข้าสู่ระบบ ERR:CLOSEPRO");
 
         }
 
@@ -491,7 +498,7 @@ const PageStatus = () => {
 
     //submit log state to check
     const submitLogToReflow120_9 = async (stage: "WAITING" | "ONCHECKING" | "CHECKED" | "CONTINUOUS" | "CLOSE" | "CANCEL") => {
-        if (!data120_2 || !submitStage) {
+        if (!data120_2 || !stage) {
             alert("Missing required fields to submit log");
             return;
         }
@@ -501,8 +508,8 @@ const PageStatus = () => {
                 R_Line: data120_2.ProcessLine,
                 R_Model: data120_2.productName,
                 productOrderNo: ProductOrderNo,
-                ST_Status: submitStage,
-                Log_User: stage,
+                ST_Status: stage,
+                Log_User: employeeUserName,
                 Log_UserID: EmployeeNo,
             };
 
@@ -552,7 +559,7 @@ const PageStatus = () => {
             const json = await res.json();
 
             if (!json.success || !json.images || json.images.length === 0) {
-                alert("ไม่พบข้อมูล Result PDF ");
+                alert("ไม่พบข้อมูล Result PDF โปรดลองใหม่ภายหลัง");
                 return false;
             }
             setresultpdfimg(json.images);
@@ -562,6 +569,20 @@ const PageStatus = () => {
             return false;
         }
     };
+
+    //animate checked
+    const [ischekced, setischecked] = useState(false);
+    useEffect(() => {
+        if (submitStage === 'CHECKED') {
+            setischecked(true); // เริ่มแสดง
+
+            const timer = setTimeout(() => {
+                setischecked(false); // ซ่อนหลัง 2 วินาที
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [submitStage]);
 
 
     return (
@@ -697,6 +718,35 @@ const PageStatus = () => {
                     </div>
                 )
             }
+            {submitStage === "CHECKED" && ischekced && (
+                <div className="fixed flex justify-center items-center w-screen h-screen z-50">
+                    <svg
+                        className="w-70 h-70"
+                        viewBox="0 0 56 56"
+                    >
+                        {/* วงกลม */}
+                        <circle
+                            className="check-circle "
+                            cx="26"
+                            cy="26"
+                            r="23"
+                            fill="none"
+                            stroke="#4ade80"
+                            strokeWidth="4"
+                        />
+                        {/* เครื่องหมายถูก */}
+                        <path
+                            className="check-mark"
+                            fill="none"
+                            stroke="#4ade80"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M14 27 L22 35 L38 19"
+                        />
+                    </svg>
+                </div>
+            )}
             {
                 submitStage === "CHECKED" && (
                     <div className="fixed flex flex-col justify-center items-center z-40 w-full h-[5%]">
@@ -758,6 +808,7 @@ const PageStatus = () => {
                                 ref={inputRef}
                                 type="password"
                                 autoComplete="off"
+                                value={EmployeeNo}
                                 onChange={handleChangeInputID}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="รหัสพนักงาน"
