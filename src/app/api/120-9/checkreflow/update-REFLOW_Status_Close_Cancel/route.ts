@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const result = await pool.request()
       .input('ST_Line', sql.NVarChar, ST_Line)
       .query(`
-        UPDATE REFLOW_TEST_Status
+        UPDATE REFLOW_Status
         SET ST_Model = NULL,
             ST_Prod = NULL,
             ST_Status = NULL,

@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       .input('ST_EmployeeID', sql.NVarChar, ST_EmployeeID?.trim() || '')
 
       .query(`
-          UPDATE REFLOW_TEST_Status
+          UPDATE REFLOW_Status
           SET ST_Model = @ST_Model,
               ST_Prod = @ST_Prod,
               ST_Status = @ST_Status,
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
           WHERE ST_Line = @ST_Line;
 
           SELECT ST_Status 
-          FROM REFLOW_TEST_Status 
+          FROM REFLOW_Status 
           WHERE ST_Line = @ST_Line;
       `);
 
