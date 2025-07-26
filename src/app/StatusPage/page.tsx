@@ -296,21 +296,8 @@ const PageStatus = () => {
     }, [data120_2]);
 
 
-    useEffect(() => {
-        const handleClickOutsubmitcard = (event: MouseEvent) => {
-            if (submitcardRef.current && !submitcardRef.current.contains(event.target as Node)) {
-                setSubmitcard(false);
-            }
-        };
-        if (submitcard) {
-            document.addEventListener("mousedown", handleClickOutsubmitcard);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutsubmitcard);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutsubmitcard);
-        };
-    }, [submitcard]);
+
+
 
 
     //allow employee
@@ -509,8 +496,8 @@ const PageStatus = () => {
                 R_Model: data120_2.productName,
                 productOrderNo: ProductOrderNo,
                 ST_Status: stage,
-                Log_User: employeeUserName,
-                Log_UserID: EmployeeNo,
+                Log_User: employeeUserName || null,
+                Log_UserID: EmployeeNo || null,
             };
 
             const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -583,6 +570,26 @@ const PageStatus = () => {
             return () => clearTimeout(timer);
         }
     }, [submitStage]);
+
+
+    //click out
+    useEffect(() => {
+        const handleClickOutsubmitcard = (event: MouseEvent) => {
+            if (submitcardRef.current && !submitcardRef.current.contains(event.target as Node)) {
+                setSubmitcard(false);
+                setCardCancelpro(false);
+                setCardClosepro(false);
+                setArrowDownButton(true);
+            }
+        };
+
+        if (submitcard || CardCancelpro || CardClosepro) {
+            document.addEventListener("mousedown", handleClickOutsubmitcard);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutsubmitcard);
+        };
+    }, [submitcard, CardCancelpro, CardClosepro]); // ✅ แยกเป็นสอง dependency
 
 
     return (
