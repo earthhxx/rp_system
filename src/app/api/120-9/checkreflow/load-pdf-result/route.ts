@@ -1,73 +1,73 @@
+//RESULTPDF
 import { NextRequest, NextResponse } from 'next/server';
 import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
-//https://localhost:3003/api/120-9/checkreflow/load-pdf-data2?R_Line=SMT-5&R_Model=NPVV067AA11MBO&productOrderNo=202504080022
-//https://localhost:3003/api/120-9/checkreflow/load-pdf-data2?R_Line=SMT-2&R_Model=15F5ST80600AO
-// Correct type for database record
-type Data = {
-  success: boolean;
-  data?: { R_PDF: string | null };
-  message?: string;
-};
+import fs from 'fs/promises';
+import path from 'path';
+import os from 'os';
+import crypto from 'crypto';
+import { convertWithBinary } from '@/lib/pdfPopplerWrapper'; // ฟังก์ชันที่ใช้ spawn ตัว pdftocairo.exe
+
+const pdftocairoPath = 'C:\\Tools\\poppler-24.08.0\\Library\\bin\\pdftocairo.exe';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    const model = searchParams.get('R_Model');
-    const line = searchParams.get('R_Line');
+    const model = searchParams.get('ST_Model');
+    const line = searchParams.get('ST_Line');
 
-
-    if (!model || !line ) {
-      return NextResponse.json(
-        { success: false, message: 'Missing R_Model or R_Line query parameter' },
-        { status: 400 }
-      );
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Fetching PDF for:', { model, line});
+    if (!model || !line) {
+      return NextResponse.json({ success: false, message: 'Missing params' }, { status: 400 });
     }
 
     const pool = await getDashboardConnection();
-
     const result = await pool.request()
       .input('R_Model', sql.NVarChar, model)
       .input('R_Line', sql.NVarChar, line)
       .query(`
-        SELECT TOP 1 PDF_Loc
+          SELECT TOP 1 PDF_Loc
         FROM REFLOW_Result
         WHERE Result_Line = @R_Line AND Result_Model = @R_Model
         ORDER BY CreateDate DESC
       `);
 
-    if (result.recordset.length === 0) {
-      return NextResponse.json(
-        { success: false, message: 'PDF not found for specified model and line' },
-        { status: 404 }
-      );
+    if (!result.recordset.length || !result.recordset[0].R_PDF) {
+      return NextResponse.json({ success: false, message: 'PDF not found' }, { status: 404 });
     }
 
-    const row = result.recordset[0];
+    const pdfBuffer = result.recordset[0].R_PDF;
+    
+    const tempDir = path.join(os.tmpdir(), `pdf-img-${crypto.randomUUID()}`);
+    await fs.mkdir(tempDir, { recursive: true });
 
-    let base64PDF: string | null = null;
-    if (row.PDF_Loc) {
-      if (Buffer.isBuffer(row.PDF_Loc)) {
-        base64PDF = row.PDF_Loc.toString('base64');
-      } else if (typeof row.PDF_Loc === 'string') {
-        base64PDF = row.PDF_Loc; // กรณีเก็บเป็น base64 string แล้ว
-      }
-    }
+    const fileName = `pdf_${crypto.randomUUID()}.pdf`;
+    const pdfPath = path.join(tempDir, fileName);
+    await fs.writeFile(pdfPath, pdfBuffer);
 
-    return NextResponse.json({
-      success: true,
-      data: { R_PDF2: base64PDF },
+    // เรียกฟังก์ชัน convertWithBinary ที่ใช้ spawn ตัว pdftocairo.exe
+    await convertWithBinary(pdfPath, {
+      format: 'png',
+      out_dir: tempDir,
+      out_prefix: 'page',
+      binary: pdftocairoPath,
     });
 
-  } catch (error) {
-    console.error('DB Query Error:', error);
-    return NextResponse.json(
-      { success: false, message: 'Internal Server Error' },
-      { status: 500 }
+    const files = await fs.readdir(tempDir);
+    const pngFiles = files.filter(f => f.endsWith('.png')).sort();
+
+    const imagesBase64 = await Promise.all(
+      pngFiles.map(async (fname) => {
+        const img = await fs.readFile(path.join(tempDir, fname));
+        return `data:image/png;base64,${img.toString('base64')}`;
+      })
     );
+
+    return NextResponse.json({ success: true, images: imagesBase64 });
+
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
   }
 }
+
+

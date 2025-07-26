@@ -96,8 +96,8 @@ const PageStatus = () => {
 
                 if (!json.success || !json.images || json.images.length === 0) {
                     alert("ไม่พบข้อมูล STANDARD PDF (รูปภาพ)");
-                    localStorage.removeItem("productOrderNo");
-                    window.dispatchEvent(new Event("productOrderNo:removed"));
+                    localStorage.removeItem("localProductOrderNo");
+                    window.dispatchEvent(new Event("localProductOrderNo:removed"));
                     router.push('/');
                     return false;
                 }
@@ -106,8 +106,8 @@ const PageStatus = () => {
                 return true;
             } catch (err) {
                 alert("ไม่พบข้อมูล STANDARD PDF (รูปภาพ)");
-                localStorage.removeItem("productOrderNo");
-                window.dispatchEvent(new Event("productOrderNo:removed"));
+                localStorage.removeItem("localProductOrderNo");
+                window.dispatchEvent(new Event("localProductOrderNo:removed"));
                 router.push('/');
                 return false;
             }
@@ -121,8 +121,8 @@ const PageStatus = () => {
 
                 if (!success || !data || data.length === 0) {
                     alert("ไม่พบข้อมูล REFLOW Status");
-                    localStorage.removeItem("productOrderNo");
-                    window.dispatchEvent(new Event("productOrderNo:removed"));
+                    localStorage.removeItem("localProductOrderNo");
+                    window.dispatchEvent(new Event("localProductOrderNo:removed"));
                     router.push('/');
                     return;
                 }
@@ -153,14 +153,14 @@ const PageStatus = () => {
                     await fetchPdfImages();
                 } else {
                     alert(`เลข productionOrderNo ไม่ตรง หรือ สถานะไม่ถูกต้อง หรือ มี pro ข้างอยู่แล้ว`);
-                    localStorage.removeItem("productOrderNo");
-                    window.dispatchEvent(new Event("productOrderNo:removed"));
+                    localStorage.removeItem("localProductOrderNo");
+                    window.dispatchEvent(new Event("localProductOrderNo:removed"));
                     router.push('/');
                 }
             } catch (err) {
                 alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
                 localStorage.removeItem("productOrderNo");
-                window.dispatchEvent(new Event("productOrderNo:removed"));
+                window.dispatchEvent(new Event("localProductOrderNo:removed"));
                 router.push('/');
             }
         };
@@ -239,9 +239,9 @@ const PageStatus = () => {
                                         <div className="flex flex-none"></div>
                                         <div
                                             onClick={() => {
-                                                // setArrowDownButtoncard(false);
-                                                // setArrowDownButton(true);
-                                                // handleOpenPdf();
+                                                setArrowDownButtoncard(false);
+                                                setArrowDownButton(true);
+                                                sethandleOpenResult((prev) => !prev);
                                             }}
                                             className="flex flex-col justify-center items-center font-kanit text-white cursor-pointer"
                                         >
@@ -343,7 +343,7 @@ const PageStatus = () => {
     //handle click submit state
     const handleNextPageStatusONCHECKING = () => {
         const value = inputRef.current?.value.trim();
-        if (!value || value.length !== 4) {
+        if (!value) {
             alert("กรุณากรอกรหัสให้ครบก่อนเข้าสู่หน้าถัดไป");
             return;
         }
@@ -538,6 +538,36 @@ const PageStatus = () => {
         }
     };
 
+    const [handleOpenResult, sethandleOpenResult] = useState(false);
+
+    useEffect(() => {
+        if (handleOpenResult) {
+            fetchPdfImagesResult();
+        }
+    }, [handleOpenResult === true]);
+
+    const [resultpdfimg, setresultpdfimg] = useState<string[]>([]);
+
+    const fetchPdfImagesResult = async (): Promise<boolean> => {
+        if (!data120_2) return false;
+
+        try {
+            const res = await fetch(`/api/120-9/checkreflow/load-pdf-result?ST_Line=${encodeURIComponent(data120_2?.ProcessLine)}&ST_Model=${encodeURIComponent(data120_2?.productName)}`);
+            const json = await res.json();
+
+            if (!json.success || !json.images || json.images.length === 0) {
+                alert("ไม่พบข้อมูล Result PDF ");
+                return false;
+            }
+            setresultpdfimg(json.images);
+            return true;
+        } catch (err) {
+            alert("ไม่สามารถหาข้อมูล Result PDF ERR:500");
+            return false;
+        }
+    };
+
+
     return (
         <div className="flex flex-col h-screen w-full bg-blue-100">
             <StatusReader onGetproductOrderNo={setProductOrderNo} />
@@ -555,9 +585,10 @@ const PageStatus = () => {
                     ))}
                 </div>
                 {/* แสดงรูปภาพ PNG ที่ได้จาก backend */}
+                {handleOpenResult && (
                 <div className="flex flex-col w-full h-full items-center p-4 space-y-4 overflow-auto max-h-[100vh]">
-                    {pdfImages.length === 0 && <p>กำลังโหลดภาพ...</p>}
-                    {pdfImages.map((src, idx) => (
+                    {resultpdfimg.length === 0 && <p className="flex justify-center items-center w-full h-full">โปรดรอ ผลการวัดโปรไฟล์...</p>}
+                    {resultpdfimg.map((src, idx) => (
                         <img
                             key={idx}
                             src={src}
@@ -566,351 +597,370 @@ const PageStatus = () => {
                         />
                     ))}
                 </div>
+                )}
             </div>
 
-            {arrowdownbutton && (
-                <div className="fixed mt-16 mr-4 z-49 flex w-full justify-end right-10">
-                    <div
-                        onClick={() => {
-                            setArrowDownButtoncard(true);
-                            setArrowDownButton(false);
-                        }}
-                        className="flex flex-none ">
-                        <MdKeyboardArrowDown
-                            className="size-12 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
+            {
+                arrowdownbutton && (
+                    <div className="fixed mt-16 mr-4 z-49 flex w-full justify-end right-10">
+                        <div
+                            onClick={() => {
+                                setArrowDownButtoncard(true);
+                                setArrowDownButton(false);
+                            }}
+                            className="flex flex-none ">
+                            <MdKeyboardArrowDown
+                                className="size-12 rounded-full bg-gray-800/70 backdrop-blur-md text-white" />
+                        </div>
                     </div>
-                </div>
-            )}
-            {arrowdownbuttoncard && (
-                arrowcard()
-            )}
+                )
+            }
+            {
+                arrowdownbuttoncard && (
+                    arrowcard()
+                )
+            }
 
-            {submitStage === "WAITING" && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
-                    <div className="flex w-full h-[30%] bg-yellow-400/50 mt-20">
-                        <div className="w-full">
-                            {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
-                        </div>
-                        <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-yellow-400/80">
-                            <div className="flex flex-col justify-center items-center w-86">
-                                <div className="flex flex-col justify-center items-center">
-                                    <div className="font-roboto font-bold text-[25px] mb-6">Waiting for Measurement</div>
-                                    <svg
-                                        className="size-24 animate-spin text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        />
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-                                        />
-                                    </svg>
-                                    <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์..</div>
+            {
+                submitStage === "WAITING" && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
+                        <div className="flex w-full h-[30%] bg-yellow-400/50 mt-20">
+                            <div className="w-full">
+                                {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
+                            </div>
+                            <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-yellow-400/80">
+                                <div className="flex flex-col justify-center items-center w-86">
+                                    <div className="flex flex-col justify-center items-center">
+                                        <div className="font-roboto font-bold text-[25px] mb-6">Waiting for Measurement</div>
+                                        <svg
+                                            className="size-24 animate-spin text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            />
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+                                            />
+                                        </svg>
+                                        <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..รอวัดโปรไฟล์..</div>
+                                    </div>
+                                    <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
                                 </div>
-                                <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {submitStage === "ONCHECKING" && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
-                    <div className="flex w-full h-[30%] bg-blue-400/50 mt-20">
-                        <div className="w-full">
-                            {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
-                        </div>
-                        <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-blue-400/80">
-                            <div className="flex flex-col justify-center items-center w-86">
-                                <div className="flex flex-col justify-center items-center">
-                                    <div className="font-roboto font-bold text-[27px] mb-6 uppercase">..Onchecking..</div>
-                                    <svg
-                                        className="size-24 animate-spin text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        />
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
-                                        />
-                                    </svg>
-                                    <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..กำลังวัดโปรไฟล์..</div>
+                )
+            }
+            {
+                submitStage === "ONCHECKING" && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45">
+                        <div className="flex w-full h-[30%] bg-blue-400/50 mt-20">
+                            <div className="w-full">
+                                {data120_2?.ProcessLine || "ไม่มีข้อมูล ProcessLine .2"}
+                            </div>
+                            <div onClick={() => { setSubmitcard(true); }} className="flex justify-center items-center w-[40%] bg-blue-400/80">
+                                <div className="flex flex-col justify-center items-center w-86">
+                                    <div className="flex flex-col justify-center items-center">
+                                        <div className="font-roboto font-bold text-[27px] mb-6 uppercase">..Onchecking..</div>
+                                        <svg
+                                            className="size-24 animate-spin text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            />
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"
+                                            />
+                                        </svg>
+                                        <div className="font-kanit ps-4 pe-4 font-bold text-[25px] mt-6">..กำลังวัดโปรไฟล์..</div>
+                                    </div>
+                                    <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
                                 </div>
-                                <div className="w-full text-[20px] text-black backdrop-blur-md rounded-xl"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {submitStage === "CHECKED" && (
-                <div className="fixed flex flex-col justify-center items-center z-40 w-full h-[5%]">
-                    {/* Header Box */}
-                    <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
-                        {/* Box1 */}
-                        <div className="flex flex-col max-h-full justify-center items-center">
-                            {/* Row2 */}
-                            <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
-                                <div className="font-roboto text-2xl text-white w-full font-bold">{data120_2?.productName}</div>
+                )
+            }
+            {
+                submitStage === "CHECKED" && (
+                    <div className="fixed flex flex-col justify-center items-center z-40 w-full h-[5%]">
+                        {/* Header Box */}
+                        <div className="flex h-full w-full bg-gradient-to-r from-blue-800 to-blue-700 backdrop-blur-lg drop-shadow-2xl items-center justify-center">
+                            {/* Box1 */}
+                            <div className="flex flex-col max-h-full justify-center items-center">
+                                {/* Row2 */}
+                                <div className="flex w-full text-xl text-center justify-center items-center pe-4 ps-4">
+                                    <div className="font-roboto text-2xl text-white w-full font-bold">{data120_2?.productName}</div>
+                                </div>
                             </div>
-                        </div>
-                        {/* Box2 */}
-                        <div className="flex h-full items-center justify-center">
-                            <button
-                                // onClick={() => setIsCardOpen(true)}
-                                type="button"
-                                className={`flex size-15 items-center px-4 py-2 transition-all duration-300 `}
-                            >
-                                <svg
-                                    className="w-20 h-20"
-                                    viewBox="0 0 56 56"
+                            {/* Box2 */}
+                            <div className="flex h-full items-center justify-center">
+                                <button
+                                    // onClick={() => setIsCardOpen(true)}
+                                    type="button"
+                                    className={`flex size-15 items-center px-4 py-2 transition-all duration-300 `}
                                 >
-                                    {/* วงกลม */}
-                                    <circle
-                                        className="check-circle "
-                                        cx="26"
-                                        cy="26"
-                                        r="23"
-                                        fill="none"
-                                        stroke="#4ade80"
-                                        strokeWidth="4"
-                                    />
-                                    {/* เครื่องหมายถูก */}
-                                    <path
-                                        className="check-mark"
-                                        fill="none"
-                                        stroke="#4ade80"
-                                        strokeWidth="4"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M14 27 L22 35 L38 19"
-                                    />
-                                </svg>
-                            </button>
+                                    <svg
+                                        className="w-20 h-20"
+                                        viewBox="0 0 56 56"
+                                    >
+                                        {/* วงกลม */}
+                                        <circle
+                                            className="check-circle "
+                                            cx="26"
+                                            cy="26"
+                                            r="23"
+                                            fill="none"
+                                            stroke="#4ade80"
+                                            strokeWidth="4"
+                                        />
+                                        {/* เครื่องหมายถูก */}
+                                        <path
+                                            className="check-mark"
+                                            fill="none"
+                                            stroke="#4ade80"
+                                            strokeWidth="4"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M14 27 L22 35 L38 19"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {submitcard && submitStage === 'WAITING' && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                        <input
-                            ref={inputRef}
-                            type="password"
-                            autoComplete="off"
-                            onChange={handleChangeInputID}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="รหัสพนักงาน"
-                        />
-                        <div className="flex flex-row w-full justify-center items-center">
-                            <div className="flex flex-col items-center">
-                                <div className="flex justify-center items-center  text-white">continuously or not?</div>
-                                <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
+                )
+            }
+            {
+                submitcard && submitStage === 'WAITING' && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                        <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col size-110 gap-4 xl:size-160 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                            <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                            <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                            <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                            <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                            <input
+                                ref={inputRef}
+                                type="password"
+                                autoComplete="off"
+                                onChange={handleChangeInputID}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="รหัสพนักงาน"
+                            />
+                            <div className="flex flex-row w-full justify-center items-center">
+                                <div className="flex flex-col items-center">
+                                    <div className="flex justify-center items-center  text-white">continuously or not?</div>
+                                    <div className="flex justify-center items-center  text-white">รันงานต่อเนื่องหรือไม่</div>
+                                </div>
+                                <div className="flex flex-none w-[5%]"></div>
+                                <button
+                                    onClick={() => {
+                                        togglepassmodelbutton();
+                                    }}
+                                    className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                                        }`}
+                                >
+                                    <pre className="text-[10px] xl:text-xl">
+                                        {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
+                                    </pre>
+                                </button>
                             </div>
-                            <div className="flex flex-none w-[5%]"></div>
-                            <button
-                                onClick={() => {
-                                    togglepassmodelbutton();
-                                }}
-                                className={`px-4 py-2 size-10 xl:size-20  rounded-full ${passmodelbutton ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
-                                    }`}
-                            >
-                                <pre className="text-[10px] xl:text-xl">
-                                    {passmodelbutton ? 'YES\nใช่' : 'NO\nไม่'}
-                                </pre>
-                            </button>
-                        </div>
 
-                        <div className="flex w-full h-full items-center">
-                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                                <div>SCAN</div>
-                                <div>สแกน</div>
+                            <div className="flex w-full h-full items-center">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                    <div>SCAN</div>
+                                    <div>สแกน</div>
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        if (passmodelbutton === true) {
+                                            if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+                                                handleNextPageStatusCHECKED();
+                                                clearinputref();
+                                            }
+                                            else {
+                                                alert('Model is not match lastest Model or user not allow')
+                                                clearinputref();
+                                            }
+                                        }
+                                        else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
+                                            handleNextPageStatusONCHECKING();
+                                            clearinputref();
+                                        }
+                                        else {
+                                            alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
+                                            clearinputref();
+                                        }
+                                    }}
+                                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <GoCheckCircle className="size-15 xl:size-30 " />
+                                    <div>
+                                        SUBMIT
+                                    </div>
+                                    <div>
+                                        ส่งข้อมูล
+                                    </div>
+                                </div>
                             </div>
-                            <div
-                                onClick={() => {
-                                    if (passmodelbutton === true) {
-                                        if (confirmmodel === true && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+                        </div>
+                    </div>
+                )
+            }
+            {
+                submitcard && submitStage === 'ONCHECKING' && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                        <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                            <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                            <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                            <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                            <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                autoComplete="off"
+                                onChange={handleChangeInputID}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="รหัสพนักงาน"
+                            />
+                            <div className="flex w-full h-full items-center">
+                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                        <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                        <div>SCAN</div>
+                                        <div>สแกน</div>
+                                    </div>
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        if (DataInArrayEmployee.includes(EmployeeNo)) {
                                             handleNextPageStatusCHECKED();
                                             clearinputref();
                                         }
                                         else {
-                                            alert('Model is not match lastest Model or user not allow')
+                                            alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
                                             clearinputref();
                                         }
-                                    }
-                                    else if (passmodelbutton === false && DataInArrayEmployee.includes(EmployeeNo)) {
-                                        handleNextPageStatusONCHECKING();
-                                        clearinputref();
-                                    }
-                                    else {
-                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
-                                        clearinputref();
-                                    }
-                                }}
-                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <GoCheckCircle className="size-15 xl:size-30 " />
-                                <div>
-                                    SUBMIT
-                                </div>
-                                <div>
-                                    ส่งข้อมูล
+                                    }}
+                                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <GoCheckCircle className="size-15 xl:size-30 " />
+                                    <div>
+                                        SUBMIT
+                                    </div>
+                                    <div>
+                                        ส่งข้อมูล
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {submitcard && submitStage === 'ONCHECKING' && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            autoComplete="off"
-                            onChange={handleChangeInputID}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="รหัสพนักงาน"
-                        />
-                        <div className="flex w-full h-full items-center">
-                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                )
+            }
+            {
+                CardClosepro && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                        <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                            <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                            <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                            <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                            <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                autoComplete="off"
+                                onChange={handleChangeInputID}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="รหัสพนักงาน"
+                            />
+                            <div className="flex w-full h-full items-center">
                                 <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                                    <div>SCAN</div>
-                                    <div>สแกน</div>
+                                    <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                        <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                        <div>SCAN</div>
+                                        <div>สแกน</div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div
-                                onClick={() => {
-                                    if (DataInArrayEmployee.includes(EmployeeNo)) {
-                                        handleNextPageStatusCHECKED();
-                                        clearinputref();
-                                    }
-                                    else {
-                                        alert('Please Check your ID and try again \n กรุณาเช็ค ID และลองใหม่อีกครั้ง')
-                                        clearinputref();
-                                    }
-                                }}
-                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <GoCheckCircle className="size-15 xl:size-30 " />
-                                <div>
-                                    SUBMIT
-                                </div>
-                                <div>
-                                    ส่งข้อมูล
+                                <div
+                                    onClick={() => {
+                                        handleNextPageStatusclosepro();
+                                    }}
+                                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <GoCheckCircle className="size-15 xl:size-30 " />
+                                    <div>
+                                        SUBMIT
+                                    </div>
+                                    <div>
+                                        ส่งข้อมูล
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {CardClosepro && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            autoComplete="off"
-                            onChange={handleChangeInputID}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="รหัสพนักงาน"
-                        />
-                        <div className="flex w-full h-full items-center">
-                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                )
+            }
+            {
+                CardCancelpro && (
+                    <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
+                        <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
+                            <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
+                            <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
+                            <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
+                            <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                autoComplete="off"
+                                onChange={handleChangeInputID}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="รหัสพนักงาน"
+                            />
+                            <div className="flex w-full h-full items-center">
                                 <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                                    <div>SCAN</div>
-                                    <div>สแกน</div>
+                                    <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                        <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
+                                        <div>SCAN</div>
+                                        <div>สแกน</div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div
-                                onClick={() => {
-                                    handleNextPageStatusclosepro();
-                                }}
-                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <GoCheckCircle className="size-15 xl:size-30 " />
-                                <div>
-                                    SUBMIT
-                                </div>
-                                <div>
-                                    ส่งข้อมูล
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {CardCancelpro && (
-                <div className="absolute flex flex-col w-screen h-screen justify-center items-center z-45 bg-black/20 backdrop-blur-sm">
-                    <div ref={submitcardRef} className="text-[14px] xl:text-xl transition-all duration-300 scale-100 opacity-100 flex flex-col gap-4 size-150 rounded-2xl bg-gray-800/70 backdrop-blur-md shadow-md justify-center items-center drop-shadow-2xl p-6">
-                        <div className="flex justify-center items-center w-full text-white">Please enter your Employee ID :</div>
-                        <div className="flex justify-center items-center w-full text-white">โปรดใส่รหัสพนักงานของคุณ : </div>
-                        <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
-                        <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            autoComplete="off"
-                            onChange={handleChangeInputID}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="รหัสพนักงาน"
-                        />
-                        <div className="flex w-full h-full items-center">
-                            <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <div className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                    <BsUpcScan className="size-15 xl:size-32 text-white"></BsUpcScan>
-                                    <div>SCAN</div>
-                                    <div>สแกน</div>
-                                </div>
-                            </div>
-                            <div
-                                onClick={() => {
-                                    handleNextPageStatusCancelpro();
-                                }}
-                                className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
-                                <GoCheckCircle className="size-15 xl:size-30 " />
-                                <div>
-                                    SUBMIT
-                                </div>
-                                <div>
-                                    ส่งข้อมูล
+                                <div
+                                    onClick={() => {
+                                        handleNextPageStatusCancelpro();
+                                    }}
+                                    className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
+                                    <GoCheckCircle className="size-15 xl:size-30 " />
+                                    <div>
+                                        SUBMIT
+                                    </div>
+                                    <div>
+                                        ส่งข้อมูล
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

@@ -1,3 +1,4 @@
+//STANDARDPDF
 import { NextRequest, NextResponse } from 'next/server';
 import { getDashboardConnection } from '@/lib/connection';
 import sql from 'mssql';
@@ -34,8 +35,9 @@ export async function GET(req: NextRequest) {
 
     const pdfBuffer = result.recordset[0].R_PDF;
 
-    const tempDir = path.join(os.tmpdir(), 'pdf-img');
+    const tempDir = path.join(os.tmpdir(), `pdf-img-${crypto.randomUUID()}`);
     await fs.mkdir(tempDir, { recursive: true });
+
 
     const fileName = `pdf_${crypto.randomUUID()}.pdf`;
     const pdfPath = path.join(tempDir, fileName);
