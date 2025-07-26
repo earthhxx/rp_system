@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
         // Query the database
         const result = await pool.request()
             .query(`
-          SELECT * FROM REFLOW_TEST_Status 
+          SELECT * FROM REFLOW_Status 
         `);
 
         const rows = result.recordset as ReflowRecordStatus[];
