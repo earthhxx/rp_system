@@ -26,7 +26,7 @@ export const getNewFCXTConnection = async () => {
     },
   }).connect();
 
-  console.log('✅ Connected to NewFCXT DB');
+  // console.log('✅ Connected to NewFCXT DB');
   return pool_NewFCXT;
 };
 
@@ -44,6 +44,6 @@ export const getDashboardConnection = async () => {
     },
   }).connect();
 
-  console.log('✅ Connected to DASHBOARD DB');
+  // console.log('✅ Connected to DASHBOARD DB');
   return pool_DASHBOARD;
 };

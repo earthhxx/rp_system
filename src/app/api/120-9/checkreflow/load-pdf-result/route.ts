@@ -15,8 +15,6 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const model = searchParams.get('ST_Model');
     const line = searchParams.get('ST_Line');
-    console.log(model,'model')
-    console.log(line,'line')
 
     if (!model || !line) {
       return NextResponse.json({ success: false, message: 'Missing params' }, { status: 400 });
