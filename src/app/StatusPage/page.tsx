@@ -269,7 +269,6 @@ const PageStatus = () => {
     const inputRef = useRef<HTMLInputElement>(null!);
 
     const togglepassmodelbutton = () => {
-        const modellocal = getJsonFromLocalStorage<string>('modellocal');
         const employeelocal = getJsonFromLocalStorage<string>('employeelocal');
         setEmployeeNo(employeelocal ? employeelocal.toString() : "");
         setpassmodelbutton(prev => !prev); // สลับสถานะ
@@ -362,16 +361,18 @@ const PageStatus = () => {
 
     const handleNextPageStatusCHECKED = () => {
         const value = EmployeeNo;
-        if (!value && DataInArrayEmployee.includes(confirmemployee?.toString() || "")) {
+        if (value && DataInArrayEmployee.includes(value?.toString() || "")) {
 
         }
-        else if (value) {
+        else if (value && !(DataInArrayEmployee.includes(value?.toString() || ""))) {
+            alert("กรุณากรอกหรือสแกนรหัสที่อณุญาติ");
+            return;
         }
         else {
             alert("กรุณากรอกหรือสแกนรหัสก่อนเข้าสู่หน้าถัดไป");
             return;
         }
-        if (EmployeeNo === employeeUserName) {
+        if (value === employeeUserName) {
             if (submitStage === "ONCHECKING") {
                 const newStage = "CHECKED";
                 setSubmitStage(newStage);
@@ -711,7 +712,6 @@ const PageStatus = () => {
                             {/* Box2 */}
                             <div className="flex h-full items-center justify-center">
                                 <button
-                                    // onClick={() => setIsCardOpen(true)}
                                     type="button"
                                     className={`flex size-15 items-center px-4 py-2 transition-all duration-300 `}
                                 >
