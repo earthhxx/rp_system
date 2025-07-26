@@ -446,8 +446,8 @@ const PageStatus = () => {
                 //await submitLogCloseprodToReflow120_9();
                 await updateReflowStatusCloseproCancelpro();
                 setCardCancelpro(false);
-                localStorage.removeItem("productOrderNo");
-                window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+                localStorage.removeItem("localProductOrderNo");
+                window.dispatchEvent(new Event("localProductOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
 
                 goToHome();
             } catch (err) {
@@ -475,8 +475,8 @@ const PageStatus = () => {
                 //await submitLogCloseprodToReflow120_9();
                 await updateReflowStatusCloseproCancelpro();
                 setCardClosepro(false);
-                localStorage.removeItem("productOrderNo");
-                window.dispatchEvent(new Event("productOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
+                localStorage.removeItem("localProductOrderNo");
+                window.dispatchEvent(new Event("localProductOrderNo:removed"));//แจ้ง component อื่นเพราะไม่ยิง STORAGE EVENT ใน layout
 
                 goToHome();
             } catch (err) {
