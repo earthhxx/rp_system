@@ -268,14 +268,33 @@ const PageStatus = () => {
     const submitcardRef = useRef<HTMLDivElement>(null!);
     const inputRef = useRef<HTMLInputElement>(null!);
 
+    //passmodelbutton
     const togglepassmodelbutton = () => {
-        setpassmodelbutton(prev => !prev);
-        const getemployee = getJsonFromLocalStorage<string>('employeelocal');
-        if (getemployee) {
-            setEmployeeNo(getemployee);
-            loadEmployeeData(getemployee);
-        }
+        setpassmodelbutton(prev => {
+            const next = !prev;
+
+            if (next) {
+                const getemployee = getJsonFromLocalStorage<string>('employeelocal');
+                if (getemployee) {
+                    setEmployeeNo(getemployee);
+                    loadEmployeeData(getemployee);
+                    if (inputRef.current) {
+                        inputRef.current.value = getemployee; // ✅ ใส่ค่าลง input
+                    }
+                }
+            } else {
+                setEmployeeName("");
+                setEmployeeNo("");
+                if (inputRef.current) {
+                    inputRef.current.value = ""; // ✅ ล้าง input
+                }
+            }
+
+            return next;
+        });
     };
+
+
     const [passmodelbutton, setpassmodelbutton] = useState(false);
     const [confirmmodel, setconfirmmodel] = useState(false);
     const [confirmemployee, setconfirmemployee] = useState<string | null>(null);
@@ -353,8 +372,6 @@ const PageStatus = () => {
 
     const handleNextPageStatusCHECKED = () => {
         const value = EmployeeNo;
-        console.log('employeeName', employeeName)
-        console.log('employeeNo', EmployeeNo)
         if (value && DataInArrayEmployee.includes(value?.toString() || "")) {
 
         }
@@ -522,11 +539,12 @@ const PageStatus = () => {
     };
 
     const clearinputref = () => {
-        // เคลียร์ inputRef และ state
+        setEmployeeNo("");
         if (inputRef.current) {
             inputRef.current.value = "";
         }
     };
+
 
     const [handleOpenResult, sethandleOpenResult] = useState(false);
 
@@ -812,10 +830,14 @@ const PageStatus = () => {
                             <div className="flex justify-center items-center w-full text-white">PLEASE CHECK YOUR ID ('ตรวจสอบข้อมูลของคุณ') = {employeeName || "ไม่มีข้อมูล"} </div>
                             <div id="qr-reader" style={{ width: "400px", height: "400px" }}></div>
                             <input
-                                ref={inputRef}
                                 type="password"
                                 autoComplete="off"
-                                onChange={handleChangeInputID}
+                                ref={inputRef}
+                                value={EmployeeNo}
+                                onChange={(e) => {
+                                    setEmployeeNo(e.target.value);
+                                    handleChangeInputID(e); // ถ้าอยากใช้ฟังก์ชันเดิมร่วมด้วย
+                                }}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="รหัสพนักงาน"
                             />
