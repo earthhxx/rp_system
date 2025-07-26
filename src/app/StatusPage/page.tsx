@@ -430,7 +430,7 @@ const PageStatus = () => {
     const [CardClosepro, setCardClosepro] = useState(false);
     //handle close pro || cancel pro
     const updateReflowStatusCloseproCancelpro = async () => {
-        const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status_Closeprod', {
+        const res = await fetch('/api/120-9/checkreflow/update-REFLOW_Status_Close_Cancel', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
