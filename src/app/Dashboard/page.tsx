@@ -140,7 +140,7 @@ const ActiveLinesDashboard: React.FC = () => {
         };
 
         fetchLines();
-        const interval = setInterval(fetchLines, 5000);
+        const interval = setInterval(fetchLines, 30000);
         return () => clearInterval(interval);
     }, []);
 
