@@ -501,7 +501,7 @@ const PageStatus = () => {
                 R_Model: data120_2.productName,
                 productOrderNo: ProductOrderNo,
                 ST_Status: stage,
-                Log_User: employeeUserName || null,
+                Log_User: employeeName || null,
                 Log_UserID: EmployeeNo || null,
             };
 
