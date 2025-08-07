@@ -502,7 +502,7 @@ const PageStatus = () => {
                 productOrderNo: ProductOrderNo,
                 ST_Status: stage,
                 Log_User: employeeName || null,
-                Log_UserID: EmployeeNo || null,
+                Log_UserID: employeeUserName || null,
             };
 
             const res = await fetch('/api/120-9/checkreflow/insert-REFLOW_log_with_username', {
@@ -798,7 +798,6 @@ const PageStatus = () => {
                                 ref={inputRef}
                                 value={EmployeeNo}
                                 onChange={(e) => {
-                                    setEmployeeNo(e.target.value);
                                     handleChangeInputID(e); // ถ้าอยากใช้ฟังก์ชันเดิมร่วมด้วย
                                 }}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg m-4 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
