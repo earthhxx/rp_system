@@ -116,7 +116,7 @@ const PageStatus = () => {
         // STAGE VALIDATION CHECK (เดิม)
         const fetchReflowStatus = async () => {
             try {
-                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}`);
+                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}&ST_PROD=${encodeURIComponent(data120_2.productOrderNo)}`);
                 const { data, success } = await res.json();
 
                 if (!success || !data || data.length === 0) {
