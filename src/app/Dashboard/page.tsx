@@ -206,43 +206,42 @@ const ActiveLinesDashboard: React.FC = () => {
 
 
 
+    const fetchLines = async () => {
+        try {
 
+            const response = await fetch("/api/120-9/dashboard/select_status");
+            if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+            const raw = await response.json();
+
+            const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
+                const stDatetime = item.ST_Datetime;
+                // console.log(stDatetime);
+                // แปลงจาก UTC+7 ไปเป็น UTC
+                const dateInUTC = new Date(new Date(stDatetime).getTime() - 7 * 60 * 60 * 1000);
+                const waitMinutes = Math.max(
+                    0,
+                    Math.floor((Date.now() - dateInUTC.getTime()) / 60000)
+                );
+
+
+
+                return {
+                    id: item.ST_Line,
+                    model: item.ST_Model || "",
+                    workOrder: item.ST_Prod || "",
+                    status: (item.ST_Status || "NULL") as LineStatus["status"],
+                    lastMeasured: item.ST_Datetime || "-",
+                    waitTime: waitMinutes,
+                    EmployeeID: item.ST_EmployeeID || "",
+                };
+            });
+            setLinesState(mappedData);
+        } catch (error) {
+            console.error("Error fetching lines:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchLines = async () => {
-            try {
-
-                const response = await fetch("/api/120-9/dashboard/select_status");
-                if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
-                const raw = await response.json();
-
-                const mappedData: LineStatus[] = raw.data.map((item: any, index: number) => {
-                    const stDatetime = item.ST_Datetime;
-                    // console.log(stDatetime);
-                    // แปลงจาก UTC+7 ไปเป็น UTC
-                    const dateInUTC = new Date(new Date(stDatetime).getTime() - 7 * 60 * 60 * 1000);
-                    const waitMinutes = Math.max(
-                        0,
-                        Math.floor((Date.now() - dateInUTC.getTime()) / 60000)
-                    );
-
-
-
-                    return {
-                        id: item.ST_Line,
-                        model: item.ST_Model || "",
-                        workOrder: item.ST_Prod || "",
-                        status: (item.ST_Status || "NULL") as LineStatus["status"],
-                        lastMeasured: item.ST_Datetime || "-",
-                        waitTime: waitMinutes,
-                        EmployeeID: item.ST_EmployeeID || "",
-                    };
-                });
-                setLinesState(mappedData);
-            } catch (error) {
-                console.error("Error fetching lines:", error);
-            }
-        };
 
         fetchLines();
         const interval = setInterval(fetchLines, 30000);
@@ -359,7 +358,9 @@ const ActiveLinesDashboard: React.FC = () => {
             setShowConfirm(false);
             setCardCancelpro(false);
             //ลบข้อมูลจาก localStorage
+            localStorage.removeItem("localProductOrderNo");
             window.dispatchEvent(new Event("localProductOrderNo:removed"));
+            fetchLines(); // รีเฟรชข้อมูลหลังจากลบ
         }
         else {
             alert("Please select a valid order and line, and ensure the employee ID matches.");
@@ -445,7 +446,7 @@ const ActiveLinesDashboard: React.FC = () => {
                                 <div
                                     onClick={() => {
                                         submitStage();
-                                        
+
                                     }}
                                     className="flex flex-col text-white justify-center items-center font-kanit w-1/2">
                                     <GoCheckCircle className="size-15 xl:size-30 " />
