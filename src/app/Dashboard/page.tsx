@@ -413,9 +413,9 @@ const ActiveLinesDashboard: React.FC = () => {
                             onClick={() => {
                                 setCardCancelpro(true);
                             }}
-                            className="p-2 bg-amber-300 text-gray-500 hover:text-gray-700 transition-colors"
+                            className="p-2 bg-amber-300 text-black hover:text-gray-700 transition-colors rounded-lg font-bold text-lg w-full mb-4"
                         >
-                            กูอยู่นี้
+                            กรณีต้องการยกเลิกการวัดผล โปรดคลิกที่นี่
                         </button>
                     </div>
                 </div>

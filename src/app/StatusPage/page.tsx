@@ -88,6 +88,7 @@ const PageStatus = () => {
     //fetch .9 และโหลดรูปภาพแทน PDF
     useEffect(() => {
         if (!data120_2) return;
+        console.log("Data120_2:", data120_2);
 
         const fetchPdfImages = async (): Promise<boolean> => {
             try {
@@ -116,7 +117,7 @@ const PageStatus = () => {
         // STAGE VALIDATION CHECK (เดิม)
         const fetchReflowStatus = async () => {
             try {
-                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}&ST_PROD=${encodeURIComponent(data120_2.productOrderNo)}`);
+                const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}&ST_Prod=${encodeURIComponent(data120_2.productOrderNo)}`);
                 const { data, success } = await res.json();
 
                 if (!success || !data || data.length === 0) {
