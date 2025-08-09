@@ -49,18 +49,22 @@ export async function GET(req: NextRequest) {
       // console.log('Rows fetched:', rows);
       return NextResponse.json({ success: true, data: rows });
     }
-    // 2. ตรวจสอบว่า ST_Line ที่รับมา ตรงกับ ST_Line ใน row ที่เจอมั้ย
-    const foundMatchingLine = prodRows.some(
+
+
+    const matchedRow = prodRows.find(
       (row) => row.ST_Line?.trim().toLowerCase() === line.trim().toLowerCase()
     );
 
+    // 2. ตรวจสอบว่า ST_Line ที่รับมา ตรงกับ ST_Line ใน row ที่เจอมั้ย
+    const foundMatchingLine = Boolean(matchedRow); // true ถ้าเจอ, false ถ้าไม่เจอ
 
-    // console.log('Found matching line?:', foundMatchingLine);
+    // console.log("foundMatchingLine:", foundMatchingLine);
+    // console.log("matchedRow:", matchedRow);
 
     if (!foundMatchingLine) {
-      console.warn('ST_Line does not match any line for the given ST_Prod');
+      // console.warn('ST_Line does not match any line for the given ST_Prod');
       return NextResponse.json(
-        { success: false, message: 'ST_Line does not match any line for the given ST_Prod' },
+        { success: false, message: `ST_Line does not match any line for the given ST_Prod : Productione Order ไม่ตรง เช็ค LINE = ${matchedRow}` },
         { status: 404 }
       );
     }

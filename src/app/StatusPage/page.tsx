@@ -118,13 +118,13 @@ const PageStatus = () => {
         const fetchReflowStatus = async () => {
             try {
                 const res = await fetch(`/api/120-9/checkreflow/select-REFLOW_Status?ST_Line=${encodeURIComponent(data120_2.ProcessLine)}&ST_Prod=${encodeURIComponent(data120_2.productOrderNo)}`);
-                const { data, success } = await res.json();
+                const { data, success, message } = await res.json();
 
-                if (!success || !data || data.length === 0) {
-                    alert("ไม่พบข้อมูล REFLOW Status");
+                if (!success || !data) {
+                    alert(message || "ไม่พบข้อมูล 404");
                     localStorage.removeItem("localProductOrderNo");
                     window.dispatchEvent(new Event("localProductOrderNo:removed"));
-                    router.push('/');
+                    router.push("/");
                     return;
                 }
 
