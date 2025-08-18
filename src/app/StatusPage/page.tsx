@@ -160,7 +160,7 @@ const PageStatus = () => {
                 }
             } catch (err) {
                 alert(`โหลด REFLOW Status ล้มเหลว: ${err}`);
-                localStorage.removeItem("productOrderNo");
+                localStorage.removeItem("localProductOrderNo");
                 window.dispatchEvent(new Event("localProductOrderNo:removed"));
                 router.push('/');
             }
