@@ -52,8 +52,10 @@ export async function GET(req: NextRequest) {
 
 
     const matchedRow = prodRows.find(
-      (row) => row.ST_Line?.trim().toLowerCase() === line.trim().toLowerCase()
+      (row) =>
+        row?.ST_Line?.toLowerCase().trim() === line?.toLowerCase().trim()
     );
+
 
     // 2. ตรวจสอบว่า ST_Line ที่รับมา ตรงกับ ST_Line ใน row ที่เจอมั้ย
     const foundMatchingLine = Boolean(matchedRow); // true ถ้าเจอ, false ถ้าไม่เจอ
@@ -63,8 +65,12 @@ export async function GET(req: NextRequest) {
 
     if (!foundMatchingLine) {
       // console.warn('ST_Line does not match any line for the given ST_Prod');
+      const expectedLines = prodRows.map((row) => row.ST_Line).join(', ');
       return NextResponse.json(
-        { success: false, message: `ST_Line does not match any line for the given ST_Prod : Productione Order ไม่ตรง เช็ค LINE = ${matchedRow}` },
+        {
+          success: false,
+          message: `LINE ที่ระบุมาไม่ตรงกับข้อมูลของ Production Order นี้ กรุณาตรวจสอบ LINE ที่ถูกต้อง: ${expectedLines}`
+        },
         { status: 404 }
       );
     }
